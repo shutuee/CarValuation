@@ -1,0 +1,540 @@
+:root {
+  color-scheme: light;
+  --bg: #eef2f5;
+  --surface: #ffffff;
+  --surface-soft: #f7f9fb;
+  --ink: #17212b;
+  --muted: #5c6875;
+  --line: #d7dee6;
+  --accent: #0f766e;
+  --accent-dark: #0b5f59;
+  --danger: #b42318;
+  --focus: #2563eb;
+  --shadow: 0 16px 50px rgba(21, 33, 48, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-size: 18px;
+  font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", Arial, sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, #dfe7ee 0, var(--bg) 38%, #f8fafc 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.app-shell {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.workspace {
+  background: var(--surface);
+  min-height: 100vh;
+}
+
+.entry-panel,
+.list-tools {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--line);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(130px, 1fr));
+  gap: 16px;
+}
+
+label {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+label span {
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #c7d0da;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  padding: 9px 11px;
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.wide {
+  grid-column: span 2;
+}
+
+.full-row {
+  grid-column: 1 / -1;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+button {
+  min-height: 42px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  padding: 0 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--accent-dark);
+}
+
+button.secondary {
+  border-color: #bfccd8;
+  background: #fff;
+  color: var(--ink);
+}
+
+button.secondary:hover {
+  background: #f1f5f9;
+}
+
+button.danger {
+  border-color: #f3c5c0;
+  background: #fff;
+  color: var(--danger);
+}
+
+button.danger:hover {
+  background: #fff1f0;
+}
+
+button.purchase {
+  border-color: #bbd7c6;
+  background: #fff;
+  color: #17603a;
+}
+
+button.purchase:hover {
+  background: #ecfdf3;
+}
+
+.list-tools {
+  background: var(--surface-soft);
+}
+
+.search-box {
+  max-width: 520px;
+}
+
+.records-section {
+  border-bottom: 1px solid var(--line);
+  padding: 24px 0 6px;
+}
+
+.records-section:last-child {
+  border-bottom: 0;
+}
+
+.section-title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 28px 14px;
+}
+
+.section-title h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.section-title span {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.date-filter {
+  display: grid;
+  grid-template-columns: minmax(220px, 260px) minmax(220px, 260px);
+  align-items: end;
+  justify-content: end;
+  gap: 10px;
+}
+
+.date-filter label {
+  width: auto;
+  min-width: 0;
+}
+
+.date-filter button {
+  min-height: 42px;
+  white-space: nowrap;
+  justify-self: start;
+}
+
+#clearPurchasedDateFilter {
+  grid-column: 1;
+}
+
+#printPurchasedButton {
+  grid-column: 2;
+}
+
+.table-wrap {
+  position: relative;
+  overflow-x: auto;
+  padding: 0 28px 24px;
+}
+
+table {
+  width: 100%;
+  min-width: 2060px;
+  border-collapse: collapse;
+  border: 1px solid var(--line);
+}
+
+th,
+td {
+  border: 1px solid var(--line);
+  padding: 13px 10px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 18px;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f8fafc;
+  color: #42505d;
+  font-size: 17px;
+}
+
+td {
+  color: #243140;
+}
+
+tr.is-purchased td {
+  background: #f0fdf4;
+  color: #17603a;
+}
+
+tbody tr:nth-child(odd) td {
+  background: #ffffff;
+}
+
+tbody tr:nth-child(even) td {
+  background: #f3f6f9;
+}
+
+.purchased-section tbody tr:nth-child(odd) td {
+  background: #f2fbf5;
+  color: #17603a;
+}
+
+.purchased-section tbody tr:nth-child(even) td {
+  background: #e5f5eb;
+  color: #17603a;
+}
+
+tbody tr td {
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+tbody tr:hover td,
+.purchased-section tbody tr:hover td {
+  background: #dceeff;
+  color: #17324d;
+}
+
+tbody tr:hover td:hover,
+.purchased-section tbody tr:hover td:hover {
+  background: #bcdcff;
+}
+
+tr.is-purchased button.purchase {
+  background: #17603a;
+  border-color: #17603a;
+  color: #fff;
+}
+
+tr.is-purchased button.purchase:hover {
+  background: #12502f;
+}
+
+.note-cell {
+  max-width: 220px;
+  white-space: pre-wrap;
+}
+
+.wide-cell {
+  min-width: 260px;
+  max-width: 360px;
+  white-space: pre-wrap;
+}
+
+.number-cell {
+  text-align: left;
+  white-space: nowrap;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 210px;
+}
+
+.row-actions button {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 17px;
+}
+
+.empty-state {
+  display: none;
+  place-items: center;
+  gap: 6px;
+  min-height: 130px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.empty-state strong {
+  color: var(--ink);
+  font-size: 22px;
+}
+
+.empty-state.is-visible {
+  display: grid;
+}
+
+.is-hidden {
+  display: none;
+}
+
+.buy-dialog {
+  width: min(440px, calc(100% - 32px));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.26);
+  padding: 0;
+}
+
+.buy-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.36);
+}
+
+.buy-dialog form {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+}
+
+.buy-dialog h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 1400px) {
+  .form-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1366px) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .section-title {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .date-filter {
+    justify-content: flex-start;
+  }
+
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wide {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 1200px) {
+  .purchased-section .section-title {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .purchased-section .date-filter {
+    justify-content: start;
+  }
+}
+
+@media (max-width: 620px) {
+  .app-shell {
+    width: 100%;
+    padding: 0;
+  }
+
+  .workspace {
+    min-height: 100vh;
+    border: 0;
+  }
+
+  .entry-panel,
+  .list-tools,
+  .section-title,
+  .table-wrap {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wide {
+    grid-column: auto;
+  }
+
+  .full-row {
+    grid-column: auto;
+  }
+
+  .form-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .date-filter {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .date-filter label {
+    width: auto;
+  }
+
+  #clearPurchasedDateFilter,
+  #printPurchasedButton {
+    grid-column: auto;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .app-shell {
+    width: 100%;
+    padding: 0;
+  }
+
+  .workspace {
+    border: 0;
+    box-shadow: none;
+    min-height: auto;
+  }
+
+  .entry-panel,
+  .list-tools,
+  .records-section:not(.purchased-section),
+  .date-filter,
+  .row-actions,
+  .empty-state {
+    display: none !important;
+  }
+
+  .purchased-section {
+    padding: 0;
+    border: 0;
+  }
+
+  .section-title,
+  .table-wrap {
+    padding: 0;
+  }
+
+  .section-title {
+    margin-bottom: 12px;
+  }
+
+  .table-wrap {
+    overflow: visible;
+  }
+
+  table {
+    min-width: 0;
+    width: 100%;
+    font-size: 10px;
+  }
+
+  th,
+  td {
+    padding: 5px 4px;
+    font-size: 10px;
+  }
+
+  th {
+    position: static;
+  }
+
+  .purchased-section th:last-child,
+  .purchased-section td:last-child {
+    display: none;
+  }
+}

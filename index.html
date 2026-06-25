@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CarValuation</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace">
+
+        <section class="entry-panel" aria-label="車輛估價表單">
+          <form id="valuationForm" autocomplete="off">
+            <input type="hidden" id="recordId" />
+            <div class="form-grid">
+              <label class="full-row">
+                <span>進件日</span>
+                <input id="receivedDate" type="date" />
+              </label>
+              <label>
+                <span>來源</span>
+                <select id="sourceType">
+                  <option value="">請選擇</option>
+                  <option value="來店">來店</option>
+                  <option value="估價網站">估價網站</option>
+                  <option value="自買">自買</option>
+                  <option value="自行輸入">自行輸入</option>
+                </select>
+              </label>
+              <label class="is-hidden" id="sourceCustomWrap">
+                <span>自行輸入來源</span>
+                <input id="sourceCustom" type="text" placeholder="請輸入來源" />
+              </label>
+              <label>
+                <span>年份</span>
+                <input id="year" type="text" placeholder="例如：2021 或 19/12" />
+              </label>
+              <label>
+                <span>車型</span>
+                <input id="model" type="text" placeholder="例如：VIOS" required />
+              </label>
+              <label>
+                <span>里程數</span>
+                <input id="km" type="number" min="0" step="0.1" placeholder="例如：5.8" />
+              </label>
+              <label>
+                <span>CC數</span>
+                <input id="cc" type="number" min="0" step="0.1" placeholder="例如：1.8" />
+              </label>
+              <label>
+                <span>車況</span>
+                <select id="condition">
+                  <option value="">請選擇</option>
+                  <option>A</option>
+                  <option>B</option>
+                  <option>C</option>
+                  <option>D</option>
+                </select>
+              </label>
+              <label>
+                <span>顏色</span>
+                <input id="color" type="text" placeholder="例如：銀" />
+              </label>
+              <label>
+                <span>版本</span>
+                <input id="version" type="text" placeholder="例如：經典版" />
+              </label>
+              <label>
+                <span>權威</span>
+                <input id="authority" type="text" placeholder="例如：93" />
+              </label>
+              <label>
+                <span>報價</span>
+                <select id="quote">
+                  <option value="">請選擇</option>
+                  <option>Y</option>
+                  <option>N</option>
+                </select>
+              </label>
+              <label>
+                <span>收購價錢</span>
+                <input id="purchasePrice" type="text" placeholder="例如：90內" />
+              </label>
+              <label>
+                <span>實際成交價</span>
+                <input id="actualDealPrice" type="text" placeholder="例如：87.7" />
+              </label>
+              <label>
+                <span>賣出價</span>
+                <input id="salePrice" type="text" placeholder="例如：96" />
+              </label>
+              <label>
+                <span>詢問</span>
+                <input id="inquiry" type="text" placeholder="例如：M、A、B" />
+              </label>
+              <label>
+                <span>備注</span>
+                <input id="remarks" type="text" placeholder="例如：半稅買進" />
+              </label>
+              <label class="wide">
+                <span>整理項目</span>
+                <textarea id="repairItems" rows="3" placeholder="例如：換右前葉、烤漆、補修等"></textarea>
+              </label>
+              <label>
+                <span>賣家</span>
+                <input id="seller" type="text" placeholder="例如：台南洪先生" />
+              </label>
+              <label>
+                <span>聯絡方式</span>
+                <input id="contact" type="text" placeholder="例如：0912-345-678" />
+              </label>
+              <label>
+                <span>獎金</span>
+                <input id="bonus" type="text" />
+              </label>
+            </div>
+            <div class="form-actions">
+              <button class="secondary" type="button" id="resetButton">清除</button>
+              <button type="submit" id="submitButton">新增資料</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="list-tools" aria-label="資料工具列">
+          <label class="search-box">
+            <span>搜尋</span>
+            <input id="searchInput" type="search" placeholder="搜尋來源、車型、車況、賣家、聯絡方式、備注或整理項目" />
+          </label>
+        </section>
+
+        <section class="records-section" aria-labelledby="ongoingTitle">
+          <header class="section-title">
+            <h2 id="ongoingTitle">估價進行中</h2>
+            <span id="ongoingCount">0 筆</span>
+          </header>
+          <div class="table-wrap" aria-label="估價進行中清單">
+            <table>
+              <thead>
+                <tr>
+                  <th>來源</th>
+                  <th>進件日</th>
+                  <th>年份</th>
+                  <th>車型</th>
+                  <th>里程數</th>
+                  <th>CC數</th>
+                  <th>車況</th>
+                  <th>顏色</th>
+                  <th>版本</th>
+                  <th>權威</th>
+                  <th>報價</th>
+                  <th>收購價錢</th>
+                  <th>實際成交價</th>
+                  <th>賣出價</th>
+                  <th>詢問</th>
+                  <th>備注</th>
+                  <th>整理項目</th>
+                  <th>賣家</th>
+                  <th>聯絡方式</th>
+                  <th>獎金</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="ongoingBody"></tbody>
+            </table>
+            <div class="empty-state" id="ongoingEmpty">
+              <strong>沒有進行中的估價資料</strong>
+              <span>新增資料後會先顯示在這裡。</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="records-section purchased-section" aria-labelledby="purchasedTitle">
+          <header class="section-title">
+            <div>
+              <h2 id="purchasedTitle">已買入</h2>
+              <span id="purchasedCount">0 筆</span>
+            </div>
+            <div class="date-filter">
+              <label>
+                <span>起始買進日</span>
+                <input id="purchasedDateFrom" type="date" />
+              </label>
+              <label>
+                <span>結束買進日</span>
+                <input id="purchasedDateTo" type="date" />
+              </label>
+              <button class="secondary" type="button" id="clearPurchasedDateFilter">清除</button>
+              <button type="button" id="printPurchasedButton">列印</button>
+            </div>
+          </header>
+          <div class="table-wrap" aria-label="已買入清單">
+            <table>
+              <thead>
+                <tr>
+                  <th>來源</th>
+                  <th>進件日</th>
+                  <th>買進日</th>
+                  <th>年份</th>
+                  <th>車型</th>
+                  <th>里程數</th>
+                  <th>CC數</th>
+                  <th>車況</th>
+                  <th>顏色</th>
+                  <th>版本</th>
+                  <th>權威</th>
+                  <th>報價</th>
+                  <th>收購價錢</th>
+                  <th>實際成交價</th>
+                  <th>賣出價</th>
+                  <th>詢問</th>
+                  <th>備注</th>
+                  <th>整理項目</th>
+                  <th>賣家</th>
+                  <th>聯絡方式</th>
+                  <th>獎金</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="purchasedBody"></tbody>
+            </table>
+            <div class="empty-state" id="purchasedEmpty">
+              <strong>尚無已買入資料</strong>
+              <span>在進行中清單按下已買入後會移到這裡。</span>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <dialog class="buy-dialog" id="buyDialog">
+      <form id="buyForm" method="dialog">
+        <h2>已買入資料</h2>
+        <input type="hidden" id="buyRecordId" />
+        <label>
+          <span>買進日</span>
+          <input id="buyDate" type="date" required />
+        </label>
+        <label>
+          <span>實際成交價</span>
+          <input id="buyActualDealPrice" type="text" placeholder="例如：87.7" required />
+        </label>
+        <div class="dialog-actions">
+          <button class="secondary" type="button" id="cancelBuyButton">取消</button>
+          <button type="submit">確認買入</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
