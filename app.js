@@ -1,7 +1,7 @@
 const STORAGE_KEY = "carvaluation.records.v1";
 const API_URL = "https://script.google.com/macros/s/AKfycbx83aRvR1MpZwqlTKKHyfej-aSJOrIPUI4aRlvX7Qy81Owz-9VxjYjCL3pRKzewkQu6/exec";
 const CUSTOM_SOURCE = "自行輸入";
-const FIXED_SOURCES = ["來店", "估價網站", "自買"];
+const FIXED_SOURCES = ["來店", "網站", "自買"];
 
 const fieldNames = [
   "sourceType",
@@ -100,8 +100,9 @@ function cleanSheetText(value) {
 
 function normalizeRecord(record) {
   const rawSource = cleanSheetText(record.source || "");
-  const sourceType = record.sourceType || (FIXED_SOURCES.includes(rawSource) ? rawSource : rawSource ? CUSTOM_SOURCE : "");
-  const sourceCustom = cleanSheetText(record.sourceCustom || (sourceType === CUSTOM_SOURCE ? rawSource : ""));
+  const normalizedSource = rawSource === "估價網站" ? "網站" : rawSource;
+  const sourceType = record.sourceType || (FIXED_SOURCES.includes(normalizedSource) ? normalizedSource : normalizedSource ? CUSTOM_SOURCE : "");
+  const sourceCustom = cleanSheetText(record.sourceCustom || (sourceType === CUSTOM_SOURCE ? normalizedSource : ""));
 
   return {
     id: cleanSheetText(record.id) || createId(),
