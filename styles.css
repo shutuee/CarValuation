@@ -52,7 +52,7 @@ textarea {
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(130px, 1fr));
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
   gap: 16px;
 }
 
@@ -60,6 +60,10 @@ label {
   display: grid;
   gap: 7px;
   min-width: 0;
+}
+
+#receivedDateWrap {
+  cursor: pointer;
 }
 
 label span {
@@ -382,12 +386,6 @@ tr.is-purchased button.purchase:hover {
 }
 
 @media (max-width: 1400px) {
-  .form-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 1366px) {
   .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
