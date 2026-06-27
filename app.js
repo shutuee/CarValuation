@@ -10,20 +10,17 @@ const fieldNames = [
   "year",
   "model",
   "km",
-  "cc",
-  "condition",
   "color",
+  "condition",
   "version",
   "authority",
   "quote",
   "purchasePrice",
   "actualDealPrice",
   "salePrice",
-  "inquiry",
   "remarks",
   "repairItems",
   "seller",
-  "contact",
   "bonus",
 ];
 
@@ -35,20 +32,17 @@ const sheetHeaders = [
   "year",
   "model",
   "km",
-  "CC",
-  "condition",
   "color",
+  "condition",
   "version",
   "authority",
   "quote",
   "purchasePrice",
   "actualDealPrice",
   "salePrice",
-  "inquiry",
   "remarks",
   "repairItems",
   "seller",
-  "contact",
   "bonus",
   "isPurchased",
   "createdAt",
@@ -63,6 +57,7 @@ const submitButton = document.querySelector("#submitButton");
 const resetButton = document.querySelector("#resetButton");
 const searchInput = document.querySelector("#searchInput");
 const sourceCustomWrap = document.querySelector("#sourceCustomWrap");
+const receivedDateWrap = document.querySelector("#receivedDateWrap");
 const ongoingBody = document.querySelector("#ongoingBody");
 const purchasedBody = document.querySelector("#purchasedBody");
 const ongoingEmpty = document.querySelector("#ongoingEmpty");
@@ -115,20 +110,17 @@ function normalizeRecord(record) {
     year: cleanSheetText(record.year),
     model: cleanSheetText(record.model),
     km: normalizeKm(cleanSheetText(record.km || record.mileage || "")),
-    cc: cleanSheetText(record.cc || record.CC || ""),
-    condition: cleanSheetText(record.condition),
     color: cleanSheetText(record.color),
+    condition: cleanSheetText(record.condition),
     version: cleanSheetText(record.version),
     authority: cleanSheetText(record.authority),
     quote: cleanSheetText(record.quote),
     purchasePrice: cleanSheetText(record.purchasePrice),
     actualDealPrice: cleanSheetText(record.actualDealPrice),
     salePrice: cleanSheetText(record.salePrice),
-    inquiry: cleanSheetText(record.inquiry),
     remarks: cleanSheetText(record.remarks || record.notes || ""),
     repairItems: cleanSheetText(record.repairItems),
     seller: cleanSheetText(record.seller || record.location || [record.sellerName, record.sellerPhone].filter(Boolean).join(" ")),
-    contact: cleanSheetText(record.contact || record.sellerPhone || ""),
     bonus: cleanSheetText(record.bonus),
     isPurchased: normalizeBoolean(record.isPurchased),
     createdAt: record.createdAt || new Date().toISOString(),
@@ -210,7 +202,6 @@ function toSheetRecord(record) {
   const sheetRecord = {
     ...normalized,
     source: getSourceLabel(normalized),
-    CC: normalized.cc,
     isPurchased: normalized.isPurchased ? "TRUE" : "FALSE",
   };
 
@@ -306,7 +297,6 @@ function getFormData() {
   }
 
   data.km = normalizeKm(data.km);
-  data.cc = asSheetText(data.cc);
   return data;
 }
 
@@ -380,20 +370,17 @@ function appendCommonCells(row, record) {
     createCell(record.year),
     createCell(record.model),
     createCell(record.km, "number-cell"),
-    createCell(record.cc),
-    createCell(record.condition),
     createCell(record.color),
+    createCell(record.condition),
     createCell(record.version),
     createCell(record.authority),
     createCell(record.quote),
     createCell(record.purchasePrice),
     createCell(record.actualDealPrice),
     createCell(record.salePrice),
-    createCell(record.inquiry),
     createCell(record.remarks, "note-cell"),
     createCell(record.repairItems, "wide-cell"),
     createCell(record.seller),
-    createCell(record.contact),
     createCell(record.bonus),
   );
 }
@@ -515,6 +502,15 @@ clearPurchasedDateFilter.addEventListener("click", () => {
 });
 printPurchasedButton.addEventListener("click", () => {
   window.print();
+});
+
+receivedDateWrap?.addEventListener("click", (event) => {
+  if (event.target === fields.receivedDate) return;
+  if (typeof fields.receivedDate.showPicker === "function") {
+    fields.receivedDate.showPicker();
+  } else {
+    fields.receivedDate.focus();
+  }
 });
 
 document.addEventListener("click", async (event) => {
