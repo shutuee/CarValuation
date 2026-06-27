@@ -14,7 +14,7 @@
           <form id="valuationForm" autocomplete="off">
             <input type="hidden" id="recordId" />
             <div class="form-grid">
-              <label class="full-row">
+              <label class="full-row" id="receivedDateWrap">
                 <span>進件日</span>
                 <input id="receivedDate" type="date" />
               </label>
@@ -30,19 +30,23 @@
               </label>
               <label class="is-hidden" id="sourceCustomWrap">
                 <span>自行輸入來源</span>
-                <input id="sourceCustom" type="text" placeholder="請輸入來源" />
+                <input id="sourceCustom" type="text" />
               </label>
               <label>
                 <span>年份</span>
-                <input id="year" type="text" placeholder="例如：2021 或 19/12" />
+                <input id="year" type="text" />
               </label>
               <label>
                 <span>車型</span>
-                <input id="model" type="text" placeholder="例如：VIOS" required />
+                <input id="model" type="text" required />
               </label>
               <label>
-                <span>里程數</span>
-                <input id="km" type="number" min="0" step="0.1" placeholder="例如：5.8" />
+                <span>里程</span>
+                <input id="km" type="number" min="0" step="0.1" />
+              </label>
+              <label>
+                <span>顏色</span>
+                <input id="color" type="text" />
               </label>
               <label>
                 <span>車況</span>
@@ -55,16 +59,12 @@
                 </select>
               </label>
               <label>
-                <span>顏色</span>
-                <input id="color" type="text" placeholder="例如：銀" />
-              </label>
-              <label>
                 <span>版本</span>
-                <input id="version" type="text" placeholder="例如：經典版" />
+                <input id="version" type="text" />
               </label>
               <label>
                 <span>權威</span>
-                <input id="authority" type="text" placeholder="例如：93" />
+                <input id="authority" type="text" />
               </label>
               <label>
                 <span>報價</span>
@@ -76,27 +76,27 @@
               </label>
               <label>
                 <span>報價</span>
-                <input id="purchasePrice" type="text" placeholder="例如：90內" />
+                <input id="purchasePrice" type="text" />
               </label>
               <label>
-                <span>實際成交價</span>
-                <input id="actualDealPrice" type="text" placeholder="例如：87.7" />
+                <span>買進價</span>
+                <input id="actualDealPrice" type="text" required />
               </label>
               <label>
                 <span>賣出價</span>
-                <input id="salePrice" type="text" placeholder="例如：96" />
+                <input id="salePrice" type="text" />
               </label>
               <label>
                 <span>備註</span>
-                <input id="remarks" type="text" placeholder="例如：半稅買進" />
+                <input id="remarks" type="text" />
               </label>
               <label class="wide">
                 <span>整理項目</span>
-                <textarea id="repairItems" rows="3" placeholder="例如：換右前葉、烤漆、補修等"></textarea>
+                <textarea id="repairItems" rows="3"></textarea>
               </label>
               <label>
                 <span>賣家</span>
-                <input id="seller" type="text" placeholder="例如：台南洪先生" />
+                <input id="seller" type="text" />
               </label>
               <label>
                 <span>獎金</span>
@@ -130,14 +130,14 @@
                   <th>進件日</th>
                   <th>年份</th>
                   <th>車型</th>
-                  <th>里程數</th>
-                  <th>車況</th>
+                  <th>里程</th>
                   <th>顏色</th>
+                  <th>車況</th>
                   <th>版本</th>
                   <th>權威</th>
                   <th>報價</th>
                   <th>報價</th>
-                  <th>實際成交價</th>
+                  <th>買進價</th>
                   <th>賣出價</th>
                   <th>備註</th>
                   <th>整理項目</th>
@@ -183,14 +183,14 @@
                   <th>買進日</th>
                   <th>年份</th>
                   <th>車型</th>
-                  <th>里程數</th>
-                  <th>車況</th>
+                  <th>里程</th>
                   <th>顏色</th>
+                  <th>車況</th>
                   <th>版本</th>
                   <th>權威</th>
                   <th>報價</th>
                   <th>報價</th>
-                  <th>實際成交價</th>
+                  <th>買進價</th>
                   <th>賣出價</th>
                   <th>備註</th>
                   <th>整理項目</th>
@@ -219,8 +219,8 @@
           <input id="buyDate" type="date" required />
         </label>
         <label>
-          <span>實際成交價</span>
-          <input id="buyActualDealPrice" type="text" placeholder="例如：87.7" required />
+          <span>買進價</span>
+          <input id="buyActualDealPrice" type="text" required />
         </label>
         <div class="dialog-actions">
           <button class="secondary" type="button" id="cancelBuyButton">取消</button>
