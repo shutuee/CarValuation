@@ -10,7 +10,6 @@ const fieldNames = [
   "year",
   "model",
   "km",
-  "cc",
   "condition",
   "color",
   "version",
@@ -22,7 +21,6 @@ const fieldNames = [
   "remarks",
   "repairItems",
   "seller",
-  "contact",
   "bonus",
 ];
 
@@ -34,7 +32,6 @@ const sheetHeaders = [
   "year",
   "model",
   "km",
-  "CC",
   "condition",
   "color",
   "version",
@@ -46,7 +43,6 @@ const sheetHeaders = [
   "remarks",
   "repairItems",
   "seller",
-  "contact",
   "bonus",
   "isPurchased",
   "createdAt",
@@ -113,7 +109,6 @@ function normalizeRecord(record) {
     year: cleanSheetText(record.year),
     model: cleanSheetText(record.model),
     km: normalizeKm(cleanSheetText(record.km || record.mileage || "")),
-    cc: cleanSheetText(record.cc || record.CC || ""),
     condition: cleanSheetText(record.condition),
     color: cleanSheetText(record.color),
     version: cleanSheetText(record.version),
@@ -125,7 +120,6 @@ function normalizeRecord(record) {
     remarks: cleanSheetText(record.remarks || record.notes || ""),
     repairItems: cleanSheetText(record.repairItems),
     seller: cleanSheetText(record.seller || record.location || [record.sellerName, record.sellerPhone].filter(Boolean).join(" ")),
-    contact: cleanSheetText(record.contact || record.sellerPhone || ""),
     bonus: cleanSheetText(record.bonus),
     isPurchased: normalizeBoolean(record.isPurchased),
     createdAt: record.createdAt || new Date().toISOString(),
@@ -207,7 +201,6 @@ function toSheetRecord(record) {
   const sheetRecord = {
     ...normalized,
     source: getSourceLabel(normalized),
-    CC: normalized.cc,
     isPurchased: normalized.isPurchased ? "TRUE" : "FALSE",
   };
 
@@ -303,7 +296,6 @@ function getFormData() {
   }
 
   data.km = normalizeKm(data.km);
-  data.cc = asSheetText(data.cc);
   return data;
 }
 
@@ -377,7 +369,6 @@ function appendCommonCells(row, record) {
     createCell(record.year),
     createCell(record.model),
     createCell(record.km, "number-cell"),
-    createCell(record.cc),
     createCell(record.condition),
     createCell(record.color),
     createCell(record.version),
@@ -389,7 +380,6 @@ function appendCommonCells(row, record) {
     createCell(record.remarks, "note-cell"),
     createCell(record.repairItems, "wide-cell"),
     createCell(record.seller),
-    createCell(record.contact),
     createCell(record.bonus),
   );
 }
