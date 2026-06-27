@@ -10,8 +10,8 @@ const fieldNames = [
   "year",
   "model",
   "km",
-  "condition",
   "color",
+  "condition",
   "version",
   "authority",
   "quote",
@@ -32,8 +32,8 @@ const sheetHeaders = [
   "year",
   "model",
   "km",
-  "condition",
   "color",
+  "condition",
   "version",
   "authority",
   "quote",
@@ -57,6 +57,7 @@ const submitButton = document.querySelector("#submitButton");
 const resetButton = document.querySelector("#resetButton");
 const searchInput = document.querySelector("#searchInput");
 const sourceCustomWrap = document.querySelector("#sourceCustomWrap");
+const receivedDateWrap = document.querySelector("#receivedDateWrap");
 const ongoingBody = document.querySelector("#ongoingBody");
 const purchasedBody = document.querySelector("#purchasedBody");
 const ongoingEmpty = document.querySelector("#ongoingEmpty");
@@ -109,8 +110,8 @@ function normalizeRecord(record) {
     year: cleanSheetText(record.year),
     model: cleanSheetText(record.model),
     km: normalizeKm(cleanSheetText(record.km || record.mileage || "")),
-    condition: cleanSheetText(record.condition),
     color: cleanSheetText(record.color),
+    condition: cleanSheetText(record.condition),
     version: cleanSheetText(record.version),
     authority: cleanSheetText(record.authority),
     quote: cleanSheetText(record.quote),
@@ -369,8 +370,8 @@ function appendCommonCells(row, record) {
     createCell(record.year),
     createCell(record.model),
     createCell(record.km, "number-cell"),
-    createCell(record.condition),
     createCell(record.color),
+    createCell(record.condition),
     createCell(record.version),
     createCell(record.authority),
     createCell(record.quote),
@@ -501,6 +502,15 @@ clearPurchasedDateFilter.addEventListener("click", () => {
 });
 printPurchasedButton.addEventListener("click", () => {
   window.print();
+});
+
+receivedDateWrap?.addEventListener("click", (event) => {
+  if (event.target === fields.receivedDate) return;
+  if (typeof fields.receivedDate.showPicker === "function") {
+    fields.receivedDate.showPicker();
+  } else {
+    fields.receivedDate.focus();
+  }
 });
 
 document.addEventListener("click", async (event) => {
