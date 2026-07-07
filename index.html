@@ -4,12 +4,548 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CarValuation</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #eef2f5;
+        --surface: #ffffff;
+        --surface-soft: #f7f9fb;
+        --ink: #17212b;
+        --muted: #5c6875;
+        --line: #d7dee6;
+        --accent: #0f766e;
+        --accent-dark: #0b5f59;
+        --danger: #b42318;
+        --focus: #2563eb;
+        --shadow: 0 16px 50px rgba(21, 33, 48, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-size: 18px;
+        font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", Arial, sans-serif;
+        color: var(--ink);
+        background: linear-gradient(180deg, #dfe7ee 0, var(--bg) 38%, #f8fafc 100%);
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      .app-shell {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .workspace {
+        background: var(--surface);
+        min-height: 100vh;
+      }
+
+      .entry-panel,
+      .list-tools {
+        padding: 24px 28px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
+        gap: 16px;
+      }
+
+      label {
+        display: grid;
+        gap: 7px;
+        min-width: 0;
+      }
+
+      #receivedDateWrap {
+        cursor: pointer;
+      }
+
+      label span {
+        color: var(--muted);
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        min-height: 42px;
+        border: 1px solid #c7d0da;
+        border-radius: 6px;
+        background: #fff;
+        color: var(--ink);
+        padding: 9px 11px;
+        outline: none;
+      }
+
+      textarea {
+        resize: vertical;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--focus);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      }
+
+      .wide {
+        grid-column: span 2;
+      }
+
+      .full-row {
+        grid-column: 1 / -1;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      button {
+        min-height: 42px;
+        border: 1px solid var(--accent);
+        border-radius: 6px;
+        background: var(--accent);
+        color: #fff;
+        padding: 0 18px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: var(--accent-dark);
+      }
+
+      button.secondary {
+        border-color: #bfccd8;
+        background: #fff;
+        color: var(--ink);
+      }
+
+      button.secondary:hover {
+        background: #f1f5f9;
+      }
+
+      button.danger {
+        border-color: #f3c5c0;
+        background: #fff;
+        color: var(--danger);
+      }
+
+      button.danger:hover {
+        background: #fff1f0;
+      }
+
+      button.purchase {
+        border-color: #bbd7c6;
+        background: #fff;
+        color: #17603a;
+      }
+
+      button.purchase:hover {
+        background: #ecfdf3;
+      }
+
+      .list-tools {
+        background: var(--surface-soft);
+      }
+
+      .search-box {
+        max-width: 520px;
+      }
+
+      .records-section {
+        border-bottom: 1px solid var(--line);
+        padding: 24px 0 6px;
+      }
+
+      .records-section:last-child {
+        border-bottom: 0;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 28px 14px;
+      }
+
+      .section-title h2 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.2;
+      }
+
+      .section-title span {
+        display: inline-block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .date-filter {
+        display: grid;
+        grid-template-columns: minmax(220px, 260px) minmax(220px, 260px);
+        align-items: end;
+        justify-content: end;
+        gap: 10px;
+      }
+
+      .date-filter label {
+        width: auto;
+        min-width: 0;
+      }
+
+      .date-filter button {
+        min-height: 42px;
+        white-space: nowrap;
+        justify-self: start;
+      }
+
+      #clearPurchasedDateFilter {
+        grid-column: 1;
+      }
+
+      #printPurchasedButton {
+        grid-column: 2;
+      }
+
+      .table-wrap {
+        position: relative;
+        overflow-x: auto;
+        padding: 0 28px 24px;
+      }
+
+      table {
+        width: 100%;
+        min-width: 2060px;
+        border-collapse: collapse;
+        border: 1px solid var(--line);
+      }
+
+      th,
+      td {
+        border: 1px solid var(--line);
+        padding: 13px 10px;
+        text-align: left;
+        vertical-align: top;
+        font-size: 18px;
+      }
+
+      th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #f8fafc;
+        color: #42505d;
+        font-size: 17px;
+      }
+
+      td {
+        color: #243140;
+      }
+
+      /* 估價進行中顏色 */
+      tbody tr:nth-child(odd) td { background: #ECF2FF; }
+      tbody tr:nth-child(even) td { background: #DBE8FF; }
+
+      /* 已買入顏色 */
+      .purchased-section tbody tr:nth-child(odd) td {
+        background: #f2fbf5;
+        color: #17603a;
+      }
+      .purchased-section tbody tr:nth-child(even) td {
+        background: #e5f5eb;
+        color: #17603a;
+      }
+
+      /* 已售出顏色：黃色 #FFFFCC 為主，奇偶不同深淺 */
+      .sold-section tbody tr:nth-child(odd) td {
+        background: #FFFFCC;
+        color: #17212b;
+      }
+      .sold-section tbody tr:nth-child(even) td {
+        background: #FFFFE6;
+        color: #17212b;
+      }
+
+      tbody tr td {
+        transition: background-color 140ms ease, color 140ms ease;
+      }
+
+      /* 滑鼠高光修改為 #E8E8E8 (不保留單格高光) */
+      tbody tr:hover td,
+      .purchased-section tbody tr:hover td,
+      .sold-section tbody tr:hover td {
+        background: #E8E8E8 !important;
+        color: #000 !important;
+      }
+
+      tr.is-purchased button.purchase {
+        background: #17603a;
+        border-color: #17603a;
+        color: #fff;
+      }
+
+      tr.is-purchased button.purchase:hover {
+        background: #12502f;
+      }
+
+      .note-cell {
+        max-width: 220px;
+        white-space: pre-wrap;
+      }
+
+      .wide-cell {
+        min-width: 260px;
+        max-width: 360px;
+        white-space: pre-wrap;
+      }
+
+      .number-cell {
+        text-align: left;
+        white-space: nowrap;
+      }
+
+      .row-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        min-width: 210px;
+      }
+
+      .row-actions button {
+        min-height: 34px;
+        padding: 0 10px;
+        font-size: 17px;
+      }
+
+      .empty-state {
+        display: none;
+        place-items: center;
+        gap: 6px;
+        min-height: 130px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .empty-state strong {
+        color: var(--ink);
+        font-size: 22px;
+      }
+
+      .empty-state.is-visible {
+        display: grid;
+      }
+
+      .is-hidden {
+        display: none;
+      }
+
+      .buy-dialog {
+        width: min(440px, calc(100% - 32px));
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.26);
+        padding: 0;
+      }
+
+      .buy-dialog::backdrop {
+        background: rgba(15, 23, 42, 0.36);
+      }
+
+      .buy-dialog form {
+        display: grid;
+        gap: 16px;
+        padding: 22px;
+      }
+
+      .buy-dialog h2 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      @media (max-width: 1400px) {
+        .form-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 980px) {
+        .section-title {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .date-filter {
+          justify-content: flex-start;
+        }
+
+        .form-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .wide {
+          grid-column: span 2;
+        }
+      }
+
+      @media (max-width: 1200px) {
+        .purchased-section .section-title {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .purchased-section .date-filter {
+          justify-content: start;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .app-shell {
+          width: 100%;
+          padding: 0;
+        }
+
+        .workspace {
+          min-height: 100vh;
+          border: 0;
+        }
+
+        .entry-panel,
+        .list-tools,
+        .section-title,
+        .table-wrap {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .wide {
+          grid-column: auto;
+        }
+
+        .full-row {
+          grid-column: auto;
+        }
+
+        .form-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .date-filter {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+
+        .date-filter label {
+          width: auto;
+        }
+
+        #clearPurchasedDateFilter,
+        #printPurchasedButton {
+          grid-column: auto;
+        }
+      }
+
+      @media print {
+        body {
+          background: #fff;
+        }
+
+        .app-shell {
+          width: 100%;
+          padding: 0;
+        }
+
+        .workspace {
+          border: 0;
+          box-shadow: none;
+          min-height: auto;
+        }
+
+        .entry-panel,
+        .list-tools,
+        .records-section:not(.purchased-section),
+        .date-filter,
+        .row-actions,
+        .empty-state {
+          display: none !important;
+        }
+
+        .purchased-section {
+          padding: 0;
+          border: 0;
+        }
+
+        .section-title,
+        .table-wrap {
+          padding: 0;
+        }
+
+        .section-title {
+          margin-bottom: 12px;
+        }
+
+        .table-wrap {
+          overflow: visible;
+        }
+
+        table {
+          min-width: 0;
+          width: 100%;
+          font-size: 10px;
+        }
+
+        th,
+        td {
+          padding: 5px 4px;
+          font-size: 10px;
+        }
+
+        th {
+          position: static;
+        }
+
+        .purchased-section th:last-child,
+        .purchased-section td:last-child {
+          display: none;
+        }
+      }
+    </style>
   </head>
   <body>
     <main class="app-shell">
       <section class="workspace">
-
         <section class="entry-panel" aria-label="車輛估價表單">
           <form id="valuationForm" autocomplete="off">
             <input type="hidden" id="recordId" />
@@ -207,6 +743,47 @@
             </div>
           </div>
         </section>
+
+        <section class="records-section sold-section" aria-labelledby="soldTitle">
+          <header class="section-title">
+            <div>
+              <h2 id="soldTitle">已售出</h2>
+              <span id="soldCount">0 筆</span>
+            </div>
+          </header>
+          <div class="table-wrap" aria-label="已售出清單">
+            <table>
+              <thead>
+                <tr>
+                  <th>來源</th>
+                  <th>進件日</th>
+                  <th>買進日</th>
+                  <th>年份</th>
+                  <th>車型</th>
+                  <th>里程</th>
+                  <th>顏色</th>
+                  <th>車況</th>
+                  <th>版本</th>
+                  <th>權威</th>
+                  <th>報價</th>
+                  <th>報價</th>
+                  <th>買進價</th>
+                  <th>賣出價</th>
+                  <th>備註</th>
+                  <th>整理項目</th>
+                  <th>賣家</th>
+                  <th>獎金</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="soldBody"></tbody>
+            </table>
+            <div class="empty-state" id="soldEmpty">
+              <strong>尚無已售出資料</strong>
+              <span>在已買入清單按下已成交後會移到這裡。</span>
+            </div>
+          </div>
+        </section>
       </section>
     </main>
 
@@ -229,6 +806,690 @@
       </form>
     </dialog>
 
-    <script src="./app.js"></script>
+    <dialog class="buy-dialog" id="sellDialog">
+      <form id="sellForm" method="dialog">
+        <h2>已售出資料</h2>
+        <input type="hidden" id="sellRecordId" />
+        <label>
+          <span>賣出價</span>
+          <input id="sellPriceInput" type="text" required />
+        </label>
+        <div class="dialog-actions">
+          <button class="secondary" type="button" id="cancelSellButton">取消</button>
+          <button type="submit">確認售出</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script>
+      const STORAGE_KEY = "carvaluation.records.v1";
+      const API_URL = "https://script.google.com/macros/s/AKfycbx83aRvR1MpZwqlTKKHyfej-aSJOrIPUI4aRlvX7Qy81Owz-9VxjYjCL3pRKzewkQu6/exec";
+      const CUSTOM_SOURCE = "自行輸入";
+      const FIXED_SOURCES = ["來店", "網站", "自買"];
+
+      const fieldNames = [
+        "sourceType",
+        "sourceCustom",
+        "receivedDate",
+        "year",
+        "model",
+        "km",
+        "color",
+        "condition",
+        "version",
+        "authority",
+        "quote",
+        "purchasePrice",
+        "actualDealPrice",
+        "salePrice",
+        "remarks",
+        "repairItems",
+        "seller",
+        "bonus",
+      ];
+
+      // 新增 isSold 到 sheetHeaders 方便擴充
+      const sheetHeaders = [
+        "id",
+        "source",
+        "receivedDate",
+        "boughtDate",
+        "year",
+        "model",
+        "km",
+        "color",
+        "condition",
+        "version",
+        "authority",
+        "quote",
+        "purchasePrice",
+        "actualDealPrice",
+        "salePrice",
+        "remarks",
+        "repairItems",
+        "seller",
+        "bonus",
+        "isPurchased",
+        "isSold",
+        "createdAt",
+        "updatedAt",
+      ];
+
+      const fields = Object.fromEntries(fieldNames.map((name) => [name, document.querySelector(`#${name}`)]));
+      fields.recordId = document.querySelector("#recordId");
+
+      const form = document.querySelector("#valuationForm");
+      const submitButton = document.querySelector("#submitButton");
+      const resetButton = document.querySelector("#resetButton");
+      const searchInput = document.querySelector("#searchInput");
+      const sourceCustomWrap = document.querySelector("#sourceCustomWrap");
+      const receivedDateWrap = document.querySelector("#receivedDateWrap");
+      
+      const ongoingBody = document.querySelector("#ongoingBody");
+      const purchasedBody = document.querySelector("#purchasedBody");
+      const soldBody = document.querySelector("#soldBody"); // 新增已售出 tbody
+      
+      const ongoingEmpty = document.querySelector("#ongoingEmpty");
+      const purchasedEmpty = document.querySelector("#purchasedEmpty");
+      const soldEmpty = document.querySelector("#soldEmpty"); // 新增已售出 empty state
+      
+      const ongoingCount = document.querySelector("#ongoingCount");
+      const purchasedCount = document.querySelector("#purchasedCount");
+      const soldCount = document.querySelector("#soldCount"); // 新增已售出數量
+      
+      const buyDialog = document.querySelector("#buyDialog");
+      const buyForm = document.querySelector("#buyForm");
+      const buyRecordId = document.querySelector("#buyRecordId");
+      const buyDate = document.querySelector("#buyDate");
+      const buyActualDealPrice = document.querySelector("#buyActualDealPrice");
+      const cancelBuyButton = document.querySelector("#cancelBuyButton");
+      
+      const sellDialog = document.querySelector("#sellDialog"); // 新增已成交 dialog
+      const sellForm = document.querySelector("#sellForm");
+      const sellRecordId = document.querySelector("#sellRecordId");
+      const sellPriceInput = document.querySelector("#sellPriceInput");
+      const cancelSellButton = document.querySelector("#cancelSellButton");
+
+      const purchasedDateFrom = document.querySelector("#purchasedDateFrom");
+      const purchasedDateTo = document.querySelector("#purchasedDateTo");
+      const clearPurchasedDateFilter = document.querySelector("#clearPurchasedDateFilter");
+      const printPurchasedButton = document.querySelector("#printPurchasedButton");
+
+      let records = loadLocalRecords();
+
+      function loadLocalRecords() {
+        try {
+          const savedRecords = JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
+          return savedRecords.map(normalizeRecord);
+        } catch {
+          return [];
+        }
+      }
+
+      function normalizeBoolean(value) {
+        return value === true || String(value).toLowerCase() === "true" || value === "是";
+      }
+
+      function cleanSheetText(value) {
+        if (value === "" || value === null || value === undefined) return "";
+        return String(value).replace(/^'/, "");
+      }
+
+      function normalizeRecord(record) {
+        const rawSource = cleanSheetText(record.source || "");
+        const normalizedSource = rawSource === "估價網站" ? "網站" : rawSource;
+        const sourceType = record.sourceType || (FIXED_SOURCES.includes(normalizedSource) ? normalizedSource : normalizedSource ? CUSTOM_SOURCE : "");
+        const sourceCustom = cleanSheetText(record.sourceCustom || (sourceType === CUSTOM_SOURCE ? normalizedSource : ""));
+
+        return {
+          id: cleanSheetText(record.id) || createId(),
+          sourceType,
+          sourceCustom,
+          receivedDate: normalizeDateText(cleanSheetText(record.receivedDate || record.date || "")),
+          boughtDate: normalizeDateText(cleanSheetText(record.boughtDate || "")),
+          year: cleanSheetText(record.year),
+          model: cleanSheetText(record.model),
+          km: normalizeKm(cleanSheetText(record.km || record.mileage || "")),
+          color: cleanSheetText(record.color),
+          condition: cleanSheetText(record.condition),
+          version: cleanSheetText(record.version),
+          authority: cleanSheetText(record.authority),
+          quote: cleanSheetText(record.quote),
+          purchasePrice: cleanSheetText(record.purchasePrice),
+          actualDealPrice: cleanSheetText(record.actualDealPrice),
+          salePrice: cleanSheetText(record.salePrice),
+          remarks: cleanSheetText(record.remarks || record.notes || ""),
+          repairItems: cleanSheetText(record.repairItems),
+          seller: cleanSheetText(record.seller || record.location || [record.sellerName, record.sellerPhone].filter(Boolean).join(" ")),
+          bonus: cleanSheetText(record.bonus),
+          isPurchased: normalizeBoolean(record.isPurchased),
+          isSold: normalizeBoolean(record.isSold), // 解析 isSold
+          createdAt: record.createdAt || new Date().toISOString(),
+          updatedAt: record.updatedAt || new Date().toISOString(),
+        };
+      }
+
+      function saveLocalRecords() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      }
+
+      function createId() {
+        return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+      }
+
+      function normalizeKm(value) {
+        if (value === "" || value === null || value === undefined) return "";
+        const number = Number(value);
+        if (!Number.isFinite(number)) return String(value);
+        return number > 1000 ? String(Math.round((number / 10000) * 10) / 10) : String(number);
+      }
+
+      function normalizeDateText(value) {
+        if (!value) return "";
+        const text = String(value);
+        const match = text.match(/^(\d{4})-(\d{2})-(\d{2})T/);
+        if (match) return `${match[1]}-${match[2]}-${match[3]}`;
+        return text;
+      }
+
+      function toDateInputValue(value) {
+        if (!value) return "";
+        const text = String(value).trim();
+        const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (isoDate) return `${isoDate[1]}-${isoDate[2]}-${isoDate[3]}`;
+
+        const shortDate = text.match(/^(\d{1,2})\/(\d{1,2})$/);
+        if (!shortDate) return "";
+
+        const year = new Date().getFullYear();
+        const month = shortDate[1].padStart(2, "0");
+        const day = shortDate[2].padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function formatDateForDisplay(value) {
+        if (!value) return "";
+        const text = String(value).trim();
+        const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (!isoDate) return text;
+        return `${Number(isoDate[2])}/${Number(isoDate[3])}`;
+      }
+
+      function formatFullDateForDisplay(value) {
+        if (!value) return "";
+        const text = String(value).trim();
+        const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (isoDate) return `${isoDate[1]}/${isoDate[2]}/${isoDate[3]}`;
+        
+        const shortDate = text.match(/^(\d{1,2})\/(\d{1,2})$/);
+        if (shortDate) {
+          const year = new Date().getFullYear();
+          const month = shortDate[1].padStart(2, "0");
+          const day = shortDate[2].padStart(2, "0");
+          return `${year}/${month}/${day}`;
+        }
+        return text;
+      }
+
+      function dateValueToNumber(value) {
+        const inputValue = toDateInputValue(value);
+        if (!inputValue) return null;
+        return Number(inputValue.replaceAll("-", ""));
+      }
+
+      function getSourceLabel(record) {
+        return record.sourceType === CUSTOM_SOURCE ? record.sourceCustom : record.sourceType;
+      }
+
+      function asSheetText(value) {
+        if (value === "" || value === null || value === undefined) return "";
+        return String(value);
+      }
+
+      function toSheetRecord(record) {
+        const normalized = normalizeRecord(record);
+        const sheetRecord = {
+          ...normalized,
+          source: getSourceLabel(normalized),
+          isPurchased: normalized.isPurchased ? "TRUE" : "FALSE",
+          isSold: normalized.isSold ? "TRUE" : "FALSE", // 寫入 isSold
+        };
+
+        return Object.fromEntries(
+          sheetHeaders.map((header) => {
+            const value = sheetRecord[header] ?? "";
+            if (header === "id" || header === "isPurchased" || header === "isSold") return [header, value];
+            return [header, asSheetText(value)];
+          }),
+        );
+      }
+
+      async function apiGetRecords() {
+        const response = await fetch(API_URL, { method: "GET" });
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error || "讀取 Google Sheet 失敗");
+        return (data.records || []).map(normalizeRecord);
+      }
+
+      async function apiPost(action, payload) {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action, ...payload }),
+        });
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error || "寫入 Google Sheet 失敗");
+        return data;
+      }
+
+      async function syncFromCloud() {
+        try {
+          const cloudRecords = await apiGetRecords();
+          records = cloudRecords;
+          saveLocalRecords();
+          render();
+        } catch (error) {
+          console.warn(error);
+          // 若有需要可以 alert，這裡為了避免干擾，僅印出 log
+        }
+      }
+
+      async function persistCreate(record) {
+        try {
+          const result = await apiPost("create", { record: toSheetRecord(record) });
+          return normalizeRecord(result.record || record);
+        } catch (error) {
+          console.warn(error);
+          return record;
+        }
+      }
+
+      async function persistUpdate(record) {
+        try {
+          const result = await apiPost("update", { record: toSheetRecord(record) });
+          return normalizeRecord(result.record || record);
+        } catch (error) {
+          console.warn(error);
+          return record;
+        }
+      }
+
+      async function persistDelete(id) {
+        try {
+          await apiPost("delete", { id });
+        } catch (error) {
+          console.warn(error);
+        }
+      }
+
+      function updateSourceCustomVisibility() {
+        const shouldShow = fields.sourceType.value === CUSTOM_SOURCE;
+        sourceCustomWrap.classList.toggle("is-hidden", !shouldShow);
+        fields.sourceCustom.disabled = !shouldShow;
+        if (!shouldShow) fields.sourceCustom.value = "";
+      }
+
+      function getFormData() {
+        const data = {
+          id: fields.recordId.value || createId(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        for (const name of fieldNames) {
+          data[name] = fields[name].value.trim();
+        }
+
+        if (data.sourceType !== CUSTOM_SOURCE) {
+          data.sourceCustom = "";
+        }
+
+        data.km = normalizeKm(data.km);
+        return data;
+      }
+
+      function setFormData(record) {
+        fields.recordId.value = record.id;
+        for (const name of fieldNames) {
+          if (name === "km") {
+            fields[name].value = normalizeKm(record[name]);
+          } else if (name === "receivedDate") {
+            fields[name].value = toDateInputValue(record[name]);
+          } else {
+            fields[name].value = record[name] || "";
+          }
+        }
+        updateSourceCustomVisibility();
+        submitButton.textContent = "儲存修改";
+        fields.sourceType.focus();
+      }
+
+      function resetForm() {
+        form.reset();
+        fields.recordId.value = "";
+        submitButton.textContent = "新增資料";
+        updateSourceCustomVisibility();
+      }
+
+      function getFilteredRecords() {
+        const keyword = searchInput.value.trim().toLowerCase();
+        if (!keyword) return records;
+
+        return records.filter((record) =>
+          [
+            getSourceLabel(record),
+            ...fieldNames.map((name) => record[name]),
+            record.boughtDate,
+            record.isSold ? "已售出" : (record.isPurchased ? "已買入" : "估價進行中"),
+          ]
+            .join(" ")
+            .toLowerCase()
+            .includes(keyword),
+        );
+      }
+
+      function sortRecords(items) {
+        return [...items].sort((a, b) => {
+          const dateA = dateValueToNumber(a.receivedDate) || 0;
+          const dateB = dateValueToNumber(b.receivedDate) || 0;
+          if (dateA !== dateB) {
+            return dateB - dateA;
+          }
+          return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
+        });
+      }
+
+      function filterPurchasedByDate(items) {
+        const from = dateValueToNumber(purchasedDateFrom.value);
+        const to = dateValueToNumber(purchasedDateTo.value);
+        if (!from && !to) return items;
+
+        return items.filter((record) => {
+          const boughtDate = dateValueToNumber(record.boughtDate);
+          if (!boughtDate) return false;
+          if (from && boughtDate < from) return false;
+          if (to && boughtDate > to) return false;
+          return true;
+        });
+      }
+
+      function createCell(value, className = "") {
+        const cell = document.createElement("td");
+        if (className) cell.className = className;
+        cell.textContent = value || "";
+        return cell;
+      }
+
+      function appendCommonCells(row, record) {
+        row.append(
+          createCell(record.year),
+          createCell(record.model),
+          createCell(record.km, "number-cell"),
+          createCell(record.color),
+          createCell(record.condition),
+          createCell(record.version),
+          createCell(record.authority),
+          createCell(record.quote),
+          createCell(record.purchasePrice),
+          createCell(record.actualDealPrice),
+          createCell(record.salePrice),
+          createCell(record.remarks, "note-cell"),
+          createCell(record.repairItems, "wide-cell"),
+          createCell(record.seller),
+          createCell(record.bonus),
+        );
+      }
+
+      function createRecordRow(record) {
+        const row = document.createElement("tr");
+        if (record.isSold) {
+          row.className = "is-sold";
+        } else if (record.isPurchased) {
+          row.className = "is-purchased";
+        }
+        
+        row.append(createCell(getSourceLabel(record)));
+        row.append(createCell(formatFullDateForDisplay(record.receivedDate)));
+
+        if (record.isPurchased || record.isSold) {
+          row.append(createCell(formatFullDateForDisplay(record.boughtDate)));
+        }
+
+        appendCommonCells(row, record);
+
+        const actionCell = document.createElement("td");
+        let actionHTML = '';
+
+        if (record.isSold) {
+          // 已售出：顯示編輯、取消成交、刪除
+          actionHTML = `
+            <div class="row-actions">
+              <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
+              <button class="secondary" type="button" data-action="toggle-sold" data-id="${record.id}">取消成交</button>
+              <button class="danger" type="button" data-action="delete" data-id="${record.id}">刪除</button>
+            </div>
+          `;
+        } else if (record.isPurchased) {
+          // 已買入：顯示編輯、已售出、取消買入、刪除
+          actionHTML = `
+            <div class="row-actions">
+              <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
+              <button class="purchase" type="button" data-action="sell" data-id="${record.id}">已售出</button>
+              <button class="secondary" type="button" data-action="toggle-purchased" data-id="${record.id}">取消買入</button>
+              <button class="danger" type="button" data-action="delete" data-id="${record.id}">刪除</button>
+            </div>
+          `;
+        } else {
+          // 估價進行中：顯示編輯、已買入、刪除
+          actionHTML = `
+            <div class="row-actions">
+              <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
+              <button class="purchase" type="button" data-action="toggle-purchased" data-id="${record.id}">已買入</button>
+              <button class="danger" type="button" data-action="delete" data-id="${record.id}">刪除</button>
+            </div>
+          `;
+        }
+
+        actionCell.innerHTML = actionHTML;
+        row.append(actionCell);
+        return row;
+      }
+
+      function renderRows(body, items) {
+        body.innerHTML = "";
+        for (const record of sortRecords(items)) {
+          body.append(createRecordRow(record));
+        }
+      }
+
+      function render() {
+        const filteredRecords = getFilteredRecords();
+        
+        // 依照狀態分組
+        const ongoingRecords = filteredRecords.filter((record) => !record.isPurchased && !record.isSold);
+        const allPurchasedRecords = filteredRecords.filter((record) => record.isPurchased && !record.isSold);
+        const soldRecords = filteredRecords.filter((record) => record.isSold);
+        
+        const purchasedRecords = filterPurchasedByDate(allPurchasedRecords);
+
+        renderRows(ongoingBody, ongoingRecords);
+        renderRows(purchasedBody, purchasedRecords);
+        renderRows(soldBody, soldRecords); // 繪製已售出列表
+
+        ongoingCount.textContent = `${ongoingRecords.length} 筆`;
+        purchasedCount.textContent =
+          purchasedRecords.length === allPurchasedRecords.length
+            ? `${purchasedRecords.length} 筆`
+            : `${purchasedRecords.length} / ${allPurchasedRecords.length} 筆`;
+        soldCount.textContent = `${soldRecords.length} 筆`; // 顯示已售出數量
+
+        ongoingEmpty.classList.toggle("is-visible", ongoingRecords.length === 0);
+        purchasedEmpty.classList.toggle("is-visible", purchasedRecords.length === 0);
+        soldEmpty.classList.toggle("is-visible", soldRecords.length === 0); // 切換已售出空狀態
+      }
+
+      function openBuyDialog(record) {
+        buyRecordId.value = record.id;
+        buyDate.value = toDateInputValue(record.boughtDate);
+        buyActualDealPrice.value = record.actualDealPrice || "";
+        buyDialog.showModal();
+        buyDate.focus();
+      }
+
+      function openSellDialog(record) {
+        sellRecordId.value = record.id;
+        sellPriceInput.value = record.salePrice || "";
+        sellDialog.showModal();
+        sellPriceInput.focus();
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        submitButton.disabled = true;
+
+        const data = getFormData();
+        const existingIndex = records.findIndex((record) => record.id === data.id);
+
+        if (existingIndex >= 0) {
+          const updatedRecord = normalizeRecord({ ...records[existingIndex], ...data });
+          records[existingIndex] = await persistUpdate(updatedRecord);
+        } else {
+          const createdRecord = normalizeRecord({ ...data, isPurchased: false, isSold: false, createdAt: new Date().toISOString() });
+          records.push(await persistCreate(createdRecord));
+        }
+
+        saveLocalRecords();
+        resetForm();
+        render();
+        submitButton.disabled = false;
+      });
+
+      // 買入表單送出
+      buyForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const recordIndex = records.findIndex((item) => item.id === buyRecordId.value);
+        if (recordIndex < 0) return;
+
+        const updatedRecord = normalizeRecord({
+          ...records[recordIndex],
+          boughtDate: buyDate.value.trim(),
+          actualDealPrice: buyActualDealPrice.value.trim(),
+          isPurchased: true,
+          updatedAt: new Date().toISOString(),
+        });
+
+        records[recordIndex] = await persistUpdate(updatedRecord);
+        saveLocalRecords();
+        render();
+        buyDialog.close();
+        buyForm.reset();
+      });
+
+      cancelBuyButton.addEventListener("click", () => {
+        buyDialog.close();
+        buyForm.reset();
+      });
+
+      // 成交表單送出
+      sellForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const recordIndex = records.findIndex((item) => item.id === sellRecordId.value);
+        if (recordIndex < 0) return;
+
+        const updatedRecord = normalizeRecord({
+          ...records[recordIndex],
+          salePrice: sellPriceInput.value.trim(),
+          isSold: true,
+          updatedAt: new Date().toISOString(),
+        });
+
+        records[recordIndex] = await persistUpdate(updatedRecord);
+        saveLocalRecords();
+        render();
+        sellDialog.close();
+        sellForm.reset();
+      });
+
+      cancelSellButton.addEventListener("click", () => {
+        sellDialog.close();
+        sellForm.reset();
+      });
+
+      fields.sourceType.addEventListener("change", updateSourceCustomVisibility);
+      resetButton.addEventListener("click", resetForm);
+      searchInput.addEventListener("input", render);
+      purchasedDateFrom.addEventListener("input", render);
+      purchasedDateTo.addEventListener("input", render);
+      clearPurchasedDateFilter.addEventListener("click", () => {
+        purchasedDateFrom.value = "";
+        purchasedDateTo.value = "";
+        render();
+      });
+      printPurchasedButton.addEventListener("click", () => {
+        window.print();
+      });
+
+      receivedDateWrap?.addEventListener("click", (event) => {
+        if (event.target === fields.receivedDate) return;
+        if (typeof fields.receivedDate.showPicker === "function") {
+          fields.receivedDate.showPicker();
+        } else {
+          fields.receivedDate.focus();
+        }
+      });
+
+      document.addEventListener("click", async (event) => {
+        const button = event.target.closest("button[data-action]");
+        if (!button) return;
+
+        const recordIndex = records.findIndex((item) => item.id === button.dataset.id);
+        const record = records[recordIndex];
+        if (!record) return;
+
+        if (button.dataset.action === "edit") {
+          setFormData(record);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        if (button.dataset.action === "toggle-purchased") {
+          if (record.isPurchased) {
+            // 取消買入
+            const updatedRecord = normalizeRecord({ ...record, isPurchased: false, updatedAt: new Date().toISOString() });
+            records[recordIndex] = await persistUpdate(updatedRecord);
+            saveLocalRecords();
+            render();
+          } else {
+            // 開啟買入
+            openBuyDialog(record);
+          }
+        }
+        
+        if (button.dataset.action === "sell") {
+          // 點擊已成交
+          openSellDialog(record);
+        }
+
+        if (button.dataset.action === "toggle-sold") {
+          // 取消成交，退回已買入狀態
+          const updatedRecord = normalizeRecord({ ...record, isSold: false, updatedAt: new Date().toISOString() });
+          records[recordIndex] = await persistUpdate(updatedRecord);
+          saveLocalRecords();
+          render();
+        }
+
+        if (button.dataset.action === "delete") {
+          const confirmed = confirm(`確定要刪除 ${record.model || "這筆"} 的資料嗎？`);
+          if (!confirmed) return;
+          await persistDelete(record.id);
+          records = records.filter((item) => item.id !== record.id);
+          saveLocalRecords();
+          render();
+          if (fields.recordId.value === record.id) resetForm();
+        }
+      });
+
+      resetForm();
+      render();
+      syncFromCloud();
+    </script>
   </body>
 </html>
