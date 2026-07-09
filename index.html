@@ -91,6 +91,15 @@
         padding: 9px 11px;
         outline: none;
       }
+      
+      select:has(option[value="custom"]:checked) + .custom-color-input {
+          display: block;
+          margin-top: 8px;
+      }
+      
+      .custom-color-input {
+          display: none;
+      }
 
       textarea {
         resize: vertical;
@@ -153,14 +162,24 @@
         background: #fff1f0;
       }
 
-      button.purchase {
-        border-color: #bbd7c6;
-        background: #fff;
-        color: #17603a;
+      button.action-blue {
+        border-color: #2563eb;
+        background: #2563eb;
+        color: #fff;
       }
 
-      button.purchase:hover {
-        background: #ecfdf3;
+      button.action-blue:hover {
+        background: #1d4ed8;
+      }
+
+      button.action-green {
+        border-color: #16a34a;
+        background: #16a34a;
+        color: #fff;
+      }
+
+      button.action-green:hover {
+        background: #15803d;
       }
 
       .list-tools {
@@ -239,12 +258,13 @@
         width: 100%;
         min-width: 2060px;
         border-collapse: collapse;
-        border: 1px solid var(--line);
+        border-bottom: 1px solid #737373;
       }
 
       th,
       td {
-        border: 1px solid var(--line);
+        border: none;
+        border-bottom: 1px solid #737373;
         padding: 13px 10px;
         text-align: left;
         vertical-align: top;
@@ -258,6 +278,7 @@
         background: #f8fafc;
         color: #42505d;
         font-size: 17px;
+        border-bottom: 2px solid #52525b;
       }
 
       td {
@@ -271,20 +292,20 @@
       /* 已買入顏色 */
       .purchased-section tbody tr:nth-child(odd) td {
         background: #f2fbf5;
-        color: #17603a;
+        color: #243140;
       }
       .purchased-section tbody tr:nth-child(even) td {
         background: #e5f5eb;
-        color: #17603a;
+        color: #243140;
       }
 
-      /* 已售出顏色：黃色 #FFFFCC 為主，奇偶不同深淺 */
+      /* 已售出顏色：黃色為主，奇偶不同深淺 */
       .sold-section tbody tr:nth-child(odd) td {
-        background: #FFFFCC;
+        background: #FFFFE6;
         color: #17212b;
       }
       .sold-section tbody tr:nth-child(even) td {
-        background: #FFFFE6;
+        background: #FFFFF5;
         color: #17212b;
       }
 
@@ -292,22 +313,12 @@
         transition: background-color 140ms ease, color 140ms ease;
       }
 
-      /* 滑鼠高光修改為 #E8E8E8 (不保留單格高光) */
+      /* 滑鼠高光修改為 #E8E8E8 */
       tbody tr:hover td,
       .purchased-section tbody tr:hover td,
       .sold-section tbody tr:hover td {
         background: #E8E8E8 !important;
         color: #000 !important;
-      }
-
-      tr.is-purchased button.purchase {
-        background: #17603a;
-        border-color: #17603a;
-        color: #fff;
-      }
-
-      tr.is-purchased button.purchase:hover {
-        background: #12502f;
       }
 
       .note-cell {
@@ -324,6 +335,16 @@
       .number-cell {
         text-align: left;
         white-space: nowrap;
+      }
+      
+      .bonus-clickable {
+          text-decoration: underline;
+          cursor: pointer;
+          color: #2563eb;
+      }
+      
+      .bonus-clickable:hover {
+          color: #1d4ed8;
       }
 
       .row-actions {
@@ -582,7 +603,19 @@
               </label>
               <label>
                 <span>顏色</span>
-                <input id="color" type="text" />
+                <select id="colorSelect">
+                  <option value="">請選擇</option>
+                  <option value="白">白</option>
+                  <option value="黑">黑</option>
+                  <option value="灰">灰</option>
+                  <option value="銀">銀</option>
+                  <option value="紅">紅</option>
+                  <option value="藍">藍</option>
+                  <option value="綠">綠</option>
+                  <option value="custom">自訂</option>
+                </select>
+                <input id="colorCustom" class="custom-color-input" type="text" placeholder="請輸入顏色" />
+                <input type="hidden" id="color" />
               </label>
               <label>
                 <span>車況</span>
@@ -591,7 +624,7 @@
                   <option>A</option>
                   <option>B</option>
                   <option>C</option>
-                  <option>D</option>
+                  <option>N</option>
                 </select>
               </label>
               <label>
@@ -652,7 +685,7 @@
             <input id="searchInput" type="search" placeholder="搜尋來源、車型、車況、賣家、備註或整理項目" />
           </label>
         </section>
-
+        
         <section class="records-section" aria-labelledby="ongoingTitle">
           <header class="section-title">
             <h2 id="ongoingTitle">估價進行中</h2>
@@ -772,7 +805,7 @@
                   <th>備註</th>
                   <th>整理項目</th>
                   <th>賣家</th>
-                  <th>獎金</th>
+                  <th id="sortBonusHeader" style="cursor: pointer; text-decoration: underline;">獎金 ↕</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -780,7 +813,7 @@
             </table>
             <div class="empty-state" id="soldEmpty">
               <strong>尚無已售出資料</strong>
-              <span>在已買入清單按下已成交後會移到這裡。</span>
+              <span>在已買入清單按下已售出後會移到這裡。</span>
             </div>
           </div>
         </section>
@@ -826,6 +859,8 @@
       const API_URL = "https://script.google.com/macros/s/AKfycbx83aRvR1MpZwqlTKKHyfej-aSJOrIPUI4aRlvX7Qy81Owz-9VxjYjCL3pRKzewkQu6/exec";
       const CUSTOM_SOURCE = "自行輸入";
       const FIXED_SOURCES = ["來店", "網站", "自買"];
+      
+      let soldSortDirection = 'desc'; // 'desc' or 'asc' for bonus sorting
 
       const fieldNames = [
         "sourceType",
@@ -848,7 +883,6 @@
         "bonus",
       ];
 
-      // 新增 isSold 到 sheetHeaders 方便擴充
       const sheetHeaders = [
         "id",
         "source",
@@ -877,6 +911,9 @@
 
       const fields = Object.fromEntries(fieldNames.map((name) => [name, document.querySelector(`#${name}`)]));
       fields.recordId = document.querySelector("#recordId");
+      
+      const colorSelect = document.querySelector("#colorSelect");
+      const colorCustom = document.querySelector("#colorCustom");
 
       const form = document.querySelector("#valuationForm");
       const submitButton = document.querySelector("#submitButton");
@@ -887,15 +924,15 @@
       
       const ongoingBody = document.querySelector("#ongoingBody");
       const purchasedBody = document.querySelector("#purchasedBody");
-      const soldBody = document.querySelector("#soldBody"); // 新增已售出 tbody
+      const soldBody = document.querySelector("#soldBody");
       
       const ongoingEmpty = document.querySelector("#ongoingEmpty");
       const purchasedEmpty = document.querySelector("#purchasedEmpty");
-      const soldEmpty = document.querySelector("#soldEmpty"); // 新增已售出 empty state
+      const soldEmpty = document.querySelector("#soldEmpty");
       
       const ongoingCount = document.querySelector("#ongoingCount");
       const purchasedCount = document.querySelector("#purchasedCount");
-      const soldCount = document.querySelector("#soldCount"); // 新增已售出數量
+      const soldCount = document.querySelector("#soldCount");
       
       const buyDialog = document.querySelector("#buyDialog");
       const buyForm = document.querySelector("#buyForm");
@@ -904,7 +941,7 @@
       const buyActualDealPrice = document.querySelector("#buyActualDealPrice");
       const cancelBuyButton = document.querySelector("#cancelBuyButton");
       
-      const sellDialog = document.querySelector("#sellDialog"); // 新增已成交 dialog
+      const sellDialog = document.querySelector("#sellDialog");
       const sellForm = document.querySelector("#sellForm");
       const sellRecordId = document.querySelector("#sellRecordId");
       const sellPriceInput = document.querySelector("#sellPriceInput");
@@ -914,6 +951,8 @@
       const purchasedDateTo = document.querySelector("#purchasedDateTo");
       const clearPurchasedDateFilter = document.querySelector("#clearPurchasedDateFilter");
       const printPurchasedButton = document.querySelector("#printPurchasedButton");
+      
+      const sortBonusHeader = document.querySelector("#sortBonusHeader");
 
       let records = loadLocalRecords();
 
@@ -963,7 +1002,7 @@
           seller: cleanSheetText(record.seller || record.location || [record.sellerName, record.sellerPhone].filter(Boolean).join(" ")),
           bonus: cleanSheetText(record.bonus),
           isPurchased: normalizeBoolean(record.isPurchased),
-          isSold: normalizeBoolean(record.isSold), // 解析 isSold
+          isSold: normalizeBoolean(record.isSold),
           createdAt: record.createdAt || new Date().toISOString(),
           updatedAt: record.updatedAt || new Date().toISOString(),
         };
@@ -1052,7 +1091,7 @@
           ...normalized,
           source: getSourceLabel(normalized),
           isPurchased: normalized.isPurchased ? "TRUE" : "FALSE",
-          isSold: normalized.isSold ? "TRUE" : "FALSE", // 寫入 isSold
+          isSold: normalized.isSold ? "TRUE" : "FALSE",
         };
 
         return Object.fromEntries(
@@ -1090,7 +1129,6 @@
           render();
         } catch (error) {
           console.warn(error);
-          // 若有需要可以 alert，這裡為了避免干擾，僅印出 log
         }
       }
 
@@ -1121,6 +1159,26 @@
           console.warn(error);
         }
       }
+      
+      function updateColorField() {
+          if (colorSelect.value === 'custom') {
+              fields.color.value = colorCustom.value;
+          } else {
+              fields.color.value = colorSelect.value;
+          }
+      }
+      
+      colorSelect.addEventListener('change', () => {
+          if (colorSelect.value === 'custom') {
+              colorCustom.style.display = 'block';
+              colorCustom.focus();
+          } else {
+              colorCustom.style.display = 'none';
+          }
+          updateColorField();
+      });
+      
+      colorCustom.addEventListener('input', updateColorField);
 
       function updateSourceCustomVisibility() {
         const shouldShow = fields.sourceType.value === CUSTOM_SOURCE;
@@ -1154,6 +1212,19 @@
             fields[name].value = normalizeKm(record[name]);
           } else if (name === "receivedDate") {
             fields[name].value = toDateInputValue(record[name]);
+          } else if (name === "color") {
+            // Setup color logic
+            const colorOptions = Array.from(colorSelect.options).map(opt => opt.value);
+            if (record[name] && !colorOptions.includes(record[name]) && record[name] !== 'custom') {
+                colorSelect.value = 'custom';
+                colorCustom.value = record[name];
+                colorCustom.style.display = 'block';
+            } else {
+                colorSelect.value = record[name] || '';
+                colorCustom.value = '';
+                colorCustom.style.display = 'none';
+            }
+            fields[name].value = record[name] || "";
           } else {
             fields[name].value = record[name] || "";
           }
@@ -1166,6 +1237,9 @@
       function resetForm() {
         form.reset();
         fields.recordId.value = "";
+        colorSelect.value = "";
+        colorCustom.value = "";
+        colorCustom.style.display = 'none';
         submitButton.textContent = "新增資料";
         updateSourceCustomVisibility();
       }
@@ -1192,10 +1266,30 @@
           const dateA = dateValueToNumber(a.receivedDate) || 0;
           const dateB = dateValueToNumber(b.receivedDate) || 0;
           if (dateA !== dateB) {
-            return dateB - dateA;
+            return dateB - dateA; // Descending by receivedDate
           }
           return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
         });
+      }
+      
+      function sortSoldRecordsByBonus(items) {
+          return [...items].sort((a, b) => {
+              const valA = a.bonus || "";
+              const valB = b.bonus || "";
+              
+              if (valA === valB) {
+                  // Fallback to receivedDate
+                  const dateA = dateValueToNumber(a.receivedDate) || 0;
+                  const dateB = dateValueToNumber(b.receivedDate) || 0;
+                  return dateB - dateA;
+              }
+              
+              if (soldSortDirection === 'desc') {
+                 return valB.localeCompare(valA);
+              } else {
+                 return valA.localeCompare(valB);
+              }
+          });
       }
 
       function filterPurchasedByDate(items) {
@@ -1219,7 +1313,7 @@
         return cell;
       }
 
-      function appendCommonCells(row, record) {
+      function appendCommonCells(row, record, isSoldTable = false) {
         row.append(
           createCell(record.year),
           createCell(record.model),
@@ -1234,12 +1328,17 @@
           createCell(record.salePrice),
           createCell(record.remarks, "note-cell"),
           createCell(record.repairItems, "wide-cell"),
-          createCell(record.seller),
-          createCell(record.bonus),
+          createCell(record.seller)
         );
+        
+        const bonusCell = createCell(record.bonus);
+        if (isSoldTable) {
+            bonusCell.innerHTML = `<span class="bonus-clickable" data-action="toggle-bonus" data-id="${record.id}">${record.bonus || 'N'}</span>`;
+        }
+        row.append(bonusCell);
       }
 
-      function createRecordRow(record) {
+      function createRecordRow(record, isSoldTable = false) {
         const row = document.createElement("tr");
         if (record.isSold) {
           row.className = "is-sold";
@@ -1254,36 +1353,33 @@
           row.append(createCell(formatFullDateForDisplay(record.boughtDate)));
         }
 
-        appendCommonCells(row, record);
+        appendCommonCells(row, record, isSoldTable);
 
         const actionCell = document.createElement("td");
         let actionHTML = '';
 
         if (record.isSold) {
-          // 已售出：顯示編輯、取消成交、刪除
           actionHTML = `
             <div class="row-actions">
               <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
-              <button class="secondary" type="button" data-action="toggle-sold" data-id="${record.id}">取消成交</button>
+              <button class="secondary" type="button" data-action="toggle-sold" data-id="${record.id}">取消售出</button>
               <button class="danger" type="button" data-action="delete" data-id="${record.id}">刪除</button>
             </div>
           `;
         } else if (record.isPurchased) {
-          // 已買入：顯示編輯、已售出、取消買入、刪除
           actionHTML = `
             <div class="row-actions">
               <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
-              <button class="purchase" type="button" data-action="sell" data-id="${record.id}">已售出</button>
+              <button class="action-green" type="button" data-action="sell" data-id="${record.id}">已售出</button>
               <button class="secondary" type="button" data-action="toggle-purchased" data-id="${record.id}">取消買入</button>
               <button class="danger" type="button" data-action="delete" data-id="${record.id}">刪除</button>
             </div>
           `;
         } else {
-          // 估價進行中：顯示編輯、已買入、刪除
           actionHTML = `
             <div class="row-actions">
               <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
-              <button class="purchase" type="button" data-action="toggle-purchased" data-id="${record.id}">已買入</button>
+              <button class="action-blue" type="button" data-action="toggle-purchased" data-id="${record.id}">已買入</button>
               <button class="danger" type="button" data-action="delete" data-id="${record.id}">刪除</button>
             </div>
           `;
@@ -1294,37 +1390,36 @@
         return row;
       }
 
-      function renderRows(body, items) {
+      function renderRows(body, items, isSoldTable = false) {
         body.innerHTML = "";
-        for (const record of sortRecords(items)) {
-          body.append(createRecordRow(record));
+        for (const record of items) {
+          body.append(createRecordRow(record, isSoldTable));
         }
       }
 
       function render() {
         const filteredRecords = getFilteredRecords();
         
-        // 依照狀態分組
-        const ongoingRecords = filteredRecords.filter((record) => !record.isPurchased && !record.isSold);
-        const allPurchasedRecords = filteredRecords.filter((record) => record.isPurchased && !record.isSold);
-        const soldRecords = filteredRecords.filter((record) => record.isSold);
+        const ongoingRecords = sortRecords(filteredRecords.filter((record) => !record.isPurchased && !record.isSold));
+        const allPurchasedRecords = sortRecords(filteredRecords.filter((record) => record.isPurchased && !record.isSold));
+        const soldRecords = sortSoldRecordsByBonus(filteredRecords.filter((record) => record.isSold));
         
         const purchasedRecords = filterPurchasedByDate(allPurchasedRecords);
 
         renderRows(ongoingBody, ongoingRecords);
         renderRows(purchasedBody, purchasedRecords);
-        renderRows(soldBody, soldRecords); // 繪製已售出列表
+        renderRows(soldBody, soldRecords, true);
 
         ongoingCount.textContent = `${ongoingRecords.length} 筆`;
         purchasedCount.textContent =
           purchasedRecords.length === allPurchasedRecords.length
             ? `${purchasedRecords.length} 筆`
             : `${purchasedRecords.length} / ${allPurchasedRecords.length} 筆`;
-        soldCount.textContent = `${soldRecords.length} 筆`; // 顯示已售出數量
+        soldCount.textContent = `${soldRecords.length} 筆`;
 
         ongoingEmpty.classList.toggle("is-visible", ongoingRecords.length === 0);
         purchasedEmpty.classList.toggle("is-visible", purchasedRecords.length === 0);
-        soldEmpty.classList.toggle("is-visible", soldRecords.length === 0); // 切換已售出空狀態
+        soldEmpty.classList.toggle("is-visible", soldRecords.length === 0);
       }
 
       function openBuyDialog(record) {
@@ -1363,7 +1458,6 @@
         submitButton.disabled = false;
       });
 
-      // 買入表單送出
       buyForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const recordIndex = records.findIndex((item) => item.id === buyRecordId.value);
@@ -1389,7 +1483,6 @@
         buyForm.reset();
       });
 
-      // 成交表單送出
       sellForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const recordIndex = records.findIndex((item) => item.id === sellRecordId.value);
@@ -1427,6 +1520,12 @@
       printPurchasedButton.addEventListener("click", () => {
         window.print();
       });
+      
+      sortBonusHeader.addEventListener("click", () => {
+          soldSortDirection = soldSortDirection === 'desc' ? 'asc' : 'desc';
+          sortBonusHeader.textContent = `獎金 ${soldSortDirection === 'desc' ? '↓' : '↑'}`;
+          render();
+      });
 
       receivedDateWrap?.addEventListener("click", (event) => {
         if (event.target === fields.receivedDate) return;
@@ -1438,7 +1537,22 @@
       });
 
       document.addEventListener("click", async (event) => {
-        const button = event.target.closest("button[data-action]");
+        const target = event.target;
+        
+        if (target.dataset.action === "toggle-bonus") {
+            const recordIndex = records.findIndex((item) => item.id === target.dataset.id);
+            const record = records[recordIndex];
+            if (!record) return;
+            
+            const newBonus = (record.bonus === "Y" || record.bonus === "y") ? "N" : "Y";
+            const updatedRecord = normalizeRecord({ ...record, bonus: newBonus, updatedAt: new Date().toISOString() });
+            records[recordIndex] = await persistUpdate(updatedRecord);
+            saveLocalRecords();
+            render();
+            return;
+        }
+
+        const button = target.closest("button[data-action]");
         if (!button) return;
 
         const recordIndex = records.findIndex((item) => item.id === button.dataset.id);
@@ -1452,24 +1566,20 @@
 
         if (button.dataset.action === "toggle-purchased") {
           if (record.isPurchased) {
-            // 取消買入
             const updatedRecord = normalizeRecord({ ...record, isPurchased: false, updatedAt: new Date().toISOString() });
             records[recordIndex] = await persistUpdate(updatedRecord);
             saveLocalRecords();
             render();
           } else {
-            // 開啟買入
             openBuyDialog(record);
           }
         }
         
         if (button.dataset.action === "sell") {
-          // 點擊已成交
           openSellDialog(record);
         }
 
         if (button.dataset.action === "toggle-sold") {
-          // 取消成交，退回已買入狀態
           const updatedRecord = normalizeRecord({ ...record, isSold: false, updatedAt: new Date().toISOString() });
           records[recordIndex] = await persistUpdate(updatedRecord);
           saveLocalRecords();
