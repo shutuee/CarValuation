@@ -91,15 +91,6 @@
         padding: 9px 11px;
         outline: none;
       }
-      
-      select:has(option[value="custom"]:checked) + .custom-color-input {
-          display: block;
-          margin-top: 8px;
-      }
-      
-      .custom-color-input {
-          display: none;
-      }
 
       textarea {
         resize: vertical;
@@ -136,6 +127,7 @@
         padding: 0 18px;
         font-weight: 700;
         cursor: pointer;
+        transition: all 0.2s ease;
       }
 
       button:hover {
@@ -234,41 +226,34 @@
         min-width: 0;
       }
 
-      .date-filter button {
-        min-height: 42px;
-        white-space: nowrap;
-        justify-self: start;
-      }
-
-      #clearPurchasedDateFilter {
-        grid-column: 1;
-      }
-
-      #printPurchasedButton {
-        grid-column: 2;
-      }
-
       .table-wrap {
         position: relative;
         overflow-x: auto;
-        padding: 0 28px 24px;
+        padding: 0 28px 32px;
       }
 
+      /* 表格基礎設定：移除垂直線、增加兩倍行高 */
       table {
         width: 100%;
         min-width: 2060px;
         border-collapse: collapse;
-        border-bottom: 1px solid #737373;
+        border: none;
+      }
+
+      .purchased-section table,
+      .sold-section table {
+        min-width: 2472px; /* 拉寬 1.2 倍 */
       }
 
       th,
       td {
         border: none;
-        border-bottom: 1px solid #737373;
-        padding: 13px 10px;
+        border-bottom: 1px solid #737373; /* 中深灰水平分隔線 */
+        padding: 0 6px; /* 移除兩側多餘留白，僅保留些微呼吸空間 */
         text-align: left;
-        vertical-align: top;
+        vertical-align: middle;
         font-size: 18px;
+        line-height: 2; /* 兩倍行高 */
       }
 
       th {
@@ -278,42 +263,59 @@
         background: #f8fafc;
         color: #42505d;
         font-size: 17px;
-        border-bottom: 2px solid #52525b;
+        border-bottom: 2px solid #52525b; /* 標題底部較深的邊線 */
       }
 
       td {
         color: #243140;
       }
 
-      /* 估價進行中顏色 */
-      tbody tr:nth-child(odd) td { background: #ECF2FF; }
-      tbody tr:nth-child(even) td { background: #DBE8FF; }
+      /* 靠右對齊 (數字、金額) */
+      .num-align {
+        text-align: right;
+      }
 
-      /* 已買入顏色 */
+      /* 狀態 Pill 標籤 */
+      .badge {
+        display: inline-block;
+        padding: 0 8px;
+        border-radius: 9999px;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.8;
+      }
+      .badge-gray { background: #e2e8f0; color: #475569; }
+      .badge-green { background: #dcfce7; color: #166534; }
+      .badge-red { background: #fee2e2; color: #991b1b; }
+
+      /* 估價進行中顏色 (深淺藍) */
+      .ongoing-section tbody tr:nth-child(odd) td { background: #ECF2FF; }
+      .ongoing-section tbody tr:nth-child(even) td { background: #DBE8FF; }
+
+      /* 已買入顏色 (深淺綠) */
       .purchased-section tbody tr:nth-child(odd) td {
         background: #f2fbf5;
-        color: #243140;
+        color: #243140; /* 維持與進行中相同的深灰字體 */
       }
       .purchased-section tbody tr:nth-child(even) td {
         background: #e5f5eb;
+        color: #243140; 
+      }
+
+      /* 已售出顏色 (較淺的黃色) */
+      .sold-section tbody tr:nth-child(odd) td {
+        background: #FFFFF5;
+        color: #243140;
+      }
+      .sold-section tbody tr:nth-child(even) td {
+        background: #FFFFEB;
         color: #243140;
       }
 
-      /* 已售出顏色：黃色為主，奇偶不同深淺 */
-      .sold-section tbody tr:nth-child(odd) td {
-        background: #FFFFE6;
-        color: #17212b;
-      }
-      .sold-section tbody tr:nth-child(even) td {
-        background: #FFFFF5;
-        color: #17212b;
-      }
-
+      /* 滑鼠懸停高光統一設定 */
       tbody tr td {
         transition: background-color 140ms ease, color 140ms ease;
       }
-
-      /* 滑鼠高光修改為 #E8E8E8 */
       tbody tr:hover td,
       .purchased-section tbody tr:hover td,
       .sold-section tbody tr:hover td {
@@ -321,43 +323,41 @@
         color: #000 !important;
       }
 
+      /* 特殊欄位設定 */
       .note-cell {
         max-width: 220px;
         white-space: pre-wrap;
       }
 
       .wide-cell {
-        min-width: 260px;
-        max-width: 360px;
+        max-width: 23ch; /* 固定於第 23 字元斷行 */
         white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
       }
 
-      .number-cell {
-        text-align: left;
-        white-space: nowrap;
+      /* 排序標題樣式 */
+      .sortable-header {
+        text-decoration: underline;
+        cursor: pointer;
+        user-select: none;
       }
-      
-      .bonus-clickable {
-          text-decoration: underline;
-          cursor: pointer;
-          color: #2563eb;
-      }
-      
-      .bonus-clickable:hover {
-          color: #1d4ed8;
+      .sortable-header:hover {
+        color: var(--focus);
       }
 
+      /* 操作按鈕群 */
       .row-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
         min-width: 210px;
+        align-items: center;
       }
-
       .row-actions button {
         min-height: 34px;
         padding: 0 10px;
-        font-size: 17px;
+        font-size: 16px;
       }
 
       .empty-state {
@@ -368,205 +368,62 @@
         color: var(--muted);
         text-align: center;
       }
+      .empty-state strong { color: var(--ink); font-size: 22px; }
+      .empty-state.is-visible { display: grid; }
+      .is-hidden { display: none; }
 
-      .empty-state strong {
-        color: var(--ink);
-        font-size: 22px;
-      }
-
-      .empty-state.is-visible {
-        display: grid;
-      }
-
-      .is-hidden {
-        display: none;
-      }
-
-      .buy-dialog {
+      dialog {
         width: min(440px, calc(100% - 32px));
         border: 1px solid var(--line);
         border-radius: 8px;
         box-shadow: 0 24px 70px rgba(15, 23, 42, 0.26);
         padding: 0;
       }
-
-      .buy-dialog::backdrop {
-        background: rgba(15, 23, 42, 0.36);
+      dialog::backdrop {
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(2px);
       }
-
-      .buy-dialog form {
+      dialog form {
         display: grid;
         gap: 16px;
-        padding: 22px;
+        padding: 24px;
       }
-
-      .buy-dialog h2 {
+      dialog h2 {
         margin: 0;
         font-size: 24px;
       }
-
       .dialog-actions {
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-      }
-
-      @media (max-width: 1400px) {
-        .form-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
+        margin-top: 8px;
       }
 
       @media (max-width: 980px) {
-        .section-title {
-          align-items: stretch;
-          flex-direction: column;
-        }
-
-        .date-filter {
-          justify-content: flex-start;
-        }
-
-        .form-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .wide {
-          grid-column: span 2;
-        }
+        .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .wide { grid-column: span 2; }
       }
-
-      @media (max-width: 1200px) {
-        .purchased-section .section-title {
-          align-items: stretch;
-          flex-direction: column;
-        }
-
-        .purchased-section .date-filter {
-          justify-content: start;
-        }
-      }
-
       @media (max-width: 620px) {
-        .app-shell {
-          width: 100%;
-          padding: 0;
-        }
-
-        .workspace {
-          min-height: 100vh;
-          border: 0;
-        }
-
-        .entry-panel,
-        .list-tools,
-        .section-title,
-        .table-wrap {
-          padding-left: 16px;
-          padding-right: 16px;
-        }
-
-        .form-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .wide {
-          grid-column: auto;
-        }
-
-        .full-row {
-          grid-column: auto;
-        }
-
-        .form-actions {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-        }
-
-        .date-filter {
-          display: grid;
-          grid-template-columns: 1fr;
-        }
-
-        .date-filter label {
-          width: auto;
-        }
-
-        #clearPurchasedDateFilter,
-        #printPurchasedButton {
-          grid-column: auto;
-        }
+        .form-grid { grid-template-columns: 1fr; }
+        .wide, .full-row { grid-column: auto; }
+        .date-filter { grid-template-columns: 1fr; }
       }
-
       @media print {
-        body {
-          background: #fff;
-        }
-
-        .app-shell {
-          width: 100%;
-          padding: 0;
-        }
-
-        .workspace {
-          border: 0;
-          box-shadow: none;
-          min-height: auto;
-        }
-
-        .entry-panel,
-        .list-tools,
-        .records-section:not(.purchased-section),
-        .date-filter,
-        .row-actions,
-        .empty-state {
+        body { background: #fff; }
+        .entry-panel, .list-tools, .records-section:not(.purchased-section), .date-filter, .row-actions, .empty-state {
           display: none !important;
         }
-
-        .purchased-section {
-          padding: 0;
-          border: 0;
-        }
-
-        .section-title,
-        .table-wrap {
-          padding: 0;
-        }
-
-        .section-title {
-          margin-bottom: 12px;
-        }
-
-        .table-wrap {
-          overflow: visible;
-        }
-
-        table {
-          min-width: 0;
-          width: 100%;
-          font-size: 10px;
-        }
-
-        th,
-        td {
-          padding: 5px 4px;
-          font-size: 10px;
-        }
-
-        th {
-          position: static;
-        }
-
-        .purchased-section th:last-child,
-        .purchased-section td:last-child {
-          display: none;
-        }
+        .purchased-section { padding: 0; border: 0; }
+        table { min-width: 0; width: 100%; font-size: 10px; }
+        th, td { padding: 2px; font-size: 10px; border-bottom: 1px solid #ccc; line-height: 1.5; }
+        .purchased-section th:last-child, .purchased-section td:last-child { display: none; }
       }
     </style>
   </head>
   <body>
     <main class="app-shell">
       <section class="workspace">
+        <!-- 估價表單 -->
         <section class="entry-panel" aria-label="車輛估價表單">
           <form id="valuationForm" autocomplete="off">
             <input type="hidden" id="recordId" />
@@ -603,19 +460,16 @@
               </label>
               <label>
                 <span>顏色</span>
-                <select id="colorSelect">
-                  <option value="">請選擇</option>
-                  <option value="白">白</option>
-                  <option value="黑">黑</option>
-                  <option value="灰">灰</option>
-                  <option value="銀">銀</option>
-                  <option value="紅">紅</option>
-                  <option value="藍">藍</option>
-                  <option value="綠">綠</option>
-                  <option value="custom">自訂</option>
-                </select>
-                <input id="colorCustom" class="custom-color-input" type="text" placeholder="請輸入顏色" />
-                <input type="hidden" id="color" />
+                <input list="colorOptions" id="color" placeholder="選擇或輸入" />
+                <datalist id="colorOptions">
+                  <option value="白"></option>
+                  <option value="黑"></option>
+                  <option value="灰"></option>
+                  <option value="銀"></option>
+                  <option value="紅"></option>
+                  <option value="藍"></option>
+                  <option value="綠"></option>
+                </datalist>
               </label>
               <label>
                 <span>車況</span>
@@ -644,7 +498,7 @@
                 </select>
               </label>
               <label>
-                <span>報價</span>
+                <span>報價(金額)</span>
                 <input id="purchasePrice" type="text" />
               </label>
               <label>
@@ -685,8 +539,9 @@
             <input id="searchInput" type="search" placeholder="搜尋來源、車型、車況、賣家、備註或整理項目" />
           </label>
         </section>
-        
-        <section class="records-section" aria-labelledby="ongoingTitle">
+
+        <!-- 估價進行中 -->
+        <section class="records-section ongoing-section" aria-labelledby="ongoingTitle">
           <header class="section-title">
             <h2 id="ongoingTitle">估價進行中</h2>
             <span id="ongoingCount">0 筆</span>
@@ -697,21 +552,21 @@
                 <tr>
                   <th>來源</th>
                   <th>進件日</th>
-                  <th>年份</th>
+                  <th class="num-align">年份</th>
                   <th>車型</th>
-                  <th>里程</th>
+                  <th class="num-align">里程</th>
                   <th>顏色</th>
                   <th>車況</th>
                   <th>版本</th>
                   <th>權威</th>
                   <th>報價</th>
-                  <th>報價</th>
-                  <th>買進價</th>
-                  <th>賣出價</th>
+                  <th class="num-align">報價(金額)</th>
+                  <th class="num-align">買進價</th>
+                  <th class="num-align">賣出價</th>
                   <th>備註</th>
                   <th>整理項目</th>
                   <th>賣家</th>
-                  <th>獎金</th>
+                  <th class="num-align">獎金</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -724,6 +579,7 @@
           </div>
         </section>
 
+        <!-- 已買入 -->
         <section class="records-section purchased-section" aria-labelledby="purchasedTitle">
           <header class="section-title">
             <div>
@@ -750,21 +606,21 @@
                   <th>來源</th>
                   <th>進件日</th>
                   <th>買進日</th>
-                  <th>年份</th>
+                  <th class="num-align">年份</th>
                   <th>車型</th>
-                  <th>里程</th>
+                  <th class="num-align">里程</th>
                   <th>顏色</th>
                   <th>車況</th>
                   <th>版本</th>
                   <th>權威</th>
                   <th>報價</th>
-                  <th>報價</th>
-                  <th>買進價</th>
-                  <th>賣出價</th>
+                  <th class="num-align">報價(金額)</th>
+                  <th class="num-align">買進價</th>
+                  <th class="num-align">賣出價</th>
                   <th>備註</th>
                   <th>整理項目</th>
                   <th>賣家</th>
-                  <th>獎金</th>
+                  <th class="num-align">獎金</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -777,6 +633,7 @@
           </div>
         </section>
 
+        <!-- 已售出 -->
         <section class="records-section sold-section" aria-labelledby="soldTitle">
           <header class="section-title">
             <div>
@@ -789,23 +646,23 @@
               <thead>
                 <tr>
                   <th>來源</th>
-                  <th id="sortSoldDateHeader" style="cursor: pointer; text-decoration: underline;">進件日 ↕</th>
+                  <th class="sortable-header" id="soldDateSortHeader" title="點擊切換進件日排序">進件日 ▼</th>
                   <th>買進日</th>
-                  <th>年份</th>
+                  <th class="num-align">年份</th>
                   <th>車型</th>
-                  <th>里程</th>
+                  <th class="num-align">里程</th>
                   <th>顏色</th>
                   <th>車況</th>
                   <th>版本</th>
                   <th>權威</th>
                   <th>報價</th>
-                  <th>報價</th>
-                  <th>買進價</th>
-                  <th>賣出價</th>
+                  <th class="num-align">報價(金額)</th>
+                  <th class="num-align">買進價</th>
+                  <th class="num-align">賣出價</th>
                   <th>備註</th>
                   <th>整理項目</th>
                   <th>賣家</th>
-                  <th id="sortBonusHeader" style="cursor: pointer; text-decoration: underline;">獎金 ↕</th>
+                  <th class="num-align sortable-header" id="soldBonusSortHeader" title="點擊切換獎金排序">獎金</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -820,7 +677,8 @@
       </section>
     </main>
 
-    <dialog class="buy-dialog" id="buyDialog">
+    <!-- 買入對話框 -->
+    <dialog id="buyDialog">
       <form id="buyForm" method="dialog">
         <h2>已買入資料</h2>
         <input type="hidden" id="buyRecordId" />
@@ -834,12 +692,13 @@
         </label>
         <div class="dialog-actions">
           <button class="secondary" type="button" id="cancelBuyButton">取消</button>
-          <button type="submit">確認買入</button>
+          <button type="submit" class="action-blue">確認買入</button>
         </div>
       </form>
     </dialog>
 
-    <dialog class="buy-dialog" id="sellDialog">
+    <!-- 售出對話框 -->
+    <dialog id="sellDialog">
       <form id="sellForm" method="dialog">
         <h2>已售出資料</h2>
         <input type="hidden" id="sellRecordId" />
@@ -849,92 +708,66 @@
         </label>
         <div class="dialog-actions">
           <button class="secondary" type="button" id="cancelSellButton">取消</button>
-          <button type="submit">確認售出</button>
+          <button type="submit" class="action-green">確認售出</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- 刪除確認對話框 -->
+    <dialog id="deleteConfirmDialog">
+      <form id="deleteConfirmForm" method="dialog">
+        <h2>確認刪除</h2>
+        <p style="margin: 0; color: var(--muted);" id="deleteConfirmText">您確定要刪除這筆資料嗎？刪除後無法復原。</p>
+        <input type="hidden" id="deleteTargetId" />
+        <div class="dialog-actions">
+          <button class="secondary" type="button" id="cancelDeleteButton">取消</button>
+          <button type="submit" class="danger">確認刪除</button>
         </div>
       </form>
     </dialog>
 
     <script>
-      const STORAGE_KEY = "carvaluation.records.v1";
+      const STORAGE_KEY = "carvaluation.records.v2";
       const API_URL = "https://script.google.com/macros/s/AKfycbx83aRvR1MpZwqlTKKHyfej-aSJOrIPUI4aRlvX7Qy81Owz-9VxjYjCL3pRKzewkQu6/exec";
       const CUSTOM_SOURCE = "自行輸入";
       const FIXED_SOURCES = ["來店", "網站", "自買"];
-      
-      let soldSortField = 'date'; // 'date' or 'bonus'
-      let soldDateSortDirection = 'desc';
-      let soldBonusSortDirection = 'desc';
 
       const fieldNames = [
-        "sourceType",
-        "sourceCustom",
-        "receivedDate",
-        "year",
-        "model",
-        "km",
-        "color",
-        "condition",
-        "version",
-        "authority",
-        "quote",
-        "purchasePrice",
-        "actualDealPrice",
-        "salePrice",
-        "remarks",
-        "repairItems",
-        "seller",
-        "bonus",
+        "sourceType", "sourceCustom", "receivedDate", "year", "model",
+        "km", "color", "condition", "version", "authority", "quote",
+        "purchasePrice", "actualDealPrice", "salePrice", "remarks",
+        "repairItems", "seller", "bonus",
       ];
 
+      // 試算表欄位，加入 state
       const sheetHeaders = [
-        "id",
-        "source",
-        "receivedDate",
-        "boughtDate",
-        "year",
-        "model",
-        "km",
-        "color",
-        "condition",
-        "version",
-        "authority",
-        "quote",
-        "purchasePrice",
-        "actualDealPrice",
-        "salePrice",
-        "remarks",
-        "repairItems",
-        "seller",
-        "bonus",
-        "isPurchased",
-        "isSold",
-        "createdAt",
-        "updatedAt",
+        "id", "source", "receivedDate", "boughtDate", "year", "model",
+        "km", "color", "condition", "version", "authority", "quote",
+        "purchasePrice", "actualDealPrice", "salePrice", "remarks",
+        "repairItems", "seller", "bonus", "isPurchased", "isSold", "state",
+        "createdAt", "updatedAt",
       ];
 
       const fields = Object.fromEntries(fieldNames.map((name) => [name, document.querySelector(`#${name}`)]));
       fields.recordId = document.querySelector("#recordId");
-      
-      const colorSelect = document.querySelector("#colorSelect");
-      const colorCustom = document.querySelector("#colorCustom");
 
       const form = document.querySelector("#valuationForm");
       const submitButton = document.querySelector("#submitButton");
       const resetButton = document.querySelector("#resetButton");
       const searchInput = document.querySelector("#searchInput");
       const sourceCustomWrap = document.querySelector("#sourceCustomWrap");
-      const receivedDateWrap = document.querySelector("#receivedDateWrap");
       
       const ongoingBody = document.querySelector("#ongoingBody");
       const purchasedBody = document.querySelector("#purchasedBody");
-      const soldBody = document.querySelector("#soldBody");
+      const soldBody = document.querySelector("#soldBody"); 
       
       const ongoingEmpty = document.querySelector("#ongoingEmpty");
       const purchasedEmpty = document.querySelector("#purchasedEmpty");
-      const soldEmpty = document.querySelector("#soldEmpty");
+      const soldEmpty = document.querySelector("#soldEmpty"); 
       
       const ongoingCount = document.querySelector("#ongoingCount");
       const purchasedCount = document.querySelector("#purchasedCount");
-      const soldCount = document.querySelector("#soldCount");
+      const soldCount = document.querySelector("#soldCount"); 
       
       const buyDialog = document.querySelector("#buyDialog");
       const buyForm = document.querySelector("#buyForm");
@@ -943,21 +776,28 @@
       const buyActualDealPrice = document.querySelector("#buyActualDealPrice");
       const cancelBuyButton = document.querySelector("#cancelBuyButton");
       
-      const sellDialog = document.querySelector("#sellDialog");
+      const sellDialog = document.querySelector("#sellDialog"); 
       const sellForm = document.querySelector("#sellForm");
       const sellRecordId = document.querySelector("#sellRecordId");
       const sellPriceInput = document.querySelector("#sellPriceInput");
       const cancelSellButton = document.querySelector("#cancelSellButton");
 
+      const deleteConfirmDialog = document.querySelector("#deleteConfirmDialog");
+      const deleteConfirmForm = document.querySelector("#deleteConfirmForm");
+      const deleteTargetId = document.querySelector("#deleteTargetId");
+      const deleteConfirmText = document.querySelector("#deleteConfirmText");
+      const cancelDeleteButton = document.querySelector("#cancelDeleteButton");
+
       const purchasedDateFrom = document.querySelector("#purchasedDateFrom");
       const purchasedDateTo = document.querySelector("#purchasedDateTo");
       const clearPurchasedDateFilter = document.querySelector("#clearPurchasedDateFilter");
-      const printPurchasedButton = document.querySelector("#printPurchasedButton");
       
-      const sortBonusHeader = document.querySelector("#sortBonusHeader");
-      const sortSoldDateHeader = document.querySelector("#sortSoldDateHeader");
-
+      const soldDateSortHeader = document.querySelector("#soldDateSortHeader");
+      const soldBonusSortHeader = document.querySelector("#soldBonusSortHeader");
+      
       let records = loadLocalRecords();
+      let soldSortMode = "date"; // "date" or "bonus"
+      let soldSortDesc = true;
 
       function loadLocalRecords() {
         try {
@@ -982,6 +822,8 @@
         const normalizedSource = rawSource === "估價網站" ? "網站" : rawSource;
         const sourceType = record.sourceType || (FIXED_SOURCES.includes(normalizedSource) ? normalizedSource : normalizedSource ? CUSTOM_SOURCE : "");
         const sourceCustom = cleanSheetText(record.sourceCustom || (sourceType === CUSTOM_SOURCE ? normalizedSource : ""));
+        const isSold = normalizeBoolean(record.isSold);
+        const state = cleanSheetText(record.state) || (isSold ? "Y" : "N");
 
         return {
           id: cleanSheetText(record.id) || createId(),
@@ -1005,7 +847,8 @@
           seller: cleanSheetText(record.seller || record.location || [record.sellerName, record.sellerPhone].filter(Boolean).join(" ")),
           bonus: cleanSheetText(record.bonus),
           isPurchased: normalizeBoolean(record.isPurchased),
-          isSold: normalizeBoolean(record.isSold),
+          isSold: isSold,
+          state: state, // 維護 state
           createdAt: record.createdAt || new Date().toISOString(),
           updatedAt: record.updatedAt || new Date().toISOString(),
         };
@@ -1039,37 +882,22 @@
         const text = String(value).trim();
         const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
         if (isoDate) return `${isoDate[1]}-${isoDate[2]}-${isoDate[3]}`;
-
         const shortDate = text.match(/^(\d{1,2})\/(\d{1,2})$/);
         if (!shortDate) return "";
-
         const year = new Date().getFullYear();
         const month = shortDate[1].padStart(2, "0");
         const day = shortDate[2].padStart(2, "0");
         return `${year}-${month}-${day}`;
       }
 
-      function formatDateForDisplay(value) {
+      // 轉換為 MM/DD
+      function formatMMDD(value) {
         if (!value) return "";
         const text = String(value).trim();
         const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
-        if (!isoDate) return text;
-        return `${Number(isoDate[2])}/${Number(isoDate[3])}`;
-      }
-
-      function formatFullDateForDisplay(value) {
-        if (!value) return "";
-        const text = String(value).trim();
-        const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
-        if (isoDate) return `${isoDate[1]}/${isoDate[2]}/${isoDate[3]}`;
-        
+        if (isoDate) return `${isoDate[2]}/${isoDate[3]}`;
         const shortDate = text.match(/^(\d{1,2})\/(\d{1,2})$/);
-        if (shortDate) {
-          const year = new Date().getFullYear();
-          const month = shortDate[1].padStart(2, "0");
-          const day = shortDate[2].padStart(2, "0");
-          return `${year}/${month}/${day}`;
-        }
+        if (shortDate) return `${shortDate[1].padStart(2, "0")}/${shortDate[2].padStart(2, "0")}`;
         return text;
       }
 
@@ -1100,7 +928,8 @@
         return Object.fromEntries(
           sheetHeaders.map((header) => {
             const value = sheetRecord[header] ?? "";
-            if (header === "id" || header === "isPurchased" || header === "isSold") return [header, value];
+            // 不將布林值轉換為字串文字，保留原本型態或特定格式
+            if (["id", "isPurchased", "isSold", "state"].includes(header)) return [header, value];
             return [header, asSheetText(value)];
           }),
         );
@@ -1139,128 +968,30 @@
         try {
           const result = await apiPost("create", { record: toSheetRecord(record) });
           return normalizeRecord(result.record || record);
-        } catch (error) {
-          console.warn(error);
-          return record;
-        }
+        } catch { return record; }
       }
 
       async function persistUpdate(record) {
         try {
           const result = await apiPost("update", { record: toSheetRecord(record) });
           return normalizeRecord(result.record || record);
-        } catch (error) {
-          console.warn(error);
-          return record;
-        }
+        } catch { return record; }
       }
 
       async function persistDelete(id) {
-        try {
-          await apiPost("delete", { id });
-        } catch (error) {
-          console.warn(error);
-        }
-      }
-      
-      function updateColorField() {
-          if (colorSelect.value === 'custom') {
-              fields.color.value = colorCustom.value;
-          } else {
-              fields.color.value = colorSelect.value;
-          }
-      }
-      
-      colorSelect.addEventListener('change', () => {
-          if (colorSelect.value === 'custom') {
-              colorCustom.style.display = 'block';
-              colorCustom.focus();
-          } else {
-              colorCustom.style.display = 'none';
-          }
-          updateColorField();
-      });
-      
-      colorCustom.addEventListener('input', updateColorField);
-
-      function updateSourceCustomVisibility() {
-        const shouldShow = fields.sourceType.value === CUSTOM_SOURCE;
-        sourceCustomWrap.classList.toggle("is-hidden", !shouldShow);
-        fields.sourceCustom.disabled = !shouldShow;
-        if (!shouldShow) fields.sourceCustom.value = "";
-      }
-
-      function getFormData() {
-        const data = {
-          id: fields.recordId.value || createId(),
-          updatedAt: new Date().toISOString(),
-        };
-
-        for (const name of fieldNames) {
-          data[name] = fields[name].value.trim();
-        }
-
-        if (data.sourceType !== CUSTOM_SOURCE) {
-          data.sourceCustom = "";
-        }
-
-        data.km = normalizeKm(data.km);
-        return data;
-      }
-
-      function setFormData(record) {
-        fields.recordId.value = record.id;
-        for (const name of fieldNames) {
-          if (name === "km") {
-            fields[name].value = normalizeKm(record[name]);
-          } else if (name === "receivedDate") {
-            fields[name].value = toDateInputValue(record[name]);
-          } else if (name === "color") {
-            // Setup color logic
-            const colorOptions = Array.from(colorSelect.options).map(opt => opt.value);
-            if (record[name] && !colorOptions.includes(record[name]) && record[name] !== 'custom') {
-                colorSelect.value = 'custom';
-                colorCustom.value = record[name];
-                colorCustom.style.display = 'block';
-            } else {
-                colorSelect.value = record[name] || '';
-                colorCustom.value = '';
-                colorCustom.style.display = 'none';
-            }
-            fields[name].value = record[name] || "";
-          } else {
-            fields[name].value = record[name] || "";
-          }
-        }
-        updateSourceCustomVisibility();
-        submitButton.textContent = "儲存修改";
-        fields.sourceType.focus();
-      }
-
-      function resetForm() {
-        form.reset();
-        fields.recordId.value = "";
-        colorSelect.value = "";
-        colorCustom.value = "";
-        colorCustom.style.display = 'none';
-        submitButton.textContent = "新增資料";
-        updateSourceCustomVisibility();
+        try { await apiPost("delete", { id }); } catch (e) { console.warn(e); }
       }
 
       function getFilteredRecords() {
         const keyword = searchInput.value.trim().toLowerCase();
         if (!keyword) return records;
-
         return records.filter((record) =>
           [
             getSourceLabel(record),
             ...fieldNames.map((name) => record[name]),
             record.boughtDate,
             record.isSold ? "已售出" : (record.isPurchased ? "已買入" : "估價進行中"),
-          ]
-            .join(" ")
-            .toLowerCase()
-            .includes(keyword),
+          ].join(" ").toLowerCase().includes(keyword),
         );
       }
 
@@ -1268,41 +999,30 @@
         return [...items].sort((a, b) => {
           const dateA = dateValueToNumber(a.receivedDate) || 0;
           const dateB = dateValueToNumber(b.receivedDate) || 0;
-          if (dateA !== dateB) {
-            return dateB - dateA; // Descending by receivedDate
-          }
+          if (dateA !== dateB) return dateB - dateA;
           return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
         });
       }
-      
-      function sortSoldRecordsByBonus(items) {
-          return [...items].sort((a, b) => {
-              if (soldSortField === 'bonus') {
-                  const valA = a.bonus || "";
-                  const valB = b.bonus || "";
-                  
-                  if (valA !== valB) {
-                      return soldBonusSortDirection === 'desc' ? valB.localeCompare(valA) : valA.localeCompare(valB);
-                  }
-              }
-              
-              // 如果依照進件日排序，或獎金相同時的預設排序
-              const dateA = dateValueToNumber(a.receivedDate) || 0;
-              const dateB = dateValueToNumber(b.receivedDate) || 0;
-              
-              if (dateA !== dateB) {
-                  return soldDateSortDirection === 'desc' ? dateB - dateA : dateA - dateB;
-              }
-              
-              return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
-          });
+
+      function sortSoldRecords(items) {
+        return [...items].sort((a, b) => {
+          if (soldSortMode === "date") {
+            const dateA = dateValueToNumber(a.receivedDate) || 0;
+            const dateB = dateValueToNumber(b.receivedDate) || 0;
+            if (dateA !== dateB) return soldSortDesc ? (dateB - dateA) : (dateA - dateB);
+          } else if (soldSortMode === "bonus") {
+            const valA = String(a.bonus || "").toUpperCase();
+            const valB = String(b.bonus || "").toUpperCase();
+            if (valA !== valB) return soldSortDesc ? valB.localeCompare(valA) : valA.localeCompare(valB);
+          }
+          return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
+        });
       }
 
       function filterPurchasedByDate(items) {
         const from = dateValueToNumber(purchasedDateFrom.value);
         const to = dateValueToNumber(purchasedDateTo.value);
         if (!from && !to) return items;
-
         return items.filter((record) => {
           const boughtDate = dateValueToNumber(record.boughtDate);
           if (!boughtDate) return false;
@@ -1312,54 +1032,50 @@
         });
       }
 
-      function createCell(value, className = "") {
+      function renderPill(value, isQuote = false) {
+        if (!value) return "";
+        let colorClass = "badge-gray";
+        const upperVal = String(value).toUpperCase();
+        if (upperVal === "A" || upperVal === "Y") colorClass = "badge-green";
+        if (upperVal === "C" || upperVal === "N") colorClass = "badge-red";
+        return `<span class="badge ${colorClass}">${value}</span>`;
+      }
+
+      function createCell(value, className = "", asHTML = false) {
         const cell = document.createElement("td");
         if (className) cell.className = className;
-        cell.textContent = value || "";
+        if (asHTML) cell.innerHTML = value || "";
+        else cell.textContent = value || "";
         return cell;
       }
 
-      function appendCommonCells(row, record, isSoldTable = false) {
-        row.append(
-          createCell(record.year),
-          createCell(record.model),
-          createCell(record.km, "number-cell"),
-          createCell(record.color),
-          createCell(record.condition),
-          createCell(record.version),
-          createCell(record.authority),
-          createCell(record.quote),
-          createCell(record.purchasePrice),
-          createCell(record.actualDealPrice),
-          createCell(record.salePrice),
-          createCell(record.remarks, "note-cell"),
-          createCell(record.repairItems, "wide-cell"),
-          createCell(record.seller)
-        );
-        
-        const bonusCell = createCell(record.bonus);
-        if (isSoldTable) {
-            bonusCell.innerHTML = `<span class="bonus-clickable" data-action="toggle-bonus" data-id="${record.id}">${record.bonus || 'N'}</span>`;
-        }
-        row.append(bonusCell);
-      }
-
-      function createRecordRow(record, isSoldTable = false) {
+      function createRecordRow(record) {
         const row = document.createElement("tr");
-        if (record.isSold) {
-          row.className = "is-sold";
-        } else if (record.isPurchased) {
-          row.className = "is-purchased";
-        }
         
         row.append(createCell(getSourceLabel(record)));
-        row.append(createCell(formatFullDateForDisplay(record.receivedDate)));
+        row.append(createCell(formatMMDD(record.receivedDate)));
 
         if (record.isPurchased || record.isSold) {
-          row.append(createCell(formatFullDateForDisplay(record.boughtDate)));
+          row.append(createCell(formatMMDD(record.boughtDate)));
         }
 
-        appendCommonCells(row, record, isSoldTable);
+        row.append(
+          createCell(record.year, "num-align"),
+          createCell(record.model),
+          createCell(record.km, "num-align"),
+          createCell(record.color),
+          createCell(renderPill(record.condition), "", true),
+          createCell(record.version),
+          createCell(record.authority),
+          createCell(renderPill(record.quote, true), "", true),
+          createCell(record.purchasePrice, "num-align"),
+          createCell(record.actualDealPrice, "num-align"),
+          createCell(record.salePrice, "num-align"),
+          createCell(record.remarks, "note-cell"),
+          createCell(record.repairItems, "wide-cell"),
+          createCell(record.seller),
+          createCell(record.bonus, "num-align")
+        );
 
         const actionCell = document.createElement("td");
         let actionHTML = '';
@@ -1368,10 +1084,9 @@
           actionHTML = `
             <div class="row-actions">
               <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
-              <button class="secondary" type="button" data-action="toggle-sold" data-id="${record.id}">取消售出</button>
+              <button class="secondary" type="button" data-action="toggle-sold" data-id="${record.id}">取消成交</button>
               <button class="danger" type="button" data-action="delete" data-id="${record.id}">刪除</button>
-            </div>
-          `;
+            </div>`;
         } else if (record.isPurchased) {
           actionHTML = `
             <div class="row-actions">
@@ -1379,48 +1094,40 @@
               <button class="action-green" type="button" data-action="sell" data-id="${record.id}">已售出</button>
               <button class="secondary" type="button" data-action="toggle-purchased" data-id="${record.id}">取消買入</button>
               <button class="danger" type="button" data-action="delete" data-id="${record.id}">刪除</button>
-            </div>
-          `;
+            </div>`;
         } else {
           actionHTML = `
             <div class="row-actions">
               <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
               <button class="action-blue" type="button" data-action="toggle-purchased" data-id="${record.id}">已買入</button>
               <button class="danger" type="button" data-action="delete" data-id="${record.id}">刪除</button>
-            </div>
-          `;
+            </div>`;
         }
-
         actionCell.innerHTML = actionHTML;
         row.append(actionCell);
         return row;
       }
 
-      function renderRows(body, items, isSoldTable = false) {
-        body.innerHTML = "";
-        for (const record of items) {
-          body.append(createRecordRow(record, isSoldTable));
-        }
-      }
-
       function render() {
         const filteredRecords = getFilteredRecords();
-        
-        const ongoingRecords = sortRecords(filteredRecords.filter((record) => !record.isPurchased && !record.isSold));
-        const allPurchasedRecords = sortRecords(filteredRecords.filter((record) => record.isPurchased && !record.isSold));
-        const soldRecords = sortSoldRecordsByBonus(filteredRecords.filter((record) => record.isSold));
+        const ongoingRecords = filteredRecords.filter((record) => !record.isPurchased && !record.isSold);
+        const allPurchasedRecords = filteredRecords.filter((record) => record.isPurchased && !record.isSold);
+        const soldRecords = filteredRecords.filter((record) => record.isSold);
         
         const purchasedRecords = filterPurchasedByDate(allPurchasedRecords);
 
-        renderRows(ongoingBody, ongoingRecords);
-        renderRows(purchasedBody, purchasedRecords);
-        renderRows(soldBody, soldRecords, true);
+        ongoingBody.innerHTML = "";
+        for (const record of sortRecords(ongoingRecords)) ongoingBody.append(createRecordRow(record));
+        
+        purchasedBody.innerHTML = "";
+        for (const record of sortRecords(purchasedRecords)) purchasedBody.append(createRecordRow(record));
+        
+        soldBody.innerHTML = "";
+        for (const record of sortSoldRecords(soldRecords)) soldBody.append(createRecordRow(record));
 
         ongoingCount.textContent = `${ongoingRecords.length} 筆`;
-        purchasedCount.textContent =
-          purchasedRecords.length === allPurchasedRecords.length
-            ? `${purchasedRecords.length} 筆`
-            : `${purchasedRecords.length} / ${allPurchasedRecords.length} 筆`;
+        purchasedCount.textContent = purchasedRecords.length === allPurchasedRecords.length 
+          ? `${purchasedRecords.length} 筆` : `${purchasedRecords.length} / ${allPurchasedRecords.length} 筆`;
         soldCount.textContent = `${soldRecords.length} 筆`;
 
         ongoingEmpty.classList.toggle("is-visible", ongoingRecords.length === 0);
@@ -1428,34 +1135,47 @@
         soldEmpty.classList.toggle("is-visible", soldRecords.length === 0);
       }
 
-      function openBuyDialog(record) {
-        buyRecordId.value = record.id;
-        buyDate.value = toDateInputValue(record.boughtDate);
-        buyActualDealPrice.value = record.actualDealPrice || "";
-        buyDialog.showModal();
-        buyDate.focus();
+      function updateSourceCustomVisibility() {
+        const shouldShow = fields.sourceType.value === CUSTOM_SOURCE;
+        sourceCustomWrap.classList.toggle("is-hidden", !shouldShow);
+        fields.sourceCustom.disabled = !shouldShow;
+        if (!shouldShow) fields.sourceCustom.value = "";
       }
 
-      function openSellDialog(record) {
-        sellRecordId.value = record.id;
-        sellPriceInput.value = record.salePrice || "";
-        sellDialog.showModal();
-        sellPriceInput.focus();
+      function setFormData(record) {
+        fields.recordId.value = record.id;
+        for (const name of fieldNames) {
+          if (name === "km") fields[name].value = normalizeKm(record[name]);
+          else if (name === "receivedDate") fields[name].value = toDateInputValue(record[name]);
+          else fields[name].value = record[name] || "";
+        }
+        updateSourceCustomVisibility();
+        submitButton.textContent = "儲存修改";
+        fields.sourceType.focus();
+      }
+
+      function resetForm() {
+        form.reset();
+        fields.recordId.value = "";
+        submitButton.textContent = "新增資料";
+        updateSourceCustomVisibility();
       }
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         submitButton.disabled = true;
 
-        const data = getFormData();
-        const existingIndex = records.findIndex((record) => record.id === data.id);
+        const data = { id: fields.recordId.value || createId(), updatedAt: new Date().toISOString() };
+        for (const name of fieldNames) data[name] = fields[name].value.trim();
+        if (data.sourceType !== CUSTOM_SOURCE) data.sourceCustom = "";
+        data.km = normalizeKm(data.km);
 
+        const existingIndex = records.findIndex((r) => r.id === data.id);
         if (existingIndex >= 0) {
-          const updatedRecord = normalizeRecord({ ...records[existingIndex], ...data });
-          records[existingIndex] = await persistUpdate(updatedRecord);
+          records[existingIndex] = await persistUpdate(normalizeRecord({ ...records[existingIndex], ...data }));
         } else {
-          const createdRecord = normalizeRecord({ ...data, isPurchased: false, isSold: false, createdAt: new Date().toISOString() });
-          records.push(await persistCreate(createdRecord));
+          // 新增資料時 state 預設為 N
+          records.push(await persistCreate(normalizeRecord({ ...data, isPurchased: false, isSold: false, state: "N", createdAt: new Date().toISOString() })));
         }
 
         saveLocalRecords();
@@ -1466,156 +1186,98 @@
 
       buyForm.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const recordIndex = records.findIndex((item) => item.id === buyRecordId.value);
-        if (recordIndex < 0) return;
-
-        const updatedRecord = normalizeRecord({
-          ...records[recordIndex],
-          boughtDate: buyDate.value.trim(),
-          actualDealPrice: buyActualDealPrice.value.trim(),
-          isPurchased: true,
-          updatedAt: new Date().toISOString(),
-        });
-
-        records[recordIndex] = await persistUpdate(updatedRecord);
-        saveLocalRecords();
-        render();
-        buyDialog.close();
-        buyForm.reset();
-      });
-
-      cancelBuyButton.addEventListener("click", () => {
-        buyDialog.close();
-        buyForm.reset();
+        const index = records.findIndex((i) => i.id === buyRecordId.value);
+        if (index >= 0) {
+          records[index] = await persistUpdate(normalizeRecord({
+            ...records[index], boughtDate: buyDate.value.trim(), actualDealPrice: buyActualDealPrice.value.trim(),
+            isPurchased: true, updatedAt: new Date().toISOString()
+          }));
+          saveLocalRecords(); render();
+        }
+        buyDialog.close(); buyForm.reset();
       });
 
       sellForm.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const recordIndex = records.findIndex((item) => item.id === sellRecordId.value);
-        if (recordIndex < 0) return;
-
-        const updatedRecord = normalizeRecord({
-          ...records[recordIndex],
-          salePrice: sellPriceInput.value.trim(),
-          isSold: true,
-          updatedAt: new Date().toISOString(),
-        });
-
-        records[recordIndex] = await persistUpdate(updatedRecord);
-        saveLocalRecords();
-        render();
-        sellDialog.close();
-        sellForm.reset();
+        const index = records.findIndex((i) => i.id === sellRecordId.value);
+        if (index >= 0) {
+          records[index] = await persistUpdate(normalizeRecord({
+            ...records[index], salePrice: sellPriceInput.value.trim(), isSold: true, state: "Y", updatedAt: new Date().toISOString()
+          }));
+          saveLocalRecords(); render();
+        }
+        sellDialog.close(); sellForm.reset();
       });
 
-      cancelSellButton.addEventListener("click", () => {
-        sellDialog.close();
-        sellForm.reset();
+      deleteConfirmForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const id = deleteTargetId.value;
+        await persistDelete(id);
+        records = records.filter((item) => item.id !== id);
+        saveLocalRecords(); render();
+        if (fields.recordId.value === id) resetForm();
+        deleteConfirmDialog.close();
       });
 
+      cancelBuyButton.addEventListener("click", () => { buyDialog.close(); buyForm.reset(); });
+      cancelSellButton.addEventListener("click", () => { sellDialog.close(); sellForm.reset(); });
+      cancelDeleteButton.addEventListener("click", () => { deleteConfirmDialog.close(); });
+      
       fields.sourceType.addEventListener("change", updateSourceCustomVisibility);
       resetButton.addEventListener("click", resetForm);
       searchInput.addEventListener("input", render);
       purchasedDateFrom.addEventListener("input", render);
       purchasedDateTo.addEventListener("input", render);
-      clearPurchasedDateFilter.addEventListener("click", () => {
-        purchasedDateFrom.value = "";
-        purchasedDateTo.value = "";
+      clearPurchasedDateFilter.addEventListener("click", () => { purchasedDateFrom.value = ""; purchasedDateTo.value = ""; render(); });
+      document.querySelector("#printPurchasedButton")?.addEventListener("click", () => window.print());
+
+      soldDateSortHeader?.addEventListener("click", () => {
+        if (soldSortMode !== "date") soldSortDesc = true; else soldSortDesc = !soldSortDesc;
+        soldSortMode = "date";
+        soldDateSortHeader.textContent = `進件日 ${soldSortDesc ? "▼" : "▲"}`;
+        soldBonusSortHeader.textContent = "獎金";
         render();
       });
-      printPurchasedButton.addEventListener("click", () => {
-        window.print();
-      });
-      
-      sortBonusHeader.addEventListener("click", () => {
-          soldSortField = 'bonus';
-          soldBonusSortDirection = soldBonusSortDirection === 'desc' ? 'asc' : 'desc';
-          sortBonusHeader.textContent = `獎金 ${soldBonusSortDirection === 'desc' ? '↓' : '↑'}`;
-          sortSoldDateHeader.textContent = `進件日 ↕`;
-          render();
-      });
 
-      sortSoldDateHeader.addEventListener("click", () => {
-          soldSortField = 'date';
-          soldDateSortDirection = soldDateSortDirection === 'desc' ? 'asc' : 'desc';
-          sortSoldDateHeader.textContent = `進件日 ${soldDateSortDirection === 'desc' ? '↓' : '↑'}`;
-          sortBonusHeader.textContent = `獎金 ↕`;
-          render();
-      });
-
-      receivedDateWrap?.addEventListener("click", (event) => {
-        if (event.target === fields.receivedDate) return;
-        if (typeof fields.receivedDate.showPicker === "function") {
-          fields.receivedDate.showPicker();
-        } else {
-          fields.receivedDate.focus();
-        }
+      soldBonusSortHeader?.addEventListener("click", () => {
+        if (soldSortMode !== "bonus") soldSortDesc = true; else soldSortDesc = !soldSortDesc;
+        soldSortMode = "bonus";
+        soldBonusSortHeader.textContent = `獎金 ${soldSortDesc ? "▼" : "▲"}`;
+        soldDateSortHeader.textContent = "進件日";
+        render();
       });
 
       document.addEventListener("click", async (event) => {
-        const target = event.target;
-        
-        if (target.dataset.action === "toggle-bonus") {
-            const recordIndex = records.findIndex((item) => item.id === target.dataset.id);
-            const record = records[recordIndex];
-            if (!record) return;
-            
-            const newBonus = (record.bonus === "Y" || record.bonus === "y") ? "N" : "Y";
-            const updatedRecord = normalizeRecord({ ...record, bonus: newBonus, updatedAt: new Date().toISOString() });
-            records[recordIndex] = await persistUpdate(updatedRecord);
-            saveLocalRecords();
-            render();
-            return;
-        }
-
-        const button = target.closest("button[data-action]");
+        const button = event.target.closest("button[data-action]");
         if (!button) return;
-
-        const recordIndex = records.findIndex((item) => item.id === button.dataset.id);
-        const record = records[recordIndex];
+        const index = records.findIndex((item) => item.id === button.dataset.id);
+        const record = records[index];
         if (!record) return;
 
         if (button.dataset.action === "edit") {
-          setFormData(record);
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-
-        if (button.dataset.action === "toggle-purchased") {
+          setFormData(record); window.scrollTo({ top: 0, behavior: "smooth" });
+        } else if (button.dataset.action === "toggle-purchased") {
           if (record.isPurchased) {
-            const updatedRecord = normalizeRecord({ ...record, isPurchased: false, updatedAt: new Date().toISOString() });
-            records[recordIndex] = await persistUpdate(updatedRecord);
-            saveLocalRecords();
-            render();
+            records[index] = await persistUpdate(normalizeRecord({ ...record, isPurchased: false, updatedAt: new Date().toISOString() }));
+            saveLocalRecords(); render();
           } else {
-            openBuyDialog(record);
+            buyRecordId.value = record.id; buyDate.value = toDateInputValue(record.boughtDate); buyActualDealPrice.value = record.actualDealPrice || "";
+            buyDialog.showModal(); buyDate.focus();
           }
-        }
-        
-        if (button.dataset.action === "sell") {
-          openSellDialog(record);
-        }
-
-        if (button.dataset.action === "toggle-sold") {
-          const updatedRecord = normalizeRecord({ ...record, isSold: false, updatedAt: new Date().toISOString() });
-          records[recordIndex] = await persistUpdate(updatedRecord);
-          saveLocalRecords();
-          render();
-        }
-
-        if (button.dataset.action === "delete") {
-          const confirmed = confirm(`確定要刪除 ${record.model || "這筆"} 的資料嗎？`);
-          if (!confirmed) return;
-          await persistDelete(record.id);
-          records = records.filter((item) => item.id !== record.id);
-          saveLocalRecords();
-          render();
-          if (fields.recordId.value === record.id) resetForm();
+        } else if (button.dataset.action === "sell") {
+          sellRecordId.value = record.id; sellPriceInput.value = record.salePrice || "";
+          sellDialog.showModal(); sellPriceInput.focus();
+        } else if (button.dataset.action === "toggle-sold") {
+          records[index] = await persistUpdate(normalizeRecord({ ...record, isSold: false, state: "N", updatedAt: new Date().toISOString() }));
+          saveLocalRecords(); render();
+        } else if (button.dataset.action === "delete") {
+          deleteTargetId.value = record.id;
+          deleteConfirmText.textContent = `您確定要刪除「${record.model || '未命名車輛'}」的估價資料嗎？此操作無法復原。`;
+          deleteConfirmDialog.showModal();
         }
       });
 
-      resetForm();
-      render();
-      syncFromCloud();
+      resetForm(); render(); syncFromCloud();
     </script>
   </body>
 </html>
