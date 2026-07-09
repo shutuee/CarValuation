@@ -232,7 +232,7 @@
         padding: 0 28px 32px;
       }
 
-      /* 表格基礎設定：移除垂直線、增加兩倍行高 */
+      /* 表格基礎設定：移除垂直線、增加三倍行高、買入售出表寬度1.2倍 */
       table {
         width: 100%;
         min-width: 2060px;
@@ -249,11 +249,11 @@
       td {
         border: none;
         border-bottom: 1px solid #737373; /* 中深灰水平分隔線 */
-        padding: 0 6px; /* 移除兩側多餘留白，僅保留些微呼吸空間 */
+        padding: 0 6px; /* 移除兩側多餘留白 */
         text-align: left;
         vertical-align: middle;
         font-size: 18px;
-        line-height: 2; /* 兩倍行高 */
+        line-height: 3.5; /* 3.5倍行高，視覺喘息空間極佳 */
       }
 
       th {
@@ -263,30 +263,12 @@
         background: #f8fafc;
         color: #42505d;
         font-size: 17px;
-        border-bottom: 2px solid #52525b; /* 標題底部較深的邊線 */
+        border-bottom: 2px solid #52525b; /* 表頭底線較深 */
       }
 
       td {
         color: #243140;
       }
-
-      /* 靠右對齊 (數字、金額) */
-      .num-align {
-        text-align: right;
-      }
-
-      /* 狀態 Pill 標籤 */
-      .badge {
-        display: inline-block;
-        padding: 0 8px;
-        border-radius: 9999px;
-        font-size: 14px;
-        font-weight: 700;
-        line-height: 1.8;
-      }
-      .badge-gray { background: #e2e8f0; color: #475569; }
-      .badge-green { background: #dcfce7; color: #166534; }
-      .badge-red { background: #fee2e2; color: #991b1b; }
 
       /* 估價進行中顏色 (深淺藍) */
       .ongoing-section tbody tr:nth-child(odd) td { background: #ECF2FF; }
@@ -295,7 +277,7 @@
       /* 已買入顏色 (深淺綠) */
       .purchased-section tbody tr:nth-child(odd) td {
         background: #f2fbf5;
-        color: #243140; /* 維持與進行中相同的深灰字體 */
+        color: #243140; /* 統一字體顏色深灰 */
       }
       .purchased-section tbody tr:nth-child(even) td {
         background: #e5f5eb;
@@ -312,7 +294,7 @@
         color: #243140;
       }
 
-      /* 滑鼠懸停高光統一設定 */
+      /* 滑鼠懸停高光統一設定 #E8E8E8 */
       tbody tr td {
         transition: background-color 140ms ease, color 140ms ease;
       }
@@ -330,7 +312,7 @@
       }
 
       .wide-cell {
-        max-width: 23ch; /* 固定於第 23 字元斷行 */
+        max-width: 30ch; /* 固定於第 30 字元斷行 */
         white-space: pre-wrap;
         word-wrap: break-word;
         overflow-wrap: break-word;
@@ -346,18 +328,20 @@
         color: var(--focus);
       }
 
-      /* 操作按鈕群 */
+      /* 操作按鈕群 - 精細化：小一號 */
       .row-actions {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
-        min-width: 210px;
+        gap: 6px;
+        min-width: 140px; /* 容器寬度配合按鈕同步縮小 */
         align-items: center;
       }
       .row-actions button {
-        min-height: 34px;
-        padding: 0 10px;
-        font-size: 16px;
+        min-height: 24px; /* 精細縮小高度 */
+        padding: 0 6px; /* 縮小左右內距 */
+        font-size: 12px; /* 字型小一號 */
+        font-weight: 600; 
+        border-radius: 4px; /* 精緻小圓角 */
       }
 
       .empty-state {
@@ -452,7 +436,7 @@
               </label>
               <label>
                 <span>車型</span>
-                <input id="model" type="text" required />
+                <input id="model" type="text" />
               </label>
               <label>
                 <span>里程</span>
@@ -503,7 +487,7 @@
               </label>
               <label>
                 <span>買進價</span>
-                <input id="actualDealPrice" type="text" required />
+                <input id="actualDealPrice" type="text" />
               </label>
               <label>
                 <span>賣出價</span>
@@ -552,21 +536,21 @@
                 <tr>
                   <th>來源</th>
                   <th>進件日</th>
-                  <th class="num-align">年份</th>
+                  <th>年份</th>
                   <th>車型</th>
-                  <th class="num-align">里程</th>
+                  <th>里程</th>
                   <th>顏色</th>
                   <th>車況</th>
                   <th>版本</th>
                   <th>權威</th>
                   <th>報價</th>
-                  <th class="num-align">報價(金額)</th>
-                  <th class="num-align">買進價</th>
-                  <th class="num-align">賣出價</th>
+                  <th>報價(金額)</th>
+                  <th>買進價</th>
+                  <th>賣出價</th>
                   <th>備註</th>
                   <th>整理項目</th>
                   <th>賣家</th>
-                  <th class="num-align">獎金</th>
+                  <th>獎金</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -606,21 +590,21 @@
                   <th>來源</th>
                   <th>進件日</th>
                   <th>買進日</th>
-                  <th class="num-align">年份</th>
+                  <th>年份</th>
                   <th>車型</th>
-                  <th class="num-align">里程</th>
+                  <th>里程</th>
                   <th>顏色</th>
                   <th>車況</th>
                   <th>版本</th>
                   <th>權威</th>
                   <th>報價</th>
-                  <th class="num-align">報價(金額)</th>
-                  <th class="num-align">買進價</th>
-                  <th class="num-align">賣出價</th>
+                  <th>報價(金額)</th>
+                  <th>買進價</th>
+                  <th>賣出價</th>
                   <th>備註</th>
                   <th>整理項目</th>
                   <th>賣家</th>
-                  <th class="num-align">獎金</th>
+                  <th>獎金</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -648,21 +632,21 @@
                   <th>來源</th>
                   <th class="sortable-header" id="soldDateSortHeader" title="點擊切換進件日排序">進件日 ▼</th>
                   <th>買進日</th>
-                  <th class="num-align">年份</th>
+                  <th>年份</th>
                   <th>車型</th>
-                  <th class="num-align">里程</th>
+                  <th>里程</th>
                   <th>顏色</th>
                   <th>車況</th>
                   <th>版本</th>
                   <th>權威</th>
                   <th>報價</th>
-                  <th class="num-align">報價(金額)</th>
-                  <th class="num-align">買進價</th>
-                  <th class="num-align">賣出價</th>
+                  <th>報價(金額)</th>
+                  <th>買進價</th>
+                  <th>賣出價</th>
                   <th>備註</th>
                   <th>整理項目</th>
                   <th>賣家</th>
-                  <th class="num-align sortable-header" id="soldBonusSortHeader" title="點擊切換獎金排序">獎金</th>
+                  <th>獎金</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -739,12 +723,12 @@
         "repairItems", "seller", "bonus",
       ];
 
-      // 試算表欄位，加入 state
+      // 試算表欄位：寫入 state 為首要狀態來源
       const sheetHeaders = [
         "id", "source", "receivedDate", "boughtDate", "year", "model",
         "km", "color", "condition", "version", "authority", "quote",
         "purchasePrice", "actualDealPrice", "salePrice", "remarks",
-        "repairItems", "seller", "bonus", "isPurchased", "isSold", "state",
+        "repairItems", "seller", "bonus", "isPurchased", "state",
         "createdAt", "updatedAt",
       ];
 
@@ -793,10 +777,8 @@
       const clearPurchasedDateFilter = document.querySelector("#clearPurchasedDateFilter");
       
       const soldDateSortHeader = document.querySelector("#soldDateSortHeader");
-      const soldBonusSortHeader = document.querySelector("#soldBonusSortHeader");
       
       let records = loadLocalRecords();
-      let soldSortMode = "date"; // "date" or "bonus"
       let soldSortDesc = true;
 
       function loadLocalRecords() {
@@ -822,8 +804,10 @@
         const normalizedSource = rawSource === "估價網站" ? "網站" : rawSource;
         const sourceType = record.sourceType || (FIXED_SOURCES.includes(normalizedSource) ? normalizedSource : normalizedSource ? CUSTOM_SOURCE : "");
         const sourceCustom = cleanSheetText(record.sourceCustom || (sourceType === CUSTOM_SOURCE ? normalizedSource : ""));
-        const isSold = normalizeBoolean(record.isSold);
-        const state = cleanSheetText(record.state) || (isSold ? "Y" : "N");
+
+        // 強制從 state 欄位判定已售出狀態，解決雲端同步衝突
+        const rawState = cleanSheetText(record.state || "").toUpperCase();
+        const isSold = (rawState === "Y");
 
         return {
           id: cleanSheetText(record.id) || createId(),
@@ -847,8 +831,8 @@
           seller: cleanSheetText(record.seller || record.location || [record.sellerName, record.sellerPhone].filter(Boolean).join(" ")),
           bonus: cleanSheetText(record.bonus),
           isPurchased: normalizeBoolean(record.isPurchased),
-          isSold: isSold,
-          state: state, // 維護 state
+          isSold: isSold, // 與 state 同步
+          state: isSold ? "Y" : "N",
           createdAt: record.createdAt || new Date().toISOString(),
           updatedAt: record.updatedAt || new Date().toISOString(),
         };
@@ -922,14 +906,13 @@
           ...normalized,
           source: getSourceLabel(normalized),
           isPurchased: normalized.isPurchased ? "TRUE" : "FALSE",
-          isSold: normalized.isSold ? "TRUE" : "FALSE",
+          state: normalized.isSold ? "Y" : "N", // 統一使用 state 拋送後端
         };
 
         return Object.fromEntries(
           sheetHeaders.map((header) => {
             const value = sheetRecord[header] ?? "";
-            // 不將布林值轉換為字串文字，保留原本型態或特定格式
-            if (["id", "isPurchased", "isSold", "state"].includes(header)) return [header, value];
+            if (["id", "isPurchased", "state"].includes(header)) return [header, value];
             return [header, asSheetText(value)];
           }),
         );
@@ -1006,15 +989,9 @@
 
       function sortSoldRecords(items) {
         return [...items].sort((a, b) => {
-          if (soldSortMode === "date") {
-            const dateA = dateValueToNumber(a.receivedDate) || 0;
-            const dateB = dateValueToNumber(b.receivedDate) || 0;
-            if (dateA !== dateB) return soldSortDesc ? (dateB - dateA) : (dateA - dateB);
-          } else if (soldSortMode === "bonus") {
-            const valA = String(a.bonus || "").toUpperCase();
-            const valB = String(b.bonus || "").toUpperCase();
-            if (valA !== valB) return soldSortDesc ? valB.localeCompare(valA) : valA.localeCompare(valB);
-          }
+          const dateA = dateValueToNumber(a.receivedDate) || 0;
+          const dateB = dateValueToNumber(b.receivedDate) || 0;
+          if (dateA !== dateB) return soldSortDesc ? (dateB - dateA) : (dateA - dateB);
           return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
         });
       }
@@ -1032,20 +1009,10 @@
         });
       }
 
-      function renderPill(value, isQuote = false) {
-        if (!value) return "";
-        let colorClass = "badge-gray";
-        const upperVal = String(value).toUpperCase();
-        if (upperVal === "A" || upperVal === "Y") colorClass = "badge-green";
-        if (upperVal === "C" || upperVal === "N") colorClass = "badge-red";
-        return `<span class="badge ${colorClass}">${value}</span>`;
-      }
-
-      function createCell(value, className = "", asHTML = false) {
+      function createCell(value, className = "") {
         const cell = document.createElement("td");
         if (className) cell.className = className;
-        if (asHTML) cell.innerHTML = value || "";
-        else cell.textContent = value || "";
+        cell.textContent = value || "";
         return cell;
       }
 
@@ -1060,21 +1027,21 @@
         }
 
         row.append(
-          createCell(record.year, "num-align"),
+          createCell(record.year),
           createCell(record.model),
-          createCell(record.km, "num-align"),
+          createCell(record.km),
           createCell(record.color),
-          createCell(renderPill(record.condition), "", true),
+          createCell(record.condition), 
           createCell(record.version),
           createCell(record.authority),
-          createCell(renderPill(record.quote, true), "", true),
-          createCell(record.purchasePrice, "num-align"),
-          createCell(record.actualDealPrice, "num-align"),
-          createCell(record.salePrice, "num-align"),
+          createCell(record.quote), 
+          createCell(record.purchasePrice),
+          createCell(record.actualDealPrice),
+          createCell(record.salePrice),
           createCell(record.remarks, "note-cell"),
           createCell(record.repairItems, "wide-cell"),
           createCell(record.seller),
-          createCell(record.bonus, "num-align")
+          createCell(record.bonus)
         );
 
         const actionCell = document.createElement("td");
@@ -1174,7 +1141,7 @@
         if (existingIndex >= 0) {
           records[existingIndex] = await persistUpdate(normalizeRecord({ ...records[existingIndex], ...data }));
         } else {
-          // 新增資料時 state 預設為 N
+          // 新增資料，強制帶入 state: "N"
           records.push(await persistCreate(normalizeRecord({ ...data, isPurchased: false, isSold: false, state: "N", createdAt: new Date().toISOString() })));
         }
 
@@ -1201,6 +1168,7 @@
         event.preventDefault();
         const index = records.findIndex((i) => i.id === sellRecordId.value);
         if (index >= 0) {
+          // 確認售出，寫入 isSold: true, state: "Y"
           records[index] = await persistUpdate(normalizeRecord({
             ...records[index], salePrice: sellPriceInput.value.trim(), isSold: true, state: "Y", updatedAt: new Date().toISOString()
           }));
@@ -1232,18 +1200,8 @@
       document.querySelector("#printPurchasedButton")?.addEventListener("click", () => window.print());
 
       soldDateSortHeader?.addEventListener("click", () => {
-        if (soldSortMode !== "date") soldSortDesc = true; else soldSortDesc = !soldSortDesc;
-        soldSortMode = "date";
+        soldSortDesc = !soldSortDesc;
         soldDateSortHeader.textContent = `進件日 ${soldSortDesc ? "▼" : "▲"}`;
-        soldBonusSortHeader.textContent = "獎金";
-        render();
-      });
-
-      soldBonusSortHeader?.addEventListener("click", () => {
-        if (soldSortMode !== "bonus") soldSortDesc = true; else soldSortDesc = !soldSortDesc;
-        soldSortMode = "bonus";
-        soldBonusSortHeader.textContent = `獎金 ${soldSortDesc ? "▼" : "▲"}`;
-        soldDateSortHeader.textContent = "進件日";
         render();
       });
 
@@ -1268,6 +1226,7 @@
           sellRecordId.value = record.id; sellPriceInput.value = record.salePrice || "";
           sellDialog.showModal(); sellPriceInput.focus();
         } else if (button.dataset.action === "toggle-sold") {
+          // 取消售出，退回 state: "N"
           records[index] = await persistUpdate(normalizeRecord({ ...record, isSold: false, state: "N", updatedAt: new Date().toISOString() }));
           saveLocalRecords(); render();
         } else if (button.dataset.action === "delete") {
