@@ -2,8 +2,8 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>車輛估價系統</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CarValuation</title>
     <style>
       :root {
         color-scheme: light;
@@ -265,14 +265,10 @@
       td {
         border: none;
         border-bottom: 1px solid #737373;
-        padding: 13px 0 !important; /* 兩側不留白 */
+        padding: 13px 10px;
         text-align: left;
         vertical-align: top;
         font-size: 18px;
-        max-width: 12ch; /* 欄位寬度限定6個字元 (2ch ≈ 1中文字) */
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
       }
 
       th {
@@ -289,11 +285,11 @@
         color: #243140;
       }
 
-      /* 估價進行中顏色：藍色為主 */
+      /* 估價進行中顏色 */
       tbody tr:nth-child(odd) td { background: #ECF2FF; }
       tbody tr:nth-child(even) td { background: #DBE8FF; }
 
-      /* 已買入顏色：綠色為主，文字顏色維持與估價進行中相同 */
+      /* 已買入顏色 */
       .purchased-section tbody tr:nth-child(odd) td {
         background: #f2fbf5;
         color: #243140;
@@ -303,25 +299,18 @@
         color: #243140;
       }
 
-      /* 已售出顏色：非常淺柔黃色為主 */
+      /* 已售出顏色：黃色為主，奇偶不同深淺 */
       .sold-section tbody tr:nth-child(odd) td {
-        background: #FFFFF5;
-        color: #17212b;
-      }
-      .sold-section tbody tr:nth-child(even) td {
         background: #FFFFE6;
         color: #17212b;
       }
-
-      /* 寬度拉寬 1.2 倍 */
-      .purchased-section table,
-      .sold-section table {
-        min-width: 2472px !important;
+      .sold-section tbody tr:nth-child(even) td {
+        background: #FFFFF5;
+        color: #17212b;
       }
 
       tbody tr td {
         transition: background-color 140ms ease, color 140ms ease;
-        line-height: 2 !important; /* 固定兩倍行高 */
       }
 
       /* 滑鼠高光修改為 #E8E8E8 */
@@ -335,14 +324,12 @@
       .note-cell {
         max-width: 220px;
         white-space: pre-wrap;
-        overflow: visible;
       }
 
       .wide-cell {
         min-width: 260px;
         max-width: 360px;
         white-space: pre-wrap;
-        overflow: visible;
       }
 
       .number-cell {
@@ -580,7 +567,6 @@
   <body>
     <main class="app-shell">
       <section class="workspace">
-        <!-- 輸入表單區 -->
         <section class="entry-panel" aria-label="車輛估價表單">
           <form id="valuationForm" autocomplete="off">
             <input type="hidden" id="recordId" />
@@ -693,7 +679,6 @@
           </form>
         </section>
 
-        <!-- 搜尋工具列 -->
         <section class="list-tools" aria-label="資料工具列">
           <label class="search-box">
             <span>搜尋</span>
@@ -701,7 +686,6 @@
           </label>
         </section>
         
-        <!-- 估價進行中 -->
         <section class="records-section" aria-labelledby="ongoingTitle">
           <header class="section-title">
             <h2 id="ongoingTitle">估價進行中</h2>
@@ -740,7 +724,6 @@
           </div>
         </section>
 
-        <!-- 已買入 -->
         <section class="records-section purchased-section" aria-labelledby="purchasedTitle">
           <header class="section-title">
             <div>
@@ -794,7 +777,6 @@
           </div>
         </section>
 
-        <!-- 已售出 -->
         <section class="records-section sold-section" aria-labelledby="soldTitle">
           <header class="section-title">
             <div>
@@ -807,7 +789,7 @@
               <thead>
                 <tr>
                   <th>來源</th>
-                  <th id="sortSoldDateHeader" style="cursor: pointer; text-decoration: underline; user-select: none;">進件日 ↕</th>
+                  <th id="sortSoldDateHeader" style="cursor: pointer; text-decoration: underline;">進件日 ↕</th>
                   <th>買進日</th>
                   <th>年份</th>
                   <th>車型</th>
@@ -823,7 +805,7 @@
                   <th>備註</th>
                   <th>整理項目</th>
                   <th>賣家</th>
-                  <th id="sortBonusHeader" style="cursor: pointer; text-decoration: underline; user-select: none;">獎金 ↕</th>
+                  <th id="sortBonusHeader" style="cursor: pointer; text-decoration: underline;">獎金 ↕</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -838,7 +820,6 @@
       </section>
     </main>
 
-    <!-- 已買入對話框 -->
     <dialog class="buy-dialog" id="buyDialog">
       <form id="buyForm" method="dialog">
         <h2>已買入資料</h2>
@@ -858,7 +839,6 @@
       </form>
     </dialog>
 
-    <!-- 已售出對話框 -->
     <dialog class="buy-dialog" id="sellDialog">
       <form id="sellForm" method="dialog">
         <h2>已售出資料</h2>
@@ -874,27 +854,15 @@
       </form>
     </dialog>
 
-    <!-- 自訂刪除確認對話框 -->
-    <dialog class="buy-dialog" id="deleteConfirmDialog">
-      <form id="deleteForm" method="dialog">
-        <h2>確認刪除</h2>
-        <p id="deleteConfirmMsg" style="margin: 0; line-height: 1.5; color: var(--ink);">確定要刪除這筆資料嗎？此動作將無法復原。</p>
-        <div class="dialog-actions">
-          <button class="secondary" type="button" id="cancelDeleteButton">取消</button>
-          <button type="submit" class="danger" style="background: var(--danger); border-color: var(--danger); color: white;">確認刪除</button>
-        </div>
-      </form>
-    </dialog>
-
     <script>
       const STORAGE_KEY = "carvaluation.records.v1";
       const API_URL = "https://script.google.com/macros/s/AKfycbx83aRvR1MpZwqlTKKHyfej-aSJOrIPUI4aRlvX7Qy81Owz-9VxjYjCL3pRKzewkQu6/exec";
       const CUSTOM_SOURCE = "自行輸入";
       const FIXED_SOURCES = ["來店", "網站", "自買"];
       
-      let soldSortField = 'receivedDate'; // 'receivedDate' or 'bonus'
-      let soldSortDirection = 'desc'; // 'desc' or 'asc'
-      let deleteTargetId = null; // 用於自訂刪除對話框
+      let soldSortField = 'date'; // 'date' or 'bonus'
+      let soldDateSortDirection = 'desc';
+      let soldBonusSortDirection = 'desc';
 
       const fieldNames = [
         "sourceType",
@@ -980,10 +948,6 @@
       const sellRecordId = document.querySelector("#sellRecordId");
       const sellPriceInput = document.querySelector("#sellPriceInput");
       const cancelSellButton = document.querySelector("#cancelSellButton");
-
-      const deleteConfirmDialog = document.querySelector("#deleteConfirmDialog");
-      const deleteConfirmMsg = document.querySelector("#deleteConfirmMsg");
-      const cancelDeleteButton = document.querySelector("#cancelDeleteButton");
 
       const purchasedDateFrom = document.querySelector("#purchasedDateFrom");
       const purchasedDateTo = document.querySelector("#purchasedDateTo");
@@ -1085,22 +1049,27 @@
         return `${year}-${month}-${day}`;
       }
 
-      function formatDateToMMDD(value) {
+      function formatDateForDisplay(value) {
         if (!value) return "";
         const text = String(value).trim();
-        
-        // 匹配 YYYY-MM-DD
         const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
-        if (isoDate) return `${isoDate[2]}/${isoDate[3]}`;
+        if (!isoDate) return text;
+        return `${Number(isoDate[2])}/${Number(isoDate[3])}`;
+      }
+
+      function formatFullDateForDisplay(value) {
+        if (!value) return "";
+        const text = String(value).trim();
+        const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (isoDate) return `${isoDate[1]}/${isoDate[2]}/${isoDate[3]}`;
         
-        // 匹配 YYYY/MM/DD
-        const slashDate = text.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})/);
-        if (slashDate) return `${slashDate[2].padStart(2, "0")}/${slashDate[3].padStart(2, "0")}`;
-        
-        // 匹配 MM/DD 
         const shortDate = text.match(/^(\d{1,2})\/(\d{1,2})$/);
-        if (shortDate) return `${shortDate[1].padStart(2, "0")}/${shortDate[2].padStart(2, "0")}`;
-        
+        if (shortDate) {
+          const year = new Date().getFullYear();
+          const month = shortDate[1].padStart(2, "0");
+          const day = shortDate[2].padStart(2, "0");
+          return `${year}/${month}/${day}`;
+        }
         return text;
       }
 
@@ -1137,7 +1106,6 @@
         );
       }
 
-      // 串接 Google Sheet API
       async function apiGetRecords() {
         const response = await fetch(API_URL, { method: "GET" });
         const data = await response.json();
@@ -1248,6 +1216,7 @@
           } else if (name === "receivedDate") {
             fields[name].value = toDateInputValue(record[name]);
           } else if (name === "color") {
+            // Setup color logic
             const colorOptions = Array.from(colorSelect.options).map(opt => opt.value);
             if (record[name] && !colorOptions.includes(record[name]) && record[name] !== 'custom') {
                 colorSelect.value = 'custom';
@@ -1295,50 +1264,37 @@
         );
       }
 
-      // 預設的排序方法：進件日由近到遠
       function sortRecords(items) {
         return [...items].sort((a, b) => {
           const dateA = dateValueToNumber(a.receivedDate) || 0;
           const dateB = dateValueToNumber(b.receivedDate) || 0;
           if (dateA !== dateB) {
-            return dateB - dateA; // 降序
+            return dateB - dateA; // Descending by receivedDate
           }
           return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
         });
       }
       
-      function formatRepairItems(text) {
-        if (!text) return "";
-        let result = "";
-        for (let i = 0; i < text.length; i += 23) {
-          result += text.substring(i, i + 23) + "\n";
-        }
-        return result.trim();
-      }
-
-      // 已售出資料排序：支援進件日與獎金排序
-      function sortSoldRecords(items) {
+      function sortSoldRecordsByBonus(items) {
           return [...items].sort((a, b) => {
-              let valA, valB;
-              
               if (soldSortField === 'bonus') {
-                  valA = a.bonus || "";
-                  valB = b.bonus || "";
-                  if (valA === valB) {
-                      const dateA = dateValueToNumber(a.receivedDate) || 0;
-                      const dateB = dateValueToNumber(b.receivedDate) || 0;
-                      return dateB - dateA;
+                  const valA = a.bonus || "";
+                  const valB = b.bonus || "";
+                  
+                  if (valA !== valB) {
+                      return soldBonusSortDirection === 'desc' ? valB.localeCompare(valA) : valA.localeCompare(valB);
                   }
-                  return soldSortDirection === 'desc' ? valB.localeCompare(valA) : valA.localeCompare(valB);
-              } else {
-                  // 依進件日排序
-                  valA = dateValueToNumber(a.receivedDate) || 0;
-                  valB = dateValueToNumber(b.receivedDate) || 0;
-                  if (valA === valB) {
-                      return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
-                  }
-                  return soldSortDirection === 'desc' ? (valB - valA) : (valA - valB);
               }
+              
+              // 如果依照進件日排序，或獎金相同時的預設排序
+              const dateA = dateValueToNumber(a.receivedDate) || 0;
+              const dateB = dateValueToNumber(b.receivedDate) || 0;
+              
+              if (dateA !== dateB) {
+                  return soldDateSortDirection === 'desc' ? dateB - dateA : dateA - dateB;
+              }
+              
+              return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
           });
       }
 
@@ -1364,9 +1320,6 @@
       }
 
       function appendCommonCells(row, record, isSoldTable = false) {
-        // 套用 23 個字元強制斷行
-        const formattedRepair = formatRepairItems(record.repairItems);
-
         row.append(
           createCell(record.year),
           createCell(record.model),
@@ -1380,7 +1333,7 @@
           createCell(record.actualDealPrice),
           createCell(record.salePrice),
           createCell(record.remarks, "note-cell"),
-          createCell(formattedRepair, "wide-cell"),
+          createCell(record.repairItems, "wide-cell"),
           createCell(record.seller)
         );
         
@@ -1400,12 +1353,10 @@
         }
         
         row.append(createCell(getSourceLabel(record)));
-        // 所有表格的進件日都顯示為 MM/DD
-        row.append(createCell(formatDateToMMDD(record.receivedDate)));
+        row.append(createCell(formatFullDateForDisplay(record.receivedDate)));
 
         if (record.isPurchased || record.isSold) {
-          // 所有表格的買進日都顯示為 MM/DD
-          row.append(createCell(formatDateToMMDD(record.boughtDate)));
+          row.append(createCell(formatFullDateForDisplay(record.boughtDate)));
         }
 
         appendCommonCells(row, record, isSoldTable);
@@ -1457,7 +1408,7 @@
         
         const ongoingRecords = sortRecords(filteredRecords.filter((record) => !record.isPurchased && !record.isSold));
         const allPurchasedRecords = sortRecords(filteredRecords.filter((record) => record.isPurchased && !record.isSold));
-        const soldRecords = sortSoldRecords(filteredRecords.filter((record) => record.isSold));
+        const soldRecords = sortSoldRecordsByBonus(filteredRecords.filter((record) => record.isSold));
         
         const purchasedRecords = filterPurchasedByDate(allPurchasedRecords);
 
@@ -1490,13 +1441,6 @@
         sellPriceInput.value = record.salePrice || "";
         sellDialog.showModal();
         sellPriceInput.focus();
-      }
-
-      // 開啟自訂刪除確認視窗
-      function openDeleteConfirmDialog(recordId, recordDesc) {
-        deleteTargetId = recordId;
-        deleteConfirmMsg.textContent = `確定要刪除「${recordDesc}」的資料嗎？此操作將永久移除資料。`;
-        deleteConfirmDialog.showModal();
       }
 
       form.addEventListener("submit", async (event) => {
@@ -1569,27 +1513,6 @@
         sellForm.reset();
       });
 
-      // 監聽自訂刪除送出事件
-      deleteConfirmDialog.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        if (!deleteTargetId) return;
-
-        const id = deleteTargetId;
-        await persistDelete(id);
-        records = records.filter((item) => item.id !== id);
-        saveLocalRecords();
-        render();
-        if (fields.recordId.value === id) resetForm();
-
-        deleteTargetId = null;
-        deleteConfirmDialog.close();
-      });
-
-      cancelDeleteButton.addEventListener("click", () => {
-        deleteTargetId = null;
-        deleteConfirmDialog.close();
-      });
-
       fields.sourceType.addEventListener("change", updateSourceCustomVisibility);
       resetButton.addEventListener("click", resetForm);
       searchInput.addEventListener("input", render);
@@ -1604,29 +1527,19 @@
         window.print();
       });
       
-      // 已售出：獎金排序按鈕點擊監聽
       sortBonusHeader.addEventListener("click", () => {
-          if (soldSortField === 'bonus') {
-              soldSortDirection = soldSortDirection === 'desc' ? 'asc' : 'desc';
-          } else {
-              soldSortField = 'bonus';
-              soldSortDirection = 'desc';
-          }
-          sortBonusHeader.textContent = `獎金 ${soldSortDirection === 'desc' ? '↓' : '↑'}`;
-          sortSoldDateHeader.textContent = '進件日 ↕';
+          soldSortField = 'bonus';
+          soldBonusSortDirection = soldBonusSortDirection === 'desc' ? 'asc' : 'desc';
+          sortBonusHeader.textContent = `獎金 ${soldBonusSortDirection === 'desc' ? '↓' : '↑'}`;
+          sortSoldDateHeader.textContent = `進件日 ↕`;
           render();
       });
 
-      // 已售出：進件日排序按鈕點擊監聽
       sortSoldDateHeader.addEventListener("click", () => {
-          if (soldSortField === 'receivedDate') {
-              soldSortDirection = soldSortDirection === 'desc' ? 'asc' : 'desc';
-          } else {
-              soldSortField = 'receivedDate';
-              soldSortDirection = 'desc';
-          }
-          sortSoldDateHeader.textContent = `進件日 ${soldSortDirection === 'desc' ? '↓' : '↑'}`;
-          sortBonusHeader.textContent = '獎金 ↕';
+          soldSortField = 'date';
+          soldDateSortDirection = soldDateSortDirection === 'desc' ? 'asc' : 'desc';
+          sortSoldDateHeader.textContent = `進件日 ${soldDateSortDirection === 'desc' ? '↓' : '↑'}`;
+          sortBonusHeader.textContent = `獎金 ↕`;
           render();
       });
 
@@ -1690,8 +1603,13 @@
         }
 
         if (button.dataset.action === "delete") {
-          const desc = record.model ? `${record.model}` : "這筆";
-          openDeleteConfirmDialog(record.id, desc);
+          const confirmed = confirm(`確定要刪除 ${record.model || "這筆"} 的資料嗎？`);
+          if (!confirmed) return;
+          await persistDelete(record.id);
+          records = records.filter((item) => item.id !== record.id);
+          saveLocalRecords();
+          render();
+          if (fields.recordId.value === record.id) resetForm();
         }
       });
 
