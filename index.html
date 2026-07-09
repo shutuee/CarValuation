@@ -214,16 +214,24 @@
       }
 
       .date-filter {
-        display: grid;
-        grid-template-columns: minmax(220px, 260px) minmax(220px, 260px);
-        align-items: end;
-        justify-content: end;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: flex-end;
         gap: 10px;
+        flex-wrap: nowrap;
       }
 
       .date-filter label {
         width: auto;
-        min-width: 0;
+        min-width: 180px;
+      }
+
+      .date-filter button {
+        width: auto;
+        min-height: 44px;
+        padding: 0 16px;
+        white-space: nowrap;
       }
 
       .table-wrap {
@@ -390,7 +398,7 @@
       @media (max-width: 620px) {
         .form-grid { grid-template-columns: 1fr; }
         .wide, .full-row { grid-column: auto; }
-        .date-filter { grid-template-columns: 1fr; }
+        .date-filter { flex-wrap: wrap; justify-content: flex-start; }
       }
       @media print {
         body { background: #fff; }
