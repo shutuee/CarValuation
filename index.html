@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>車輛估價系統</title>
     <style>
       :root {
@@ -261,20 +261,18 @@
         border-bottom: 1px solid #737373;
       }
 
-      /* 套用 1.2倍寬度至已買入與已售出資料表 */
-      .purchased-section table,
-      .sold-section table {
-        min-width: 2472px; 
-      }
-
       th,
       td {
         border: none;
         border-bottom: 1px solid #737373;
-        padding: 13px 10px;
+        padding: 13px 0 !important; /* 兩側不留白 */
         text-align: left;
         vertical-align: top;
         font-size: 18px;
+        max-width: 12ch; /* 欄位寬度限定6個字元 (2ch ≈ 1中文字) */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       th {
@@ -291,17 +289,11 @@
         color: #243140;
       }
 
-      /* 資料列固定兩倍行高 */
-      tbody tr td {
-        line-height: 2;
-        transition: background-color 140ms ease, color 140ms ease;
-      }
-
-      /* 估價進行中顏色 */
+      /* 估價進行中顏色：藍色為主 */
       tbody tr:nth-child(odd) td { background: #ECF2FF; }
       tbody tr:nth-child(even) td { background: #DBE8FF; }
 
-      /* 已買入顏色 */
+      /* 已買入顏色：綠色為主，文字顏色維持與估價進行中相同 */
       .purchased-section tbody tr:nth-child(odd) td {
         background: #f2fbf5;
         color: #243140;
@@ -311,14 +303,25 @@
         color: #243140;
       }
 
-      /* 已售出顏色：黃色為主，奇偶不同深淺 */
+      /* 已售出顏色：非常淺柔黃色為主 */
       .sold-section tbody tr:nth-child(odd) td {
-        background: #FFFFCC;
+        background: #FFFFF5;
         color: #17212b;
       }
       .sold-section tbody tr:nth-child(even) td {
-        background: #FFFFF5;
+        background: #FFFFE6;
         color: #17212b;
+      }
+
+      /* 寬度拉寬 1.2 倍 */
+      .purchased-section table,
+      .sold-section table {
+        min-width: 2472px !important;
+      }
+
+      tbody tr td {
+        transition: background-color 140ms ease, color 140ms ease;
+        line-height: 2 !important; /* 固定兩倍行高 */
       }
 
       /* 滑鼠高光修改為 #E8E8E8 */
@@ -332,12 +335,14 @@
       .note-cell {
         max-width: 220px;
         white-space: pre-wrap;
+        overflow: visible;
       }
 
       .wide-cell {
         min-width: 260px;
         max-width: 360px;
         white-space: pre-wrap;
+        overflow: visible;
       }
 
       .number-cell {
@@ -417,19 +422,6 @@
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-      }
-
-      .toast-notification {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        background: var(--ink);
-        color: #fff;
-        padding: 12px 24px;
-        border-radius: 8px;
-        box-shadow: var(--shadow);
-        z-index: 9999;
-        transition: opacity 0.3s ease, transform 0.3s ease;
       }
 
       @media (max-width: 1400px) {
@@ -588,6 +580,7 @@
   <body>
     <main class="app-shell">
       <section class="workspace">
+        <!-- 輸入表單區 -->
         <section class="entry-panel" aria-label="車輛估價表單">
           <form id="valuationForm" autocomplete="off">
             <input type="hidden" id="recordId" />
@@ -700,6 +693,7 @@
           </form>
         </section>
 
+        <!-- 搜尋工具列 -->
         <section class="list-tools" aria-label="資料工具列">
           <label class="search-box">
             <span>搜尋</span>
@@ -707,6 +701,7 @@
           </label>
         </section>
         
+        <!-- 估價進行中 -->
         <section class="records-section" aria-labelledby="ongoingTitle">
           <header class="section-title">
             <h2 id="ongoingTitle">估價進行中</h2>
@@ -745,6 +740,7 @@
           </div>
         </section>
 
+        <!-- 已買入 -->
         <section class="records-section purchased-section" aria-labelledby="purchasedTitle">
           <header class="section-title">
             <div>
@@ -798,6 +794,7 @@
           </div>
         </section>
 
+        <!-- 已售出 -->
         <section class="records-section sold-section" aria-labelledby="soldTitle">
           <header class="section-title">
             <div>
@@ -810,7 +807,7 @@
               <thead>
                 <tr>
                   <th>來源</th>
-                  <th>進件日</th>
+                  <th id="sortSoldDateHeader" style="cursor: pointer; text-decoration: underline; user-select: none;">進件日 ↕</th>
                   <th>買進日</th>
                   <th>年份</th>
                   <th>車型</th>
@@ -826,7 +823,7 @@
                   <th>備註</th>
                   <th>整理項目</th>
                   <th>賣家</th>
-                  <th id="sortBonusHeader" style="cursor: pointer; text-decoration: underline;">獎金 ↕</th>
+                  <th id="sortBonusHeader" style="cursor: pointer; text-decoration: underline; user-select: none;">獎金 ↕</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -841,6 +838,7 @@
       </section>
     </main>
 
+    <!-- 已買入對話框 -->
     <dialog class="buy-dialog" id="buyDialog">
       <form id="buyForm" method="dialog">
         <h2>已買入資料</h2>
@@ -860,6 +858,7 @@
       </form>
     </dialog>
 
+    <!-- 已售出對話框 -->
     <dialog class="buy-dialog" id="sellDialog">
       <form id="sellForm" method="dialog">
         <h2>已售出資料</h2>
@@ -875,19 +874,17 @@
       </form>
     </dialog>
 
-    <dialog class="buy-dialog" id="deleteDialog">
+    <!-- 自訂刪除確認對話框 -->
+    <dialog class="buy-dialog" id="deleteConfirmDialog">
       <form id="deleteForm" method="dialog">
         <h2>確認刪除</h2>
-        <p id="deleteConfirmMessage">確定要刪除此筆資料嗎？</p>
-        <input type="hidden" id="deleteRecordId" />
+        <p id="deleteConfirmMsg" style="margin: 0; line-height: 1.5; color: var(--ink);">確定要刪除這筆資料嗎？此動作將無法復原。</p>
         <div class="dialog-actions">
           <button class="secondary" type="button" id="cancelDeleteButton">取消</button>
-          <button type="submit" class="danger" style="background: var(--danger); border-color: var(--danger);">確定刪除</button>
+          <button type="submit" class="danger" style="background: var(--danger); border-color: var(--danger); color: white;">確認刪除</button>
         </div>
       </form>
     </dialog>
-
-    <div id="toastNotification" class="toast-notification is-hidden"></div>
 
     <script>
       const STORAGE_KEY = "carvaluation.records.v1";
@@ -895,7 +892,9 @@
       const CUSTOM_SOURCE = "自行輸入";
       const FIXED_SOURCES = ["來店", "網站", "自買"];
       
+      let soldSortField = 'receivedDate'; // 'receivedDate' or 'bonus'
       let soldSortDirection = 'desc'; // 'desc' or 'asc'
+      let deleteTargetId = null; // 用於自訂刪除對話框
 
       const fieldNames = [
         "sourceType",
@@ -982,10 +981,8 @@
       const sellPriceInput = document.querySelector("#sellPriceInput");
       const cancelSellButton = document.querySelector("#cancelSellButton");
 
-      const deleteDialog = document.querySelector("#deleteDialog");
-      const deleteForm = document.querySelector("#deleteForm");
-      const deleteRecordId = document.querySelector("#deleteRecordId");
-      const deleteConfirmMessage = document.querySelector("#deleteConfirmMessage");
+      const deleteConfirmDialog = document.querySelector("#deleteConfirmDialog");
+      const deleteConfirmMsg = document.querySelector("#deleteConfirmMsg");
       const cancelDeleteButton = document.querySelector("#cancelDeleteButton");
 
       const purchasedDateFrom = document.querySelector("#purchasedDateFrom");
@@ -994,21 +991,9 @@
       const printPurchasedButton = document.querySelector("#printPurchasedButton");
       
       const sortBonusHeader = document.querySelector("#sortBonusHeader");
+      const sortSoldDateHeader = document.querySelector("#sortSoldDateHeader");
 
       let records = loadLocalRecords();
-
-      function showToast(message) {
-        const toast = document.querySelector("#toastNotification");
-        toast.textContent = message;
-        toast.classList.remove("is-hidden");
-        toast.style.opacity = "1";
-        toast.style.transform = "translateY(0)";
-        setTimeout(() => {
-          toast.style.opacity = "0";
-          toast.style.transform = "translateY(10px)";
-          setTimeout(() => toast.classList.add("is-hidden"), 300);
-        }, 3500);
-      }
 
       function loadLocalRecords() {
         try {
@@ -1100,31 +1085,23 @@
         return `${year}-${month}-${day}`;
       }
 
-      // 輸出格式一律修正為 MM/DD (不管哪張資料表)
-      function formatDateForDisplay(value) {
+      function formatDateToMMDD(value) {
         if (!value) return "";
         const text = String(value).trim();
-        const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
-        if (isoDate) {
-          return `${isoDate[2]}/${isoDate[3]}`;
-        }
         
+        // 匹配 YYYY-MM-DD
+        const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (isoDate) return `${isoDate[2]}/${isoDate[3]}`;
+        
+        // 匹配 YYYY/MM/DD
+        const slashDate = text.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+        if (slashDate) return `${slashDate[2].padStart(2, "0")}/${slashDate[3].padStart(2, "0")}`;
+        
+        // 匹配 MM/DD 
         const shortDate = text.match(/^(\d{1,2})\/(\d{1,2})$/);
-        if (shortDate) {
-          return `${shortDate[1].padStart(2, "0")}/${shortDate[2].padStart(2, "0")}`;
-        }
+        if (shortDate) return `${shortDate[1].padStart(2, "0")}/${shortDate[2].padStart(2, "0")}`;
+        
         return text;
-      }
-
-      // 已買入與已售出列表：針對「整理項目」在第 23 字元強制斷行
-      function formatRepairItems(text, isPurchasedOrSold) {
-        if (!text) return "";
-        if (!isPurchasedOrSold) return text;
-        let result = [];
-        for (let i = 0; i < text.length; i += 23) {
-          result.push(text.slice(i, i + 23));
-        }
-        return result.join("\n");
       }
 
       function dateValueToNumber(value) {
@@ -1160,6 +1137,7 @@
         );
       }
 
+      // 串接 Google Sheet API
       async function apiGetRecords() {
         const response = await fetch(API_URL, { method: "GET" });
         const data = await response.json();
@@ -1184,21 +1162,17 @@
           records = cloudRecords;
           saveLocalRecords();
           render();
-          showToast("已成功與雲端 Google Sheet 同步完成！");
         } catch (error) {
           console.warn(error);
-          showToast("與雲端連線失敗，目前先顯示本機暫存資料。");
         }
       }
 
       async function persistCreate(record) {
         try {
           const result = await apiPost("create", { record: toSheetRecord(record) });
-          showToast("新增資料已同步至雲端！");
           return normalizeRecord(result.record || record);
         } catch (error) {
           console.warn(error);
-          showToast("新增失敗，資料已暫存於此瀏覽器。");
           return record;
         }
       }
@@ -1206,11 +1180,9 @@
       async function persistUpdate(record) {
         try {
           const result = await apiPost("update", { record: toSheetRecord(record) });
-          showToast("修改資料已更新至雲端！");
           return normalizeRecord(result.record || record);
         } catch (error) {
           console.warn(error);
-          showToast("更新失敗，修改已先暫存於本機。");
           return record;
         }
       }
@@ -1218,10 +1190,8 @@
       async function persistDelete(id) {
         try {
           await apiPost("delete", { id });
-          showToast("刪除成功！已同步至雲端。");
         } catch (error) {
           console.warn(error);
-          showToast("刪除雲端資料失敗，本機已先移除顯示。");
         }
       }
       
@@ -1325,33 +1295,49 @@
         );
       }
 
-      // 一律按進件日排序
+      // 預設的排序方法：進件日由近到遠
       function sortRecords(items) {
         return [...items].sort((a, b) => {
           const dateA = dateValueToNumber(a.receivedDate) || 0;
           const dateB = dateValueToNumber(b.receivedDate) || 0;
           if (dateA !== dateB) {
-            return dateB - dateA;
+            return dateB - dateA; // 降序
           }
           return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
         });
       }
       
-      function sortSoldRecordsByBonus(items) {
+      function formatRepairItems(text) {
+        if (!text) return "";
+        let result = "";
+        for (let i = 0; i < text.length; i += 23) {
+          result += text.substring(i, i + 23) + "\n";
+        }
+        return result.trim();
+      }
+
+      // 已售出資料排序：支援進件日與獎金排序
+      function sortSoldRecords(items) {
           return [...items].sort((a, b) => {
-              const valA = a.bonus || "";
-              const valB = b.bonus || "";
+              let valA, valB;
               
-              if (valA === valB) {
-                  const dateA = dateValueToNumber(a.receivedDate) || 0;
-                  const dateB = dateValueToNumber(b.receivedDate) || 0;
-                  return dateB - dateA;
-              }
-              
-              if (soldSortDirection === 'desc') {
-                 return valB.localeCompare(valA);
+              if (soldSortField === 'bonus') {
+                  valA = a.bonus || "";
+                  valB = b.bonus || "";
+                  if (valA === valB) {
+                      const dateA = dateValueToNumber(a.receivedDate) || 0;
+                      const dateB = dateValueToNumber(b.receivedDate) || 0;
+                      return dateB - dateA;
+                  }
+                  return soldSortDirection === 'desc' ? valB.localeCompare(valA) : valA.localeCompare(valB);
               } else {
-                 return valA.localeCompare(valB);
+                  // 依進件日排序
+                  valA = dateValueToNumber(a.receivedDate) || 0;
+                  valB = dateValueToNumber(b.receivedDate) || 0;
+                  if (valA === valB) {
+                      return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
+                  }
+                  return soldSortDirection === 'desc' ? (valB - valA) : (valA - valB);
               }
           });
       }
@@ -1378,7 +1364,9 @@
       }
 
       function appendCommonCells(row, record, isSoldTable = false) {
-        const isPurchasedOrSold = record.isPurchased || record.isSold;
+        // 套用 23 個字元強制斷行
+        const formattedRepair = formatRepairItems(record.repairItems);
+
         row.append(
           createCell(record.year),
           createCell(record.model),
@@ -1392,8 +1380,7 @@
           createCell(record.actualDealPrice),
           createCell(record.salePrice),
           createCell(record.remarks, "note-cell"),
-          // 已買入與已售出在此套用 23字元斷行限制
-          createCell(formatRepairItems(record.repairItems, isPurchasedOrSold), "wide-cell"),
+          createCell(formattedRepair, "wide-cell"),
           createCell(record.seller)
         );
         
@@ -1413,11 +1400,12 @@
         }
         
         row.append(createCell(getSourceLabel(record)));
-        // 所有表格日期皆一律呈現 MM/DD
-        row.append(createCell(formatDateForDisplay(record.receivedDate)));
+        // 所有表格的進件日都顯示為 MM/DD
+        row.append(createCell(formatDateToMMDD(record.receivedDate)));
 
         if (record.isPurchased || record.isSold) {
-          row.append(createCell(formatDateForDisplay(record.boughtDate)));
+          // 所有表格的買進日都顯示為 MM/DD
+          row.append(createCell(formatDateToMMDD(record.boughtDate)));
         }
 
         appendCommonCells(row, record, isSoldTable);
@@ -1434,7 +1422,6 @@
             </div>
           `;
         } else if (record.isPurchased) {
-          // 已買入清單中之「已售出」按鈕採用綠底白字
           actionHTML = `
             <div class="row-actions">
               <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
@@ -1444,7 +1431,6 @@
             </div>
           `;
         } else {
-          // 進行中清單之「已買入」按鈕採用藍底白字 (action-blue)
           actionHTML = `
             <div class="row-actions">
               <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
@@ -1471,7 +1457,7 @@
         
         const ongoingRecords = sortRecords(filteredRecords.filter((record) => !record.isPurchased && !record.isSold));
         const allPurchasedRecords = sortRecords(filteredRecords.filter((record) => record.isPurchased && !record.isSold));
-        const soldRecords = sortSoldRecordsByBonus(filteredRecords.filter((record) => record.isSold));
+        const soldRecords = sortSoldRecords(filteredRecords.filter((record) => record.isSold));
         
         const purchasedRecords = filterPurchasedByDate(allPurchasedRecords);
 
@@ -1504,6 +1490,13 @@
         sellPriceInput.value = record.salePrice || "";
         sellDialog.showModal();
         sellPriceInput.focus();
+      }
+
+      // 開啟自訂刪除確認視窗
+      function openDeleteConfirmDialog(recordId, recordDesc) {
+        deleteTargetId = recordId;
+        deleteConfirmMsg.textContent = `確定要刪除「${recordDesc}」的資料嗎？此操作將永久移除資料。`;
+        deleteConfirmDialog.showModal();
       }
 
       form.addEventListener("submit", async (event) => {
@@ -1576,19 +1569,25 @@
         sellForm.reset();
       });
 
-      deleteForm.addEventListener("submit", async (event) => {
+      // 監聽自訂刪除送出事件
+      deleteConfirmDialog.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const id = deleteRecordId.value;
+        if (!deleteTargetId) return;
+
+        const id = deleteTargetId;
         await persistDelete(id);
         records = records.filter((item) => item.id !== id);
         saveLocalRecords();
         render();
         if (fields.recordId.value === id) resetForm();
-        deleteDialog.close();
+
+        deleteTargetId = null;
+        deleteConfirmDialog.close();
       });
 
       cancelDeleteButton.addEventListener("click", () => {
-        deleteDialog.close();
+        deleteTargetId = null;
+        deleteConfirmDialog.close();
       });
 
       fields.sourceType.addEventListener("change", updateSourceCustomVisibility);
@@ -1605,9 +1604,29 @@
         window.print();
       });
       
+      // 已售出：獎金排序按鈕點擊監聽
       sortBonusHeader.addEventListener("click", () => {
-          soldSortDirection = soldSortDirection === 'desc' ? 'asc' : 'desc';
+          if (soldSortField === 'bonus') {
+              soldSortDirection = soldSortDirection === 'desc' ? 'asc' : 'desc';
+          } else {
+              soldSortField = 'bonus';
+              soldSortDirection = 'desc';
+          }
           sortBonusHeader.textContent = `獎金 ${soldSortDirection === 'desc' ? '↓' : '↑'}`;
+          sortSoldDateHeader.textContent = '進件日 ↕';
+          render();
+      });
+
+      // 已售出：進件日排序按鈕點擊監聽
+      sortSoldDateHeader.addEventListener("click", () => {
+          if (soldSortField === 'receivedDate') {
+              soldSortDirection = soldSortDirection === 'desc' ? 'asc' : 'desc';
+          } else {
+              soldSortField = 'receivedDate';
+              soldSortDirection = 'desc';
+          }
+          sortSoldDateHeader.textContent = `進件日 ${soldSortDirection === 'desc' ? '↓' : '↑'}`;
+          sortBonusHeader.textContent = '獎金 ↕';
           render();
       });
 
@@ -1671,10 +1690,8 @@
         }
 
         if (button.dataset.action === "delete") {
-          // 無原生彈窗：改用客製化 dialog 進行確認
-          deleteRecordId.value = record.id;
-          deleteConfirmMessage.textContent = `確定要刪除 ${record.model || "這筆"} 的資料嗎？`;
-          deleteDialog.showModal();
+          const desc = record.model ? `${record.model}` : "這筆";
+          openDeleteConfirmDialog(record.id, desc);
         }
       });
 
