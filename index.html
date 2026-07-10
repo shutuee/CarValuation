@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CarValuation</title>
     <style>
       :root {
@@ -333,7 +333,7 @@
         user-select: none;
       }
       .sortable-header:hover {
-        color: var(--focus);
+        color: #000;
       }
 
       /* 操作按鈕群 - 精細化：小一號 */
@@ -578,18 +578,7 @@
               <h2 id="purchasedTitle">已買入</h2>
               <span id="purchasedCount">0 筆</span>
             </div>
-            <div class="date-filter">
-              <label>
-                <span>起始買進日</span>
-                <input id="purchasedDateFrom" type="date" />
-              </label>
-              <label>
-                <span>結束買進日</span>
-                <input id="purchasedDateTo" type="date" />
-              </label>
-              <button class="secondary" type="button" id="clearPurchasedDateFilter">清除</button>
-              <button type="button" id="printPurchasedButton">列印</button>
-            </div>
+            <!-- 已將原本在標題列右方的日期搜尋移開，保持大器簡約 -->
           </header>
           <div class="table-wrap" aria-label="已買入清單">
             <table>
@@ -654,7 +643,8 @@
                   <th>備註</th>
                   <th>整理項目</th>
                   <th>賣家</th>
-                  <th>獎金</th>
+                  <!-- 獎金欄位加入 class="sortable-header" 與 id 作為排序控制項 -->
+                  <th class="sortable-header" id="soldBonusSortHeader" title="點擊切換獎金排序">獎金 ▼</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -663,6 +653,22 @@
             <div class="empty-state" id="soldEmpty">
               <strong>尚無已售出資料</strong>
               <span>在已買入清單按下已售出後會移到這裡。</span>
+            </div>
+          </div>
+
+          <!-- 搜尋與列印區域移至「已售出資料表」的最下方 -->
+          <div style="padding: 20px 28px; border-top: 1px solid var(--line); background: var(--surface-soft); display: flex; justify-content: flex-end;">
+            <div class="date-filter">
+              <label>
+                <span>起始買進日</span>
+                <input id="purchasedDateFrom" type="date" />
+              </label>
+              <label>
+                <span>結束買進日</span>
+                <input id="purchasedDateTo" type="date" />
+              </label>
+              <button class="secondary" type="button" id="clearPurchasedDateFilter">清除</button>
+              <button type="button" id="printPurchasedButton">列印</button>
             </div>
           </div>
         </section>
@@ -785,8 +791,10 @@
       const clearPurchasedDateFilter = document.querySelector("#clearPurchasedDateFilter");
       
       const soldDateSortHeader = document.querySelector("#soldDateSortHeader");
+      const soldBonusSortHeader = document.querySelector("#soldBonusSortHeader");
       
       let records = loadLocalRecords();
+      let soldSortField = "receivedDate"; // 支援 'receivedDate' 或 'bonus' 排序
       let soldSortDesc = true;
 
       function loadLocalRecords() {
@@ -997,9 +1005,26 @@
 
       function sortSoldRecords(items) {
         return [...items].sort((a, b) => {
-          const dateA = dateValueToNumber(a.receivedDate) || 0;
-          const dateB = dateValueToNumber(b.receivedDate) || 0;
-          if (dateA !== dateB) return soldSortDesc ? (dateB - dateA) : (dateA - dateB);
+          if (soldSortField === "bonus") {
+            // 處理獎金欄位排序 (解析為數值方便正確數值比對大小)
+            const getBonusNum = (val) => {
+              if (!val) return 0;
+              const num = parseFloat(String(val).replace(/[^\d.-]/g, ""));
+              return isNaN(num) ? 0 : num;
+            };
+            const bonusA = getBonusNum(a.bonus);
+            const bonusB = getBonusNum(b.bonus);
+            if (bonusA !== bonusB) {
+              return soldSortDesc ? (bonusB - bonusA) : (bonusA - bonusB);
+            }
+          } else {
+            // 預設進件日排序
+            const dateA = dateValueToNumber(a.receivedDate) || 0;
+            const dateB = dateValueToNumber(b.receivedDate) || 0;
+            if (dateA !== dateB) {
+              return soldSortDesc ? (dateB - dateA) : (dateA - dateB);
+            }
+          }
           return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
         });
       }
@@ -1207,9 +1232,35 @@
       clearPurchasedDateFilter.addEventListener("click", () => { purchasedDateFrom.value = ""; purchasedDateTo.value = ""; render(); });
       document.querySelector("#printPurchasedButton")?.addEventListener("click", () => window.print());
 
+      // 已售出：進件日與獎金雙排序控制邏輯
+      function updateSoldHeadersUI() {
+        if (soldDateSortHeader) {
+          soldDateSortHeader.textContent = `進件日 ${soldSortField === "receivedDate" ? (soldSortDesc ? "▼" : "▲") : "▼"}`;
+        }
+        if (soldBonusSortHeader) {
+          soldBonusSortHeader.textContent = `獎金 ${soldSortField === "bonus" ? (soldSortDesc ? "▼" : "▲") : "▼"}`;
+        }
+      }
+
       soldDateSortHeader?.addEventListener("click", () => {
-        soldSortDesc = !soldSortDesc;
-        soldDateSortHeader.textContent = `進件日 ${soldSortDesc ? "▼" : "▲"}`;
+        if (soldSortField === "receivedDate") {
+          soldSortDesc = !soldSortDesc;
+        } else {
+          soldSortField = "receivedDate";
+          soldSortDesc = true;
+        }
+        updateSoldHeadersUI();
+        render();
+      });
+
+      soldBonusSortHeader?.addEventListener("click", () => {
+        if (soldSortField === "bonus") {
+          soldSortDesc = !soldSortDesc;
+        } else {
+          soldSortField = "bonus";
+          soldSortDesc = true;
+        }
+        updateSoldHeadersUI();
         render();
       });
 
@@ -1244,7 +1295,7 @@
         }
       });
 
-      resetForm(); render(); syncFromCloud();
+      resetForm(); updateSoldHeadersUI(); render(); syncFromCloud();
     </script>
   </body>
 </html>
