@@ -1112,9 +1112,10 @@
         const filteredRecords = getFilteredRecords();
         const ongoingRecords = filteredRecords.filter((record) => !record.isPurchased && !record.isSold);
         const allPurchasedRecords = filteredRecords.filter((record) => record.isPurchased && !record.isSold);
-        const soldRecords = filteredRecords.filter((record) => record.isSold);
+        const allSoldRecords = filteredRecords.filter((record) => record.isSold);
         
         const purchasedRecords = filterPurchasedByDate(allPurchasedRecords);
+        const soldRecords = filterPurchasedByDate(allSoldRecords);
 
         ongoingBody.innerHTML = "";
         for (const record of sortRecords(ongoingRecords)) ongoingBody.append(createRecordRow(record));
@@ -1128,7 +1129,8 @@
         ongoingCount.textContent = `${ongoingRecords.length} 筆`;
         purchasedCount.textContent = purchasedRecords.length === allPurchasedRecords.length 
           ? `${purchasedRecords.length} 筆` : `${purchasedRecords.length} / ${allPurchasedRecords.length} 筆`;
-        soldCount.textContent = `${soldRecords.length} 筆`;
+        soldCount.textContent = soldRecords.length === allSoldRecords.length 
+          ? `${soldRecords.length} 筆` : `${soldRecords.length} / ${allSoldRecords.length} 筆`;
 
         ongoingEmpty.classList.toggle("is-visible", ongoingRecords.length === 0);
         purchasedEmpty.classList.toggle("is-visible", purchasedRecords.length === 0);
