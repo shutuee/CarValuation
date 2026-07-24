@@ -449,7 +449,7 @@
               </label>
               <label>
                 <span>里程</span>
-                <input id="km" type="number" min="0" step="0.1" />
+                <input id="km" type="text" />
               </label>
               <label>
                 <span>顏色</span>
@@ -683,11 +683,11 @@
         <input type="hidden" id="buyRecordId" />
         <label>
           <span>買進日</span>
-          <input id="buyDate" type="date" required />
+          <input id="buyDate" type="date" />
         </label>
         <label>
           <span>買進價</span>
-          <input id="buyActualDealPrice" type="text" required />
+          <input id="buyActualDealPrice" type="text" />
         </label>
         <div class="dialog-actions">
           <button class="secondary" type="button" id="cancelBuyButton">取消</button>
@@ -703,7 +703,7 @@
         <input type="hidden" id="sellRecordId" />
         <label>
           <span>賣出價</span>
-          <input id="sellPriceInput" type="text" required />
+          <input id="sellPriceInput" type="text" />
         </label>
         <div class="dialog-actions">
           <button class="secondary" type="button" id="cancelSellButton">取消</button>
@@ -1113,7 +1113,7 @@
         const filteredRecords = getFilteredRecords();
         const ongoingRecords = filteredRecords.filter((record) => !record.isPurchased && !record.isSold);
         const allPurchasedRecords = filteredRecords.filter((record) => record.isPurchased && !record.isSold);
-        const soldRecords = filteredRecords.filter((record) => record.isSold);
+        const soldRecords = filterPurchasedByDate(filteredRecords.filter((record) => record.isSold));
         
         const purchasedRecords = filterPurchasedByDate(allPurchasedRecords);
 
@@ -1127,8 +1127,7 @@
         for (const record of sortSoldRecords(soldRecords)) soldBody.append(createRecordRow(record));
 
         ongoingCount.textContent = `${ongoingRecords.length} 筆`;
-        purchasedCount.textContent = purchasedRecords.length === allPurchasedRecords.length 
-          ? `${purchasedRecords.length} 筆` : `${purchasedRecords.length} / ${allPurchasedRecords.length} 筆`;
+        purchasedCount.textContent = `${purchasedRecords.length} 筆`;
         soldCount.textContent = `${soldRecords.length} 筆`;
 
         ongoingEmpty.classList.toggle("is-visible", ongoingRecords.length === 0);
