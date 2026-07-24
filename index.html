@@ -53,7 +53,7 @@
 
       .entry-panel,
       .list-tools {
-        padding: 24px 28px;
+        padding: 20px 28px;
         border-bottom: 1px solid var(--line);
       }
 
@@ -75,7 +75,7 @@
 
       label span {
         color: var(--muted);
-        font-size: 14px; /* 調整為 14px，提升閱讀動線流暢度 */
+        font-size: 14px;
         font-weight: 700;
       }
 
@@ -83,7 +83,7 @@
       select,
       textarea {
         width: 100%;
-        min-height: 44px; /* 放大點擊區域至 44px，極致優化手機端操作 */
+        min-height: 44px;
         border: 1px solid #c7d0da;
         border-radius: 6px;
         background: #fff;
@@ -119,7 +119,7 @@
       }
 
       button {
-        min-height: 44px; /* 同步將主要按鈕高度提升至 44px，避免誤觸 */
+        min-height: 44px;
         border: 1px solid var(--accent);
         border-radius: 6px;
         background: var(--accent);
@@ -174,12 +174,148 @@
         background: #15803d;
       }
 
+      /* 資料工具列與快速切換按鈕樣式 */
       .list-tools {
         background: var(--surface-soft);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px 28px;
+        border-bottom: 1px solid var(--line);
       }
 
       .search-box {
+        width: 100%;
         max-width: 520px;
+      }
+
+      .quick-switch-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .quick-switch-label {
+        font-size: 15px;
+        font-weight: 700;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+      }
+
+      .switch-btn-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .switch-btn {
+        min-height: 40px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 15px;
+        font-weight: 700;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        color: #475569;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+      }
+
+      .switch-btn .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: currentColor;
+      }
+
+      .btn-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 22px;
+        height: 20px;
+        padding: 0 6px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 800;
+        background: rgba(0, 0, 0, 0.08);
+      }
+
+      .switch-btn:hover {
+        opacity: 0.88;
+      }
+
+      /* 全部切換按鈕 */
+      .switch-btn[data-status="all"] {
+        border-color: #cbd5e1;
+        color: #475569;
+        background: #ffffff;
+      }
+      .switch-btn[data-status="all"].is-active {
+        background: #475569;
+        border-color: #475569;
+        color: #ffffff;
+      }
+      .switch-btn[data-status="all"].is-active .btn-count {
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff;
+      }
+
+      /* 進行中 (藍色對照) */
+      .switch-btn[data-status="ongoing"] {
+        border-color: #bfdbfe;
+        color: #1d4ed8;
+        background: #eff6ff;
+      }
+      .switch-btn[data-status="ongoing"].is-active {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #ffffff;
+      }
+      .switch-btn[data-status="ongoing"].is-active .btn-count {
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff;
+      }
+
+      /* 已買入 (綠色對照) */
+      .switch-btn[data-status="purchased"] {
+        border-color: #bbf7d0;
+        color: #15803d;
+        background: #f0fdf4;
+      }
+      .switch-btn[data-status="purchased"].is-active {
+        background: #16a34a;
+        border-color: #16a34a;
+        color: #ffffff;
+      }
+      .switch-btn[data-status="purchased"].is-active .btn-count {
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff;
+      }
+
+      /* 已售出 (橘/黃色對照) */
+      .switch-btn[data-status="sold"] {
+        border-color: #fde68a;
+        color: #b45309;
+        background: #fffbeb;
+      }
+      .switch-btn[data-status="sold"].is-active {
+        background: #f59e0b;
+        border-color: #d97706;
+        color: #ffffff;
+      }
+      .switch-btn[data-status="sold"].is-active .btn-count {
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff;
       }
 
       .records-section {
@@ -240,7 +376,6 @@
         padding: 0 28px 32px;
       }
 
-      /* 表格基礎設定：移除垂直線、增加三倍行高、買入售出表寬度1.2倍 */
       table {
         width: 100%;
         min-width: 2060px;
@@ -250,18 +385,18 @@
 
       .purchased-section table,
       .sold-section table {
-        min-width: 2472px; /* 拉寬 1.2 倍 */
+        min-width: 2472px;
       }
 
       th,
       td {
         border: none;
-        border-bottom: 1px solid #737373; /* 中深灰水平分隔線 */
-        padding: 0 6px; /* 移除兩側多餘留白 */
+        border-bottom: 1px solid #737373;
+        padding: 0 6px;
         text-align: left;
         vertical-align: middle;
         font-size: 18px;
-        line-height: 3; /* 三倍行高 */
+        line-height: 3;
       }
 
       th {
@@ -271,28 +406,25 @@
         background: #f8fafc;
         color: #42505d;
         font-size: 17px;
-        border-bottom: 2px solid #52525b; /* 表頭底線較深 */
+        border-bottom: 2px solid #52525b;
       }
 
       td {
         color: #243140;
       }
 
-      /* 估價進行中顏色 (深淺藍) */
       .ongoing-section tbody tr:nth-child(odd) td { background: #ECF2FF; }
       .ongoing-section tbody tr:nth-child(even) td { background: #DBE8FF; }
 
-      /* 已買入顏色 (深淺綠) */
       .purchased-section tbody tr:nth-child(odd) td {
         background: #f2fbf5;
-        color: #243140; /* 統一字體顏色深灰 */
+        color: #243140;
       }
       .purchased-section tbody tr:nth-child(even) td {
         background: #e5f5eb;
         color: #243140; 
       }
 
-      /* 已售出顏色 (較淺的黃色) */
       .sold-section tbody tr:nth-child(odd) td {
         background: #FFFFF5;
         color: #243140;
@@ -302,7 +434,6 @@
         color: #243140;
       }
 
-      /* 滑鼠懸停高光統一設定 #E8E8E8 */
       tbody tr td {
         transition: background-color 140ms ease, color 140ms ease;
       }
@@ -313,20 +444,18 @@
         color: #000 !important;
       }
 
-      /* 特殊欄位設定 */
       .note-cell {
         max-width: 220px;
         white-space: pre-wrap;
       }
 
       .wide-cell {
-        max-width: 30ch; /* 固定於第 30 字元斷行 */
+        max-width: 30ch;
         white-space: pre-wrap;
         word-wrap: break-word;
         overflow-wrap: break-word;
       }
 
-      /* 排序標題樣式 */
       .sortable-header {
         text-decoration: underline;
         cursor: pointer;
@@ -336,20 +465,19 @@
         color: #000;
       }
 
-      /* 操作按鈕群 - 精細化：小一號 */
       .row-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        min-width: 140px; /* 容器寬度配合按鈕同步縮小 */
+        min-width: 140px;
         align-items: center;
       }
       .row-actions button {
-        min-height: 20px; /* 高度縮減至 20px */
-        padding: 0 6px; /* 縮小左右內距 */
-        font-size: 15px; /* 字體縮至 15px */
+        min-height: 20px;
+        padding: 0 6px;
+        font-size: 15px;
         font-weight: 600; 
-        border-radius: 3px; /* 圓角微調 */
+        border-radius: 3px;
       }
 
       .empty-state {
@@ -362,7 +490,7 @@
       }
       .empty-state strong { color: var(--ink); font-size: 22px; }
       .empty-state.is-visible { display: grid; }
-      .is-hidden { display: none; }
+      .is-hidden { display: none !important; }
 
       dialog {
         width: min(440px, calc(100% - 32px));
@@ -399,6 +527,9 @@
         .form-grid { grid-template-columns: 1fr; }
         .wide, .full-row { grid-column: auto; }
         .date-filter { flex-wrap: wrap; justify-content: flex-start; }
+        .quick-switch-wrap { flex-direction: column; align-items: flex-start; gap: 8px; }
+        .switch-btn-group { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .switch-btn { justify-content: center; width: 100%; padding: 8px 10px; }
       }
       @media print {
         body { background: #fff; }
@@ -526,15 +657,42 @@
           </form>
         </section>
 
+        <!-- 資料工具列 (搜尋欄位與下方快速切換按鈕) -->
         <section class="list-tools" aria-label="資料工具列">
+          <!-- 上方搜尋欄位 -->
           <label class="search-box">
             <span>搜尋</span>
             <input id="searchInput" type="search" placeholder="搜尋來源、車型、車況、賣家、備註或整理項目" />
           </label>
+
+          <!-- 下方快速切換按鈕區域 (包含筆數 Badge) -->
+          <div class="quick-switch-wrap">
+            <div class="quick-switch-label">
+              <span>🌪️ 快速切換:</span>
+            </div>
+            <div class="switch-btn-group">
+              <button type="button" class="switch-btn is-active" data-status="all">
+                <span class="dot"></span>全部
+                <span class="btn-count" id="switchCountAll">0</span>
+              </button>
+              <button type="button" class="switch-btn" data-status="ongoing">
+                <span class="dot"></span>進行中
+                <span class="btn-count" id="switchCountOngoing">0</span>
+              </button>
+              <button type="button" class="switch-btn" data-status="purchased">
+                <span class="dot"></span>已買入
+                <span class="btn-count" id="switchCountPurchased">0</span>
+              </button>
+              <button type="button" class="switch-btn" data-status="sold">
+                <span class="dot"></span>已售出
+                <span class="btn-count" id="switchCountSold">0</span>
+              </button>
+            </div>
+          </div>
         </section>
 
         <!-- 估價進行中 -->
-        <section class="records-section ongoing-section" aria-labelledby="ongoingTitle">
+        <section class="records-section ongoing-section" id="ongoingSection" aria-labelledby="ongoingTitle">
           <header class="section-title">
             <h2 id="ongoingTitle">估價進行中</h2>
             <span id="ongoingCount">0 筆</span>
@@ -573,13 +731,12 @@
         </section>
 
         <!-- 已買入 -->
-        <section class="records-section purchased-section" aria-labelledby="purchasedTitle">
+        <section class="records-section purchased-section" id="purchasedSection" aria-labelledby="purchasedTitle">
           <header class="section-title">
             <div>
               <h2 id="purchasedTitle">已買入</h2>
               <span id="purchasedCount">0 筆</span>
             </div>
-            <!-- 已將原本在標題列右方的日期搜尋移開，保持大器簡約 -->
           </header>
           <div class="table-wrap" aria-label="已買入清單">
             <table>
@@ -616,7 +773,7 @@
         </section>
 
         <!-- 已售出 -->
-        <section class="records-section sold-section" aria-labelledby="soldTitle">
+        <section class="records-section sold-section" id="soldSection" aria-labelledby="soldTitle">
           <header class="section-title">
             <div>
               <h2 id="soldTitle">已售出</h2>
@@ -644,7 +801,6 @@
                   <th>備註</th>
                   <th>整理項目</th>
                   <th>賣家</th>
-                  <!-- 獎金欄位加入 class="sortable-header" 與 id 作為排序控制項 -->
                   <th class="sortable-header" id="soldBonusSortHeader" title="點擊切換獎金排序">獎金 ▼</th>
                   <th>操作</th>
                 </tr>
@@ -738,7 +894,6 @@
         "repairItems", "seller", "bonus",
       ];
 
-      // 試算表欄位：寫入 state 為首要狀態來源
       const sheetHeaders = [
         "id", "source", "receivedDate", "boughtDate", "year", "model",
         "km", "color", "condition", "version", "authority", "quote",
@@ -756,6 +911,10 @@
       const searchInput = document.querySelector("#searchInput");
       const sourceCustomWrap = document.querySelector("#sourceCustomWrap");
       
+      const ongoingSection = document.querySelector("#ongoingSection");
+      const purchasedSection = document.querySelector("#purchasedSection");
+      const soldSection = document.querySelector("#soldSection");
+
       const ongoingBody = document.querySelector("#ongoingBody");
       const purchasedBody = document.querySelector("#purchasedBody");
       const soldBody = document.querySelector("#soldBody"); 
@@ -767,6 +926,11 @@
       const ongoingCount = document.querySelector("#ongoingCount");
       const purchasedCount = document.querySelector("#purchasedCount");
       const soldCount = document.querySelector("#soldCount"); 
+
+      const switchCountAll = document.querySelector("#switchCountAll");
+      const switchCountOngoing = document.querySelector("#switchCountOngoing");
+      const switchCountPurchased = document.querySelector("#switchCountPurchased");
+      const switchCountSold = document.querySelector("#switchCountSold");
       
       const buyDialog = document.querySelector("#buyDialog");
       const buyForm = document.querySelector("#buyForm");
@@ -795,8 +959,9 @@
       const soldBonusSortHeader = document.querySelector("#soldBonusSortHeader");
       
       let records = loadLocalRecords();
-      let soldSortField = "receivedDate"; // 支援 'receivedDate' 或 'bonus' 排序
+      let soldSortField = "receivedDate";
       let soldSortDesc = true;
+      let currentStatusFilter = "all"; // 可為 'all', 'ongoing', 'purchased', 'sold'
 
       function loadLocalRecords() {
         try {
@@ -822,7 +987,6 @@
         const sourceType = record.sourceType || (FIXED_SOURCES.includes(normalizedSource) ? normalizedSource : normalizedSource ? CUSTOM_SOURCE : "");
         const sourceCustom = cleanSheetText(record.sourceCustom || (sourceType === CUSTOM_SOURCE ? normalizedSource : ""));
 
-        // 強制從 state 欄位判定已售出狀態，解決雲端同步衝突
         const rawState = cleanSheetText(record.state || "").toUpperCase();
         const isSold = (rawState === "Y");
 
@@ -848,7 +1012,7 @@
           seller: cleanSheetText(record.seller || record.location || [record.sellerName, record.sellerPhone].filter(Boolean).join(" ")),
           bonus: cleanSheetText(record.bonus),
           isPurchased: normalizeBoolean(record.isPurchased),
-          isSold: isSold, // 與 state 同步
+          isSold: isSold,
           state: isSold ? "Y" : "N",
           createdAt: record.createdAt || new Date().toISOString(),
           updatedAt: record.updatedAt || new Date().toISOString(),
@@ -891,7 +1055,6 @@
         return `${year}-${month}-${day}`;
       }
 
-      // 轉換為 MM/DD
       function formatMMDD(value) {
         if (!value) return "";
         const text = String(value).trim();
@@ -923,7 +1086,7 @@
           ...normalized,
           source: getSourceLabel(normalized),
           isPurchased: normalized.isPurchased ? "TRUE" : "FALSE",
-          state: normalized.isSold ? "Y" : "N", // 統一使用 state 拋送後端
+          state: normalized.isSold ? "Y" : "N",
         };
 
         return Object.fromEntries(
@@ -1007,7 +1170,6 @@
       function sortSoldRecords(items) {
         return [...items].sort((a, b) => {
           if (soldSortField === "bonus") {
-            // 處理獎金欄位排序 (解析為數值方便正確數值比對大小)
             const getBonusNum = (val) => {
               if (!val) return 0;
               const num = parseFloat(String(val).replace(/[^\d.-]/g, ""));
@@ -1019,7 +1181,6 @@
               return soldSortDesc ? (bonusB - bonusA) : (bonusA - bonusB);
             }
           } else {
-            // 預設進件日排序
             const dateA = dateValueToNumber(a.receivedDate) || 0;
             const dateB = dateValueToNumber(b.receivedDate) || 0;
             if (dateA !== dateB) {
@@ -1109,6 +1270,31 @@
         return row;
       }
 
+      function updateStatusFilterUI() {
+        document.querySelectorAll(".switch-btn").forEach((btn) => {
+          btn.classList.toggle("is-active", btn.dataset.status === currentStatusFilter);
+        });
+
+        // 依據選擇的狀態顯示/隱藏區塊
+        if (currentStatusFilter === "all") {
+          ongoingSection.classList.remove("is-hidden");
+          purchasedSection.classList.remove("is-hidden");
+          soldSection.classList.remove("is-hidden");
+        } else if (currentStatusFilter === "ongoing") {
+          ongoingSection.classList.remove("is-hidden");
+          purchasedSection.classList.add("is-hidden");
+          soldSection.classList.add("is-hidden");
+        } else if (currentStatusFilter === "purchased") {
+          ongoingSection.classList.add("is-hidden");
+          purchasedSection.classList.remove("is-hidden");
+          soldSection.classList.add("is-hidden");
+        } else if (currentStatusFilter === "sold") {
+          ongoingSection.classList.add("is-hidden");
+          purchasedSection.classList.add("is-hidden");
+          soldSection.classList.remove("is-hidden");
+        }
+      }
+
       function render() {
         const filteredRecords = getFilteredRecords();
         const ongoingRecords = filteredRecords.filter((record) => !record.isPurchased && !record.isSold);
@@ -1126,13 +1312,22 @@
         soldBody.innerHTML = "";
         for (const record of sortSoldRecords(soldRecords)) soldBody.append(createRecordRow(record));
 
+        // 更新區域筆數
         ongoingCount.textContent = `${ongoingRecords.length} 筆`;
         purchasedCount.textContent = `${purchasedRecords.length} 筆`;
         soldCount.textContent = `${soldRecords.length} 筆`;
 
+        // 更新快速切換按鈕內部筆數 Badge
+        if (switchCountOngoing) switchCountOngoing.textContent = ongoingRecords.length;
+        if (switchCountPurchased) switchCountPurchased.textContent = purchasedRecords.length;
+        if (switchCountSold) switchCountSold.textContent = soldRecords.length;
+        if (switchCountAll) switchCountAll.textContent = ongoingRecords.length + purchasedRecords.length + soldRecords.length;
+
         ongoingEmpty.classList.toggle("is-visible", ongoingRecords.length === 0);
         purchasedEmpty.classList.toggle("is-visible", purchasedRecords.length === 0);
         soldEmpty.classList.toggle("is-visible", soldRecords.length === 0);
+
+        updateStatusFilterUI();
       }
 
       function updateSourceCustomVisibility() {
@@ -1174,7 +1369,6 @@
         if (existingIndex >= 0) {
           records[existingIndex] = await persistUpdate(normalizeRecord({ ...records[existingIndex], ...data }));
         } else {
-          // 新增資料，強制帶入 state: "N"
           records.push(await persistCreate(normalizeRecord({ ...data, isPurchased: false, isSold: false, state: "N", createdAt: new Date().toISOString() })));
         }
 
@@ -1201,7 +1395,6 @@
         event.preventDefault();
         const index = records.findIndex((i) => i.id === sellRecordId.value);
         if (index >= 0) {
-          // 確認售出，寫入 isSold: true, state: "Y"
           records[index] = await persistUpdate(normalizeRecord({
             ...records[index], salePrice: sellPriceInput.value.trim(), isSold: true, state: "Y", updatedAt: new Date().toISOString()
           }));
@@ -1232,7 +1425,14 @@
       clearPurchasedDateFilter.addEventListener("click", () => { purchasedDateFrom.value = ""; purchasedDateTo.value = ""; render(); });
       document.querySelector("#printPurchasedButton")?.addEventListener("click", () => window.print());
 
-      // 已售出：進件日與獎金雙排序控制邏輯
+      // 綁定快速切換按鈕事件
+      document.querySelectorAll(".switch-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          currentStatusFilter = btn.dataset.status;
+          render();
+        });
+      });
+
       function updateSoldHeadersUI() {
         if (soldDateSortHeader) {
           soldDateSortHeader.textContent = `進件日 ${soldSortField === "receivedDate" ? (soldSortDesc ? "▼" : "▲") : "▼"}`;
@@ -1285,7 +1485,6 @@
           sellRecordId.value = record.id; sellPriceInput.value = record.salePrice || "";
           sellDialog.showModal(); sellPriceInput.focus();
         } else if (button.dataset.action === "toggle-sold") {
-          // 取消售出，退回 state: "N"
           records[index] = await persistUpdate(normalizeRecord({ ...record, isSold: false, state: "N", updatedAt: new Date().toISOString() }));
           saveLocalRecords(); render();
         } else if (button.dataset.action === "delete") {
