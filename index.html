@@ -423,7 +423,7 @@
             <div class="form-grid">
               <label class="full-row" id="receivedDateWrap">
                 <span>進件日</span>
-                <input id="receivedDate" type="text" placeholder="可填寫日期或任意文字符號" />
+                <input id="receivedDate" type="date" />
               </label>
               <label>
                 <span>來源</span>
@@ -1146,6 +1146,7 @@
         fields.recordId.value = record.id;
         for (const name of fieldNames) {
           if (name === "km") fields[name].value = normalizeKm(record[name]);
+          else if (name === "receivedDate") fields[name].value = toDateInputValue(record[name]);
           else fields[name].value = record[name] || "";
         }
         updateSourceCustomVisibility();
