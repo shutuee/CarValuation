@@ -423,7 +423,7 @@
             <div class="form-grid">
               <label class="full-row" id="receivedDateWrap">
                 <span>進件日</span>
-                <input id="receivedDate" type="date" />
+                <input id="receivedDate" type="text" placeholder="可填寫日期或任意文字符號" />
               </label>
               <label>
                 <span>來源</span>
@@ -683,7 +683,7 @@
         <input type="hidden" id="buyRecordId" />
         <label>
           <span>買進日</span>
-          <input id="buyDate" type="date" />
+          <input id="buyDate" type="text" placeholder="可填寫日期或任意文字符號" />
         </label>
         <label>
           <span>買進價</span>
@@ -1146,7 +1146,6 @@
         fields.recordId.value = record.id;
         for (const name of fieldNames) {
           if (name === "km") fields[name].value = normalizeKm(record[name]);
-          else if (name === "receivedDate") fields[name].value = toDateInputValue(record[name]);
           else fields[name].value = record[name] || "";
         }
         updateSourceCustomVisibility();
@@ -1278,7 +1277,7 @@
             records[index] = await persistUpdate(normalizeRecord({ ...record, isPurchased: false, updatedAt: new Date().toISOString() }));
             saveLocalRecords(); render();
           } else {
-            buyRecordId.value = record.id; buyDate.value = toDateInputValue(record.boughtDate); buyActualDealPrice.value = record.actualDealPrice || "";
+            buyRecordId.value = record.id; buyDate.value = record.boughtDate || ""; buyActualDealPrice.value = record.actualDealPrice || "";
             buyDialog.showModal(); buyDate.focus();
           }
         } else if (button.dataset.action === "sell") {
