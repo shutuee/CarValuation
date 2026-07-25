@@ -191,26 +191,29 @@
       /* 資料工具列與快速切換按鈕樣式 */
       .list-tools {
         background: var(--surface-soft);
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
         padding: 20px 28px;
         border-bottom: 1px solid var(--line);
       }
 
+      .search-tools-group {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 16px;
+        width: fit-content;
+        max-width: 100%;
+      }
+
       .search-row {
         display: flex;
-        align-items: flex-end;
+        align-items: center;
         gap: 12px;
-        flex-wrap: wrap;
         width: 100%;
       }
 
       .search-box {
         width: 100%;
-        max-width: 520px;
         flex: 1;
-        min-width: 240px;
+        min-width: 200px;
       }
 
       .quick-switch-wrap {
@@ -218,6 +221,7 @@
         align-items: center;
         gap: 12px;
         flex-wrap: wrap;
+        width: 100%;
       }
 
       .quick-switch-label {
@@ -397,25 +401,96 @@
         font-weight: 700;
       }
 
+      /* 底部篩選與列印工具列 */
+      .sold-filter-bar {
+        padding: 16px 28px;
+        border-top: 1px solid var(--line);
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .filter-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #475569;
+        white-space: nowrap;
+      }
+
+      .filter-icon {
+        color: #2563eb;
+        font-size: 12px;
+      }
+
       .date-filter {
         display: flex;
         flex-direction: row;
-        align-items: flex-end;
-        justify-content: flex-end;
+        align-items: center;
         gap: 10px;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
       }
 
-      .date-filter label {
-        width: auto;
-        min-width: 180px;
+      .date-filter input[type="date"] {
+        width: 160px;
+        min-height: 40px;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background: #f8fafc;
+        color: #334155;
+        font-size: 14px;
       }
 
-      .date-filter button {
-        width: auto;
-        min-height: 44px;
+      .date-separator {
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .btn-clear-filter {
+        min-height: 40px;
         padding: 0 16px;
-        white-space: nowrap;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn-clear-filter:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+      }
+
+      .btn-print-sold {
+        min-height: 40px;
+        padding: 0 18px;
+        border-radius: 8px;
+        border: 1px solid #2563eb;
+        background: #2563eb;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+      }
+
+      .btn-print-sold:hover {
+        background: #1d4ed8;
+        border-color: #1d4ed8;
       }
 
       /* 表格容器：設定雙向滾動與自訂滾動條 */
@@ -605,10 +680,38 @@
         .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .wide { grid-column: span 2; }
       }
+      @media (max-width: 768px) {
+        .sold-filter-bar {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 12px;
+          padding: 16px;
+        }
+        .date-filter {
+          width: 100%;
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          gap: 8px;
+          align-items: center;
+        }
+        .date-filter input[type="date"] {
+          width: 100%;
+          min-width: 0;
+        }
+        .btn-clear-filter {
+          grid-column: span 3;
+          width: 100%;
+          min-height: 42px;
+        }
+        .btn-print-sold {
+          grid-column: span 3;
+          width: 100%;
+          min-height: 42px;
+        }
+      }
       @media (max-width: 620px) {
         .form-grid { grid-template-columns: 1fr; }
         .wide, .full-row { grid-column: auto; }
-        .date-filter { flex-wrap: wrap; justify-content: flex-start; }
         .quick-switch-wrap { flex-direction: column; align-items: flex-start; gap: 8px; }
         .switch-btn-group { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         .switch-btn { justify-content: center; width: 100%; padding: 8px 10px; }
@@ -631,34 +734,35 @@
       <section class="workspace">
         <!-- 資料工具列 (新增估價按鈕與搜尋欄位) -->
         <section class="list-tools" aria-label="資料工具列">
-          <!-- 上方搜尋欄位列：新增估價按鈕在搜尋欄位前 -->
-          <div class="search-row">
-            <button type="button" class="btn-add-valuation" id="openValuationBtn">+新增估價</button>
-            <label class="search-box">
-              <span>搜尋</span>
-              <input id="searchInput" type="search" placeholder="搜尋來源、車型、車況、賣家、備註或整理項目" />
-            </label>
-          </div>
+          <div class="search-tools-group">
+            <!-- 上方搜尋欄位列：新增估價按鈕在搜尋欄位前 -->
+            <div class="search-row">
+              <button type="button" class="btn-add-valuation" id="openValuationBtn">+新增估價</button>
+              <label class="search-box">
+                <input id="searchInput" type="search" placeholder="搜尋" />
+              </label>
+            </div>
 
-          <!-- 下方快速切換按鈕區域 (包含筆數 Badge) -->
-          <div class="quick-switch-wrap">
-            <div class="switch-btn-group">
-              <button type="button" class="switch-btn is-active" data-status="all">
-                <span class="dot"></span>全部
-                <span class="btn-count" id="switchCountAll">0</span>
-              </button>
-              <button type="button" class="switch-btn" data-status="ongoing">
-                <span class="dot"></span>進行中
-                <span class="btn-count" id="switchCountOngoing">0</span>
-              </button>
-              <button type="button" class="switch-btn" data-status="purchased">
-                <span class="dot"></span>已買入
-                <span class="btn-count" id="switchCountPurchased">0</span>
-              </button>
-              <button type="button" class="switch-btn" data-status="sold">
-                <span class="dot"></span>已售出
-                <span class="btn-count" id="switchCountSold">0</span>
-              </button>
+            <!-- 下方快速切換按鈕區域 (包含筆數 Badge) -->
+            <div class="quick-switch-wrap">
+              <div class="switch-btn-group">
+                <button type="button" class="switch-btn is-active" data-status="all">
+                  <span class="dot"></span>全部
+                  <span class="btn-count" id="switchCountAll">0</span>
+                </button>
+                <button type="button" class="switch-btn" data-status="ongoing">
+                  <span class="dot"></span>進行中
+                  <span class="btn-count" id="switchCountOngoing">0</span>
+                </button>
+                <button type="button" class="switch-btn" data-status="purchased">
+                  <span class="dot"></span>已買入
+                  <span class="btn-count" id="switchCountPurchased">0</span>
+                </button>
+                <button type="button" class="switch-btn" data-status="sold">
+                  <span class="dot"></span>已售出
+                  <span class="btn-count" id="switchCountSold">0</span>
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -788,18 +892,20 @@
           </div>
 
           <!-- 搜尋與列印區域移至「已售出資料表」的最下方 -->
-          <div style="padding: 20px 28px; border-top: 1px solid var(--line); background: var(--surface-soft); display: flex; justify-content: flex-end;">
+          <div class="sold-filter-bar">
+            <div class="filter-title">
+              <span class="filter-icon">▼</span>
+              <span>已售出買進日區間篩選</span>
+            </div>
             <div class="date-filter">
-              <label>
-                <span>起始買進日</span>
-                <input id="purchasedDateFrom" type="date" />
-              </label>
-              <label>
-                <span>結束買進日</span>
-                <input id="purchasedDateTo" type="date" />
-              </label>
-              <button class="secondary" type="button" id="clearPurchasedDateFilter">清除</button>
-              <button type="button" id="printPurchasedButton">列印</button>
+              <input id="purchasedDateFrom" type="date" aria-label="起始買進日" />
+              <span class="date-separator">至</span>
+              <input id="purchasedDateTo" type="date" aria-label="結束買進日" />
+              <button class="btn-clear-filter" type="button" id="clearPurchasedDateFilter">清除</button>
+              <button class="btn-print-sold" type="button" id="printPurchasedButton">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                列印已售出
+              </button>
             </div>
           </div>
         </section>
