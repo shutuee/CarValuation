@@ -170,12 +170,10 @@
         color: #fff;
       }
 
-      button.action-green:hover {
-        background: #15803d;
-      }
-
-      /* 紅色 +新增估價 按鈕樣式 */
-      button.btn-add-valuation {
+      /* 紅色 +新增估價 按鈕樣式 & 新增/編輯提交按鈕 */
+      button.btn-add-valuation,
+      button.action-red,
+      #submitButton {
         border-color: #dc2626;
         background: #dc2626;
         color: #ffffff;
@@ -183,7 +181,9 @@
         white-space: nowrap;
       }
 
-      button.btn-add-valuation:hover {
+      button.btn-add-valuation:hover,
+      button.action-red:hover,
+      #submitButton:hover {
         background: #b91c1c;
         border-color: #b91c1c;
       }
@@ -363,6 +363,30 @@
         margin: 0;
         font-size: 22px;
         line-height: 1.2;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+      }
+
+      .status-dot.dot-ongoing {
+        background-color: #2563eb;
+      }
+
+      .status-dot.dot-purchased {
+        background-color: #16a34a;
+      }
+
+      .status-dot.dot-sold {
+        background-color: #f59e0b;
       }
 
       .section-title span {
@@ -642,8 +666,10 @@
         <!-- 估價進行中 -->
         <section class="records-section ongoing-section" id="ongoingSection" aria-labelledby="ongoingTitle">
           <header class="section-title">
-            <h2 id="ongoingTitle">估價進行中</h2>
-            <span id="ongoingCount">0 筆</span>
+            <div>
+              <h2 id="ongoingTitle"><span class="status-dot dot-ongoing"></span>估價進行中</h2>
+              <span id="ongoingCount">0 筆</span>
+            </div>
           </header>
           <div class="table-wrap" aria-label="估價進行中清單">
             <table>
@@ -682,7 +708,7 @@
         <section class="records-section purchased-section" id="purchasedSection" aria-labelledby="purchasedTitle">
           <header class="section-title">
             <div>
-              <h2 id="purchasedTitle">已買入</h2>
+              <h2 id="purchasedTitle"><span class="status-dot dot-purchased"></span>已買入</h2>
               <span id="purchasedCount">0 筆</span>
             </div>
           </header>
@@ -724,7 +750,7 @@
         <section class="records-section sold-section" id="soldSection" aria-labelledby="soldTitle">
           <header class="section-title">
             <div>
-              <h2 id="soldTitle">已售出</h2>
+              <h2 id="soldTitle"><span class="status-dot dot-sold"></span>已售出</h2>
               <span id="soldCount">0 筆</span>
             </div>
           </header>
