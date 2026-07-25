@@ -174,6 +174,20 @@
         background: #15803d;
       }
 
+      /* 紅色 +新增估價 按鈕樣式 */
+      button.btn-add-valuation {
+        border-color: #dc2626;
+        background: #dc2626;
+        color: #ffffff;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      button.btn-add-valuation:hover {
+        background: #b91c1c;
+        border-color: #b91c1c;
+      }
+
       /* 資料工具列與快速切換按鈕樣式 */
       .list-tools {
         background: var(--surface-soft);
@@ -184,9 +198,19 @@
         border-bottom: 1px solid var(--line);
       }
 
+      .search-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+
       .search-box {
         width: 100%;
         max-width: 520px;
+        flex: 1;
+        min-width: 240px;
       }
 
       .quick-switch-wrap {
@@ -528,6 +552,11 @@
         box-shadow: 0 24px 70px rgba(15, 23, 42, 0.26);
         padding: 0;
       }
+      dialog#valuationDialog {
+        width: min(760px, calc(100% - 32px));
+        max-height: 90vh;
+        overflow-y: auto;
+      }
       dialog::backdrop {
         background: rgba(15, 23, 42, 0.4);
         backdrop-filter: blur(2px);
@@ -576,129 +605,19 @@
   <body>
     <main class="app-shell">
       <section class="workspace">
-        <!-- 估價表單 -->
-        <section class="entry-panel" aria-label="車輛估價表單">
-          <form id="valuationForm" autocomplete="off">
-            <input type="hidden" id="recordId" />
-            <div class="form-grid">
-              <label class="full-row" id="receivedDateWrap">
-                <span>進件日</span>
-                <input id="receivedDate" type="date" />
-              </label>
-              <label>
-                <span>來源</span>
-                <select id="sourceType">
-                  <option value="">請選擇</option>
-                  <option value="來店">來店</option>
-                  <option value="網站">網站</option>
-                  <option value="自買">自買</option>
-                  <option value="自行輸入">自行輸入</option>
-                </select>
-              </label>
-              <label class="is-hidden" id="sourceCustomWrap">
-                <span>自行輸入來源</span>
-                <input id="sourceCustom" type="text" />
-              </label>
-              <label>
-                <span>年份</span>
-                <input id="year" type="text" />
-              </label>
-              <label>
-                <span>車型</span>
-                <input id="model" type="text" />
-              </label>
-              <label>
-                <span>里程</span>
-                <input id="km" type="text" />
-              </label>
-              <label>
-                <span>顏色</span>
-                <input list="colorOptions" id="color" placeholder="選擇或輸入" />
-                <datalist id="colorOptions">
-                  <option value="白"></option>
-                  <option value="黑"></option>
-                  <option value="灰"></option>
-                  <option value="銀"></option>
-                  <option value="紅"></option>
-                  <option value="藍"></option>
-                  <option value="綠"></option>
-                </datalist>
-              </label>
-              <label>
-                <span>車況</span>
-                <select id="condition">
-                  <option value="">請選擇</option>
-                  <option>A</option>
-                  <option>B</option>
-                  <option>C</option>
-                  <option>N</option>
-                </select>
-              </label>
-              <label>
-                <span>版本</span>
-                <input id="version" type="text" />
-              </label>
-              <label>
-                <span>權威</span>
-                <input id="authority" type="text" />
-              </label>
-              <label>
-                <span>報價</span>
-                <select id="quote">
-                  <option value="">請選擇</option>
-                  <option>Y</option>
-                  <option>N</option>
-                </select>
-              </label>
-              <label>
-                <span>報價(金額)</span>
-                <input id="purchasePrice" type="text" />
-              </label>
-              <label>
-                <span>買進價</span>
-                <input id="actualDealPrice" type="text" />
-              </label>
-              <label>
-                <span>賣出價</span>
-                <input id="salePrice" type="text" />
-              </label>
-              <label>
-                <span>備註</span>
-                <input id="remarks" type="text" />
-              </label>
-              <label class="wide">
-                <span>整理項目</span>
-                <textarea id="repairItems" rows="3"></textarea>
-              </label>
-              <label>
-                <span>賣家</span>
-                <input id="seller" type="text" />
-              </label>
-              <label>
-                <span>獎金</span>
-                <input id="bonus" type="text" />
-              </label>
-            </div>
-            <div class="form-actions">
-              <button class="secondary" type="button" id="resetButton">清除</button>
-              <button type="submit" id="submitButton">新增資料</button>
-            </div>
-          </form>
-        </section>
-
-        <!-- 資料工具列 (搜尋欄位與下方快速切換按鈕) -->
+        <!-- 資料工具列 (新增估價按鈕與搜尋欄位) -->
         <section class="list-tools" aria-label="資料工具列">
-          <!-- 上方搜尋欄位 -->
-          <label class="search-box">
-            <span>搜尋</span>
-            <input id="searchInput" type="search" placeholder="搜尋來源、車型、車況、賣家、備註或整理項目" />
-          </label>
+          <!-- 上方搜尋欄位列：新增估價按鈕在搜尋欄位前 -->
+          <div class="search-row">
+            <button type="button" class="btn-add-valuation" id="openValuationBtn">+新增估價</button>
+            <label class="search-box">
+              <span>搜尋</span>
+              <input id="searchInput" type="search" placeholder="搜尋來源、車型、車況、賣家、備註或整理項目" />
+            </label>
+          </div>
 
           <!-- 下方快速切換按鈕區域 (包含筆數 Badge) -->
           <div class="quick-switch-wrap">
-            <div class="quick-switch-label">
-              <span>🌪️ 快速切換:</span>
-            </div>
             <div class="switch-btn-group">
               <button type="button" class="switch-btn is-active" data-status="all">
                 <span class="dot"></span>全部
@@ -861,6 +780,120 @@
       </section>
     </main>
 
+    <!-- 新增/編輯估價對話框 -->
+    <dialog id="valuationDialog">
+      <form id="valuationForm" autocomplete="off">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 4px;">
+          <h2 style="margin:0;" id="valuationDialogTitle">新增估價資料</h2>
+          <button class="secondary" type="button" id="closeValuationDialogBtn" style="min-height:36px; padding:0 12px;">✕</button>
+        </div>
+        <input type="hidden" id="recordId" />
+        <div class="form-grid">
+          <label class="full-row" id="receivedDateWrap">
+            <span>進件日</span>
+            <input id="receivedDate" type="date" />
+          </label>
+          <label>
+            <span>來源</span>
+            <select id="sourceType">
+              <option value="">請選擇</option>
+              <option value="來店">來店</option>
+              <option value="網站">網站</option>
+              <option value="自買">自買</option>
+              <option value="自行輸入">自行輸入</option>
+            </select>
+          </label>
+          <label class="is-hidden" id="sourceCustomWrap">
+            <span>自行輸入來源</span>
+            <input id="sourceCustom" type="text" />
+          </label>
+          <label>
+            <span>年份</span>
+            <input id="year" type="text" />
+          </label>
+          <label>
+            <span>車型</span>
+            <input id="model" type="text" />
+          </label>
+          <label>
+            <span>里程</span>
+            <input id="km" type="text" />
+          </label>
+          <label>
+            <span>顏色</span>
+            <input list="colorOptions" id="color" placeholder="選擇或輸入" />
+            <datalist id="colorOptions">
+              <option value="白"></option>
+              <option value="黑"></option>
+              <option value="灰"></option>
+              <option value="銀"></option>
+              <option value="紅"></option>
+              <option value="藍"></option>
+              <option value="綠"></option>
+            </datalist>
+          </label>
+          <label>
+            <span>車況</span>
+            <select id="condition">
+              <option value="">請選擇</option>
+              <option>A</option>
+              <option>B</option>
+              <option>C</option>
+              <option>N</option>
+            </select>
+          </label>
+          <label>
+            <span>版本</span>
+            <input id="version" type="text" />
+          </label>
+          <label>
+            <span>權威</span>
+            <input id="authority" type="text" />
+          </label>
+          <label>
+            <span>報價</span>
+            <select id="quote">
+              <option value="">請選擇</option>
+              <option>Y</option>
+              <option>N</option>
+            </select>
+          </label>
+          <label>
+            <span>報價(金額)</span>
+            <input id="purchasePrice" type="text" />
+          </label>
+          <label>
+            <span>買進價</span>
+            <input id="actualDealPrice" type="text" />
+          </label>
+          <label>
+            <span>賣出價</span>
+            <input id="salePrice" type="text" />
+          </label>
+          <label>
+            <span>備註</span>
+            <input id="remarks" type="text" />
+          </label>
+          <label class="wide">
+            <span>整理項目</span>
+            <textarea id="repairItems" rows="3"></textarea>
+          </label>
+          <label>
+            <span>賣家</span>
+            <input id="seller" type="text" />
+          </label>
+          <label>
+            <span>獎金</span>
+            <input id="bonus" type="text" />
+          </label>
+        </div>
+        <div class="form-actions">
+          <button class="secondary" type="button" id="resetButton">清除</button>
+          <button type="submit" id="submitButton">新增資料</button>
+        </div>
+      </form>
+    </dialog>
+
     <!-- 買入對話框 -->
     <dialog id="buyDialog">
       <form id="buyForm" method="dialog">
@@ -933,6 +966,11 @@
 
       const fields = Object.fromEntries(fieldNames.map((name) => [name, document.querySelector(`#${name}`)]));
       fields.recordId = document.querySelector("#recordId");
+
+      const valuationDialog = document.querySelector("#valuationDialog");
+      const valuationDialogTitle = document.querySelector("#valuationDialogTitle");
+      const openValuationBtn = document.querySelector("#openValuationBtn");
+      const closeValuationDialogBtn = document.querySelector("#closeValuationDialogBtn");
 
       const form = document.querySelector("#valuationForm");
       const submitButton = document.querySelector("#submitButton");
@@ -1375,6 +1413,8 @@
         }
         updateSourceCustomVisibility();
         submitButton.textContent = "儲存修改";
+        if (valuationDialogTitle) valuationDialogTitle.textContent = "編輯估價資料";
+        valuationDialog.showModal();
         fields.sourceType.focus();
       }
 
@@ -1382,8 +1422,18 @@
         form.reset();
         fields.recordId.value = "";
         submitButton.textContent = "新增資料";
+        if (valuationDialogTitle) valuationDialogTitle.textContent = "新增估價資料";
         updateSourceCustomVisibility();
       }
+
+      openValuationBtn?.addEventListener("click", () => {
+        resetForm();
+        valuationDialog.showModal();
+      });
+
+      closeValuationDialogBtn?.addEventListener("click", () => {
+        valuationDialog.close();
+      });
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -1404,6 +1454,7 @@
         saveLocalRecords();
         resetForm();
         render();
+        valuationDialog.close();
         submitButton.disabled = false;
       });
 
@@ -1501,7 +1552,7 @@
         if (!record) return;
 
         if (button.dataset.action === "edit") {
-          setFormData(record); window.scrollTo({ top: 0, behavior: "smooth" });
+          setFormData(record);
         } else if (button.dataset.action === "toggle-purchased") {
           if (record.isPurchased) {
             records[index] = await persistUpdate(normalizeRecord({ ...record, isPurchased: false, updatedAt: new Date().toISOString() }));
