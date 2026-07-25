@@ -508,23 +508,23 @@
       }
 
       .btn-print {
-        border: 1px solid #2563eb;
-        background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+        border: 1px solid #475569;
+        background: linear-gradient(180deg, #64748b 0%, #475569 100%);
         color: #ffffff;
-        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        box-shadow: 0 2px 4px rgba(71, 85, 105, 0.2);
       }
 
       /* 列印按鈕懸停加深發光 */
       .btn-print:hover {
-        background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
-        box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+        background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
+        box-shadow: 0 6px 12px rgba(71, 85, 105, 0.3);
         transform: translateY(-1px);
       }
 
       /* 點擊微縮 */
       .btn-print:active {
         transform: scale(0.96);
-        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        box-shadow: 0 2px 4px rgba(71, 85, 105, 0.2);
       }
 
       /* RWD 佈局優化 */
@@ -666,6 +666,10 @@
         white-space: pre-wrap;
         word-wrap: break-word;
         overflow-wrap: break-word;
+      }
+
+      .model-cell {
+        font-weight: 600;
       }
 
       .sortable-header {
@@ -927,7 +931,7 @@
           <div style="padding: 20px 28px; border-top: 1px solid var(--line); background: var(--surface-soft);">
             <div class="print-filter-wrapper">
               <div class="print-filter-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                 已售出買進日區間篩選
               </div>
               <div class="print-filter-controls">
@@ -1458,7 +1462,7 @@
 
         row.append(
           createCell(record.year),
-          createCell(record.model),
+          createCell(record.model, "model-cell"),
           createCell(record.km),
           createCell(record.color),
           createCell(record.condition), 
