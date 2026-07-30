@@ -32,7 +32,7 @@
         --text-main: #0f172a;
         --text-muted: #64748b;
         --border-color: #e2e8f0;
-        --modal-overlay: rgba(15, 23, 42, 0.5);
+        --modal-overlay: rgba(15, 23, 42, 0.55);
       }
 
       * {
@@ -193,6 +193,10 @@
       button.btn-add-valuation,
       button.action-red,
       #submitButton {
+        min-height: 44px;
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 6px;
         border-color: #dc2626;
         background: #dc2626;
         color: #ffffff;
@@ -207,14 +211,14 @@
         border-color: #b91c1c;
       }
 
-      /* ===== 操作欄位：深灰色底預約按鈕 (Btn-Calendar-View) ===== */
+      /* ===== 操作欄位：黑底預約按鈕 (高度與新增估價一致 44px) ===== */
       .btn-calendar-view {
-        height: 40px;
-        min-height: 40px;
-        padding: 0 16px;
-        border-radius: 8px;
-        border: none;
-        background-color: var(--dark-grey);
+        min-height: 44px;
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 6px;
+        border: 1px solid #0f172a;
+        background-color: #0f172a;
         color: #ffffff;
         font-size: 15px;
         font-weight: 700;
@@ -223,16 +227,19 @@
         gap: 8px;
         cursor: pointer;
         white-space: nowrap;
-        transition: all 0.2s ease;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1);
       }
 
       .btn-calendar-view:hover {
-        background-color: var(--dark-grey-hover);
+        background-color: #1e293b;
+        border-color: #1e293b;
+        box-shadow: 0 4px 8px rgba(15, 23, 42, 0.15);
+        transform: translateY(-1px);
       }
 
       .btn-calendar-view:active {
-        background-color: var(--dark-grey-active);
-        transform: scale(0.98);
+        transform: translateY(0);
       }
 
       /* ===== 編輯欄位 / 彈窗內預約按鈕 (Btn-Add-Booking) ===== */
@@ -261,7 +268,6 @@
         color: #0f172a;
       }
 
-      /* 估價進行中預約按鈕樣式 (藍色框 淺藍底 藍字) */
       .btn-add-booking.type-valuation {
         border-color: #2563eb;
         background-color: #eff6ff;
@@ -273,7 +279,6 @@
         border-color: #1d4ed8;
       }
 
-      /* 已買入預約按鈕樣式 (綠色框 淺綠底 綠字) */
       .btn-add-booking.type-delivery {
         border-color: #16a34a;
         background-color: #f0fdf4;
@@ -285,16 +290,15 @@
         border-color: #15803d;
       }
 
-      /* 黑底白字按鈕樣式 (用於 + 新增預約) */
       .btn-black {
-        height: 32px;
-        min-height: 32px;
-        padding: 0 14px;
-        border-radius: 6px;
+        height: 36px;
+        min-height: 36px;
+        padding: 0 16px;
+        border-radius: 8px;
         border: 1px solid #0f172a;
         background-color: #0f172a;
         color: #ffffff;
-        font-size: 13px;
+        font-size: 14px;
         font-weight: 700;
         display: inline-flex;
         align-items: center;
@@ -303,11 +307,18 @@
         cursor: pointer;
         white-space: nowrap;
         transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1);
       }
 
       .btn-black:hover {
         background-color: #1e293b;
         border-color: #1e293b;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(15, 23, 42, 0.15);
+      }
+
+      .btn-black:active {
+        transform: translateY(0);
       }
 
       .list-tools {
@@ -674,7 +685,7 @@
 
       dialog::backdrop {
         background: var(--modal-overlay);
-        backdrop-filter: blur(2px);
+        backdrop-filter: blur(4px);
       }
 
       dialog#valuationDialog {
@@ -688,7 +699,6 @@
         border-radius: 12px;
       }
 
-      /* 新增預約時間/交車 彈窗按鈕大小統一 */
       #bookingDialog .dialog-actions {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -710,23 +720,24 @@
         margin: 0;
       }
 
-      /* 車輛選擇選單焦點樣式：去除藍色外框 */
       #modalVehicleSelect:focus {
         border-color: #cbd5e1;
         box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.2);
       }
 
+      /* ===== 月曆對話框與 UI/UX 風格設計美化 ===== */
       dialog#calendarViewDialog {
-        width: min(840px, calc(100% - 32px));
-        max-height: 90vh;
-        border-radius: 16px;
+        width: min(860px, calc(100vw - 32px));
+        max-height: 92vh;
+        border-radius: 20px;
+        border: 1px solid rgba(226, 232, 240, 0.8);
         overflow-y: auto;
-        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.05);
       }
 
       dialog form, .modal-content-wrap {
         display: grid;
-        gap: 16px;
+        gap: 18px;
         padding: 24px;
       }
 
@@ -743,13 +754,13 @@
         margin-top: 12px;
       }
 
-      /* ===== 月曆視圖 (Grid View) 樣式 ===== */
+      /* 月曆標頭區塊 */
       .calendar-header {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 14px;
         border-bottom: 1px solid var(--border-color);
-        padding-bottom: 14px;
+        padding-bottom: 16px;
       }
 
       .calendar-header-row1 {
@@ -772,10 +783,10 @@
       .month-nav {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 2px;
         background: #f1f5f9;
-        padding: 3px;
-        border-radius: 8px;
+        padding: 4px;
+        border-radius: 10px;
       }
 
       .month-nav-btn {
@@ -783,111 +794,82 @@
         border: none;
         color: var(--text-main);
         min-height: 32px;
-        padding: 0 10px;
-        border-radius: 6px;
+        padding: 0 12px;
+        border-radius: 7px;
         font-size: 14px;
         font-weight: 700;
         cursor: pointer;
         transition: all 0.15s ease;
+        outline: none !important;
+      }
+
+      .month-nav-btn:focus,
+      .month-nav-btn:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
       }
 
       .month-nav-btn:hover {
         background: #ffffff;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
       }
 
-      /* 「今天」按鈕調整為深灰色字體 */
       .month-nav-btn.today-btn {
         color: var(--dark-grey);
         font-weight: 800;
       }
 
+      /* Segmented Control 篩選列 */
       .calendar-filter-bar {
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        gap: 8px;
-        font-size: 15px;
-        font-weight: 700;
-        flex-wrap: nowrap;
+        gap: 3px;
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 12px;
       }
 
       .filter-chip {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 8px 16px;
-        border-radius: 20px;
-        border: 1px solid #cbd5e1;
-        background: #ffffff;
-        color: #475569;
-        cursor: pointer;
-        font-size: 15px;
-        font-weight: 700;
-        transition: all 0.15s ease;
-        user-select: none;
-        white-space: nowrap;
-      }
-
-      .filter-chip:hover { opacity: 0.88; }
-      .filter-chip.is-active { background: #0f172a; color: #ffffff; border-color: #0f172a; }
-      .filter-chip.is-active[data-filter="valuation"] { background: #2563eb; border-color: #2563eb; color: #ffffff; }
-      .filter-chip.is-active[data-filter="delivery"] { background: #16a34a; border-color: #16a34a; color: #ffffff; }
-
-      .legend-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        display: inline-block;
-      }
-
-      .legend-dot.dot-valuation { background-color: #2563eb; }
-      .legend-dot.dot-delivery { background-color: #16a34a; }
-
-      /* 黑底白字按鈕樣式 (用於 + 新增) */
-      .btn-black {
-        height: 38px;
-        min-height: 38px;
-        padding: 0 18px;
-        border-radius: 20px;
-        border: 1px solid #0f172a;
-        background-color: #0f172a;
-        color: #ffffff;
-        font-size: 15px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: all 0.2s ease;
-      }
-
-      .btn-black:hover {
-        background-color: #1e293b;
-        border-color: #1e293b;
-      }
-
-      .filter-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 12px;
-        border-radius: 20px;
-        border: 1px solid #cbd5e1;
-        background: #ffffff;
-        color: #475569;
+        padding: 6px 14px;
+        border-radius: 9px;
+        border: none;
+        background: transparent;
+        color: #64748b;
         cursor: pointer;
         font-size: 13px;
         font-weight: 700;
-        transition: all 0.15s ease;
+        transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none;
+        white-space: nowrap;
+        outline: none !important;
       }
 
-      .filter-chip:hover { opacity: 0.88; }
-      .filter-chip.is-active { background: #0f172a; color: #ffffff; border-color: #0f172a; }
-      .filter-chip.is-active[data-filter="valuation"] { background: #2563eb; border-color: #2563eb; color: #ffffff; }
-      .filter-chip.is-active[data-filter="delivery"] { background: #16a34a; border-color: #16a34a; color: #ffffff; }
+      .filter-chip:focus,
+      .filter-chip:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
+      }
+
+      .filter-chip:hover {
+        color: #0f172a;
+      }
+
+      .filter-chip.is-active {
+        background: #ffffff;
+        color: #0f172a;
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12), 0 1px 2px rgba(15, 23, 42, 0.06);
+      }
+
+      .filter-chip.is-active[data-filter="valuation"] {
+        color: #2563eb;
+      }
+
+      .filter-chip.is-active[data-filter="delivery"] {
+        color: #16a34a;
+      }
 
       .legend-dot {
         width: 8px;
@@ -899,13 +881,14 @@
       .legend-dot.dot-valuation { background-color: #2563eb; }
       .legend-dot.dot-delivery { background-color: #16a34a; }
 
+      /* 月曆網格與單元格 */
       .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 2px;
+        gap: 1px;
         background: #cbd5e1;
         border: 1px solid #cbd5e1;
-        border-radius: 12px;
+        border-radius: 14px;
         overflow: hidden;
       }
 
@@ -923,6 +906,7 @@
       }
 
       .calendar-cell {
+        position: relative;
         background: #ffffff;
         min-height: 88px;
         padding: 8px 6px;
@@ -930,7 +914,7 @@
         flex-direction: column;
         gap: 5px;
         cursor: pointer;
-        transition: all 0.15s ease;
+        transition: background-color 0.15s ease;
         box-sizing: border-box;
       }
 
@@ -938,11 +922,11 @@
         background: #f8fafc;
       }
 
-      /* 選取日期時，格子呈現黑框 (2px solid #000) 與淺灰底 (#f1f5f9) */
+      /* 選取日期狀態：內置雙像素高對比黑框直接覆蓋，無灰邊重疊 */
       .calendar-cell.is-selected {
-        outline: 2px solid #000000;
-        outline-offset: -2px;
-        background: #f1f5f9;
+        background: #f8fafc;
+        box-shadow: inset 0 0 0 2px #0f172a !important;
+        z-index: 2;
       }
 
       .calendar-cell.other-month > * {
@@ -962,6 +946,7 @@
         color: #ef4444;
       }
 
+      /* 當日標示 (Today Pill)：紅底白字圓形醒目標記 + 柔和陰影 */
       .cell-date-num {
         font-size: 13px;
         font-weight: 700;
@@ -978,13 +963,14 @@
         background: #dc2626;
         color: #ffffff;
         font-weight: 800;
-        box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+        box-shadow: 0 2px 6px rgba(220, 38, 38, 0.35);
       }
 
+      /* 行程標籤 (Badges)：微漸層與輕量邊框、藍/綠底白字、文字置中 */
       .calendar-badge {
-        background: #2563eb;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
         color: #ffffff;
-        border: 1px solid #1d4ed8;
+        border: 1px solid rgba(37, 99, 235, 0.3);
         border-radius: 6px;
         padding: 3px 6px;
         font-size: 12px;
@@ -993,14 +979,17 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        text-align: center;
+        box-shadow: 0 1px 2px rgba(37, 99, 235, 0.15);
         transition: transform 0.15s ease, box-shadow 0.15s ease;
         pointer-events: none;
       }
 
       .calendar-badge.is-purchased {
-        background: #16a34a;
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
         color: #ffffff;
-        border-color: #15803d;
+        border-color: rgba(22, 163, 74, 0.3);
+        box-shadow: 0 1px 2px rgba(22, 163, 74, 0.15);
       }
 
       .calendar-more-badge {
@@ -1014,6 +1003,7 @@
         pointer-events: none;
       }
 
+      /* 當日預約清單面板 (Agenda View Panel) */
       .daily-agenda-panel {
         margin-top: 16px;
         padding: 16px;
@@ -1048,15 +1038,32 @@
         gap: 8px;
       }
 
+      /* 左側色條卡片 (Accent Bar Cards) */
       .agenda-item {
         display: flex;
         align-items: center;
         justify-content: space-between;
         background: #ffffff;
         border: 1px solid #e2e8f0;
+        border-left: 4px solid #94a3b8;
         border-radius: 8px;
         padding: 10px 14px;
         gap: 12px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      }
+
+      .agenda-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+      }
+
+      .agenda-item.type-valuation-card {
+        border-left-color: #2563eb;
+      }
+
+      .agenda-item.type-delivery-card {
+        border-left-color: #16a34a;
       }
 
       .agenda-item-left {
@@ -1089,12 +1096,12 @@
       .agenda-time { font-weight: 800; font-size: 16px; color: #0f172a; }
       .agenda-detail { font-size: 13px; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-      /* 彈窗內的操作按鈕：編輯與刪除皆為灰邊白底灰字 */
+      /* 微型圖示化操作按鈕 */
       .btn-edit-agenda,
       .btn-delete-agenda {
         height: 32px;
         min-height: 32px;
-        padding: 0 12px;
+        padding: 0 10px;
         font-size: 13px;
         font-weight: 700;
         border-radius: 6px;
@@ -1104,8 +1111,9 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        gap: 4px;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .btn-delete-agenda {
@@ -1116,8 +1124,16 @@
       .btn-edit-agenda:hover,
       .btn-delete-agenda:hover {
         background-color: #f8fafc;
-        border-color: #94a3b8;
+        border-color: #0f172a;
         color: #0f172a;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1);
+      }
+
+      .btn-delete-agenda:hover {
+        border-color: #ef4444;
+        color: #ef4444;
+        background-color: #fef2f2;
       }
 
       @media (max-width: 768px) {
@@ -1267,7 +1283,7 @@
             <div class="search-row">
               <button type="button" class="btn-add-valuation" id="openValuationBtn">+新增估價</button>
 
-              <!-- 操作欄位：深灰色底 預約按鈕 (Btn-Calendar-View) -->
+              <!-- 操作欄位：黑底 預約按鈕 (高度 44px 比例對齊) -->
               <button type="button" class="btn-calendar-view" id="openCalendarViewBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -1466,7 +1482,6 @@
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 4px;">
           <h2 style="margin:0;" id="valuationDialogTitle">新增估價資料</h2>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <!-- 編輯欄位：預約按鈕 -->
             <button type="button" class="btn-add-booking type-valuation" id="formAddBookingBtn">+估價預約</button>
             <button class="secondary" type="button" id="closeValuationDialogBtn" style="min-height:36px; padding:0 12px;">✕</button>
           </div>
@@ -1626,9 +1641,9 @@
             </div>
             <button type="button" class="secondary" id="closeCalendarViewBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
           </div>
-          <!-- 第二層：橫向 Legend & Filter Bar + 新增預約按鈕對齊 -->
+          <!-- 第二層：Segmented Control 篩選列 + 新增預約按鈕對齊 -->
           <div class="calendar-header-row2" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: nowrap; width: 100%;">
-            <div class="calendar-filter-bar" id="calendarFilterBar" style="display: flex; align-items: center; gap: 6px; flex-wrap: nowrap;">
+            <div class="calendar-filter-bar" id="calendarFilterBar">
               <span class="filter-chip is-active" data-filter="all">全部</span>
               <span class="filter-chip" data-filter="valuation"><span class="legend-dot dot-valuation"></span>估價</span>
               <span class="filter-chip" data-filter="delivery"><span class="legend-dot dot-delivery"></span>交車</span>
@@ -1641,7 +1656,7 @@
           <!-- JS 動態生成月曆網格 -->
         </div>
 
-        <!-- 當日行程詳細清單 (Agenda View) -->
+        <!-- 當日行程詳細清單 (Agenda View Panel) -->
         <div class="daily-agenda-panel" id="dailyAgendaPanel">
           <div class="agenda-header">
             <h3 class="agenda-title" id="agendaDateTitle">📌 選擇日期的預約行程</h3>
@@ -1808,9 +1823,8 @@
       let currentStatusFilter = "all";
       let calendarCurrentDate = new Date();
       let calendarFilterType = "all";
-      let selectedCalendarDateISO = new Date().toISOString().split("T")[0];
+      let selectedCalendarDateISO = ""; // 進入月曆時預設空字串，不強制預選
 
-      // 將時間字串 (如 9:00 或 10:30) 解析為當日總分鐘數，精準比對排序
       function timeToMinutes(timeStr) {
         if (!timeStr) return 9999;
         const parts = String(timeStr).split(":");
@@ -2222,15 +2236,12 @@
         
         if (formAddBookingBtn) {
           if (record.isSold) {
-            // 已售出：隱藏按鈕
             formAddBookingBtn.classList.add("is-hidden");
           } else if (record.isPurchased) {
-            // 已買進：顯示「+交車預約」綠色框 淺綠底 綠字
             formAddBookingBtn.classList.remove("is-hidden");
             formAddBookingBtn.textContent = "+交車預約";
             formAddBookingBtn.className = "btn-add-booking type-delivery";
           } else {
-            // 估價進行中：顯示「+估價預約」藍色框 淺藍底 藍字
             formAddBookingBtn.classList.remove("is-hidden");
             formAddBookingBtn.textContent = "+估價預約";
             formAddBookingBtn.className = "btn-add-booking type-valuation";
@@ -2259,15 +2270,15 @@
         calendarMonthTitle.textContent = `${year}年 ${month + 1}月`;
 
         calendarGrid.innerHTML = "";
-        const daysOfWeek = ["日", "一", "二", "三", "四", "五", "六"];
+        
+        const daysOfWeek = ["一", "二", "三", "四", "五", "六", "日"];
         daysOfWeek.forEach((d, idx) => {
           const h = document.createElement("div");
-          h.className = "calendar-day-header" + (idx === 0 || idx === 6 ? " is-weekend" : "");
+          h.className = "calendar-day-header" + (idx >= 5 ? " is-weekend" : "");
           h.textContent = d;
           calendarGrid.appendChild(h);
         });
 
-        // 台灣國定假日字典
         const getTaiwanHoliday = (dateISO) => {
           const holidays = {
             "01-01": "元旦", "02-28": "和平紀念日", "04-04": "兒童節", "05-01": "勞動節", "10-10": "國慶日",
@@ -2291,7 +2302,7 @@
             cell.classList.add("is-today");
           }
 
-          if (dateISO === selectedCalendarDateISO) {
+          if (selectedCalendarDateISO && dateISO === selectedCalendarDateISO) {
             cell.classList.add("is-selected");
           }
 
@@ -2302,7 +2313,6 @@
           }
           cell.innerHTML = `<div class="cell-date-row">${dateHtml}</div>`;
 
-          // 抓取當日預約並過濾（估價預約 / 交車預約）
           let dayBookings = records.filter((r) => r.bookingDate === dateISO);
           if (calendarFilterType === "valuation") {
             dayBookings = dayBookings.filter((r) => !r.isPurchased);
@@ -2310,7 +2320,6 @@
             dayBookings = dayBookings.filter((r) => r.isPurchased);
           }
 
-          // 解析時間為當日總分鐘數進行正確升冪排序 (如 9:00 排在 10:00 前面)
           dayBookings.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
 
           if (dayBookings.length > 0) {
@@ -2318,7 +2327,6 @@
               dayBookings.forEach((b) => {
                 const badge = document.createElement("div");
                 badge.className = "calendar-badge" + (b.isPurchased ? " is-purchased" : "");
-                // 純淨化呈現：僅呈現時間如 09:00，移除了標點彈窗與 title 提示
                 badge.textContent = b.bookingTime || '預約';
                 cell.appendChild(badge);
               });
@@ -2336,7 +2344,6 @@
             }
           }
 
-          // 點擊日期格子：選取該日並渲染下方當日行程清單
           cell.addEventListener("click", () => {
             selectedCalendarDateISO = dateISO;
             renderCalendarView();
@@ -2346,7 +2353,8 @@
         };
 
         const firstDayOfMonth = new Date(year, month, 1);
-        let startingDay = firstDayOfMonth.getDay();
+        let rawDay = firstDayOfMonth.getDay();
+        let startingDay = rawDay === 0 ? 6 : rawDay - 1;
 
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const prevMonthLastDate = new Date(year, month, 0).getDate();
@@ -2381,6 +2389,23 @@
 
         if (!agendaDateTitle || !agendaList) return;
 
+        if (!dateISO) {
+          agendaDateTitle.textContent = `📌 請點選月曆日期檢視行程`;
+          agendaList.innerHTML = `<div style="color: #64748b; font-size: 14px; text-align: center; padding: 12px 0;">點擊月曆上的日期即可查看當日詳細行程。</div>`;
+          if (agendaAddBookingBtn) {
+            agendaAddBookingBtn.onclick = () => {
+              const todayStr = new Date().toISOString().split("T")[0];
+              bookingTargetRecordId.value = "";
+              populateVehicleSelect("");
+              updateBookingDialogTitle("");
+              modalBookingDate.value = todayStr;
+              modalBookingTime.value = "08:30";
+              openBookingModal();
+            };
+          }
+          return;
+        }
+
         const dateFormatted = dateISO.replaceAll("-", "/");
         agendaDateTitle.textContent = `📌 ${dateFormatted} 預約行程列表`;
 
@@ -2391,26 +2416,19 @@
           dayBookings = dayBookings.filter((r) => r.isPurchased);
         }
 
-        // 排序規則：優先依照類別（"估價" 排在前面，"已買入" 排在後面），同類別再按預約時間升冪排序
-        dayBookings.sort((a, b) => {
-          const typeA = a.isPurchased ? 1 : 0;
-          const typeB = b.isPurchased ? 1 : 0;
-          if (typeA !== typeB) return typeA - typeB;
-          return timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime);
-        });
+        dayBookings.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
 
         agendaList.innerHTML = "";
 
         if (dayBookings.length > 0) {
           dayBookings.forEach((b) => {
             const item = document.createElement("div");
-            item.className = "agenda-item";
-
             const isDeliv = b.isPurchased;
+            item.className = "agenda-item " + (isDeliv ? "type-delivery-card" : "type-valuation-card");
+
             const badgeLabel = isDeliv ? "交車" : "估價";
             const badgeClass = isDeliv ? "type-delivery" : "type-valuation";
 
-            // 格式化車輛與賣家資訊，呈現如：2015 X1 • 林小姐
             const vehicleStr = [b.year, b.model].filter(Boolean).join(" ");
             const infoParts = [];
             if (vehicleStr) infoParts.push(vehicleStr);
@@ -2428,7 +2446,13 @@
                 </div>
               </div>
               <div style="display: flex; align-items: center; gap: 6px;">
-                <button type="button" class="btn-edit-agenda" data-id="${b.id}">編輯</button>
+                <button type="button" class="btn-edit-agenda" data-id="${b.id}" title="編輯預約">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                  編輯
+                </button>
                 <button type="button" class="btn-delete-agenda" title="清除該筆預約" data-id="${b.id}">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
@@ -2444,7 +2468,6 @@
               openBookingModalForRecord(b.id);
             });
 
-            // 垃圾桶按鈕點擊：快速清除預約日期與時間
             item.querySelector(".btn-delete-agenda")?.addEventListener("click", async () => {
               const idx = records.findIndex((r) => r.id === b.id);
               if (idx >= 0) {
@@ -2462,6 +2485,8 @@
 
             agendaList.appendChild(item);
           });
+        } else {
+          agendaList.innerHTML = `<div style="color: #64748b; font-size: 14px; text-align: center; padding: 12px 0;">當日尚無預約行程。</div>`;
         }
 
         if (agendaAddBookingBtn) {
@@ -2471,7 +2496,7 @@
             updateBookingDialogTitle("");
             modalBookingDate.value = dateISO;
             modalBookingTime.value = "08:30";
-            bookingDialog.showModal();
+            openBookingModal();
           };
         }
       }
@@ -2511,6 +2536,13 @@
         }
       }
 
+      function openBookingModal() {
+        bookingDialog.showModal();
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+      }
+
       modalVehicleSelect?.addEventListener("change", (e) => {
         const selectedId = e.target.value;
         bookingTargetRecordId.value = selectedId;
@@ -2528,9 +2560,12 @@
 
       openCalendarViewBtn?.addEventListener("click", () => {
         calendarCurrentDate = new Date();
-        selectedCalendarDateISO = new Date().toISOString().split("T")[0];
+        selectedCalendarDateISO = ""; // 進入月曆時不自動帶入選取框線
         renderCalendarView();
         calendarViewDialog.showModal();
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
       });
 
       closeCalendarViewBtn?.addEventListener("click", () => {
@@ -2561,12 +2596,7 @@
         const todayStr = new Date().toISOString().split("T")[0];
         modalBookingDate.value = targetRec?.bookingDate || todayStr;
         modalBookingTime.value = targetRec?.bookingTime || "09:00";
-        bookingDialog.showModal();
-
-        // 移開選單焦點，防止瀏覽器主動彈出選單下拉列表
-        if (modalVehicleSelect) {
-          modalVehicleSelect.blur();
-        }
+        openBookingModal();
       }
 
       formAddBookingBtn?.addEventListener("click", () => {
@@ -2782,3 +2812,4 @@
     </script>
   </body>
 </html>
+
