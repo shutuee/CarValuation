@@ -999,7 +999,15 @@
         }
 
         .calendar-header-row1 {
-          padding-right: 36px;
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          align-items: center;
+          gap: 8px;
+          padding-right: 0;
+        }
+
+        .month-nav {
+          justify-self: center;
         }
 
         #calendarMonthTitle {
@@ -1007,9 +1015,7 @@
         }
 
         #closeCalendarViewBtn {
-          position: absolute;
-          top: 10px;
-          right: 6px;
+          position: static;
           min-height: 32px !important;
           padding: 0 10px !important;
         }
@@ -1043,25 +1049,16 @@
         }
 
         .calendar-badge {
-          font-size: 10px;
-          padding: 1px 3px;
+          font-size: 11px;
+          padding: 2px 3px;
           border-radius: 4px;
           text-align: center;
         }
-
-        /* 手機端預約卡片簡化為：純圓點 + 時間 */
-        .calendar-badge .badge-text-full { display: none; }
-        .calendar-badge .badge-text-short { display: inline; }
 
         .calendar-more-badge {
           font-size: 9px;
           padding: 1px 2px;
         }
-      }
-
-      @media (min-width: 769px) {
-        .calendar-badge .badge-text-full { display: inline; }
-        .calendar-badge .badge-text-short { display: none; }
       }
 
       @media (max-width: 620px) {
@@ -2137,8 +2134,7 @@
                 const timeStr = b.bookingTime || '預約';
                 const carStr = b.model || b.seller || '車輛';
                 
-                // 桌機顯示完整文字、手機顯示縮寫/純時間
-                badge.innerHTML = `<span class="badge-text-full">${timeStr} ${carStr}</span><span class="badge-text-short">• ${timeStr}</span>`;
+                badge.textContent = timeStr;
                 badge.title = `${timeStr} ${carStr}`;
                 
                 badge.addEventListener("click", (e) => {
@@ -2156,7 +2152,7 @@
                 const timeStr = b.bookingTime || '預約';
                 const carStr = b.model || b.seller || '車輛';
                 
-                badge.innerHTML = `<span class="badge-text-full">${timeStr} ${carStr}</span><span class="badge-text-short">• ${timeStr}</span>`;
+                badge.textContent = timeStr;
                 badge.title = `${timeStr} ${carStr}`;
                 
                 badge.addEventListener("click", (e) => {
@@ -2237,7 +2233,7 @@
         agendaList.innerHTML = "";
 
         if (dayBookings.length === 0) {
-          agendaList.innerHTML = `<div style="padding:16px; text-align:center; color:#64748b; font-size:14px; font-weight:600;">當日無預約行程，點擊右上角「+ 本日預約」新增。</div>`;
+          agendaList.innerHTML = "";
         } else {
           dayBookings.forEach((b) => {
             const item = document.createElement("div");
