@@ -26,6 +26,9 @@
         --primary-blue-light: #eff6ff;
         --primary-green: #16a34a;
         --primary-green-hover: #15803d;
+        --dark-grey: #475569;
+        --dark-grey-hover: #334155;
+        --dark-grey-active: #1e293b;
         --text-main: #0f172a;
         --text-muted: #64748b;
         --border-color: #e2e8f0;
@@ -204,14 +207,14 @@
         border-color: #b91c1c;
       }
 
-      /* ===== 操作欄位：藍底 Icon 預約按鈕 (Btn-Calendar-View) ===== */
+      /* ===== 操作欄位：深灰色底預約按鈕 (Btn-Calendar-View) ===== */
       .btn-calendar-view {
         height: 40px;
         min-height: 40px;
         padding: 0 16px;
         border-radius: 8px;
         border: none;
-        background-color: var(--primary-blue);
+        background-color: var(--dark-grey);
         color: #ffffff;
         font-size: 15px;
         font-weight: 700;
@@ -224,23 +227,23 @@
       }
 
       .btn-calendar-view:hover {
-        background-color: var(--primary-blue-hover);
+        background-color: var(--dark-grey-hover);
       }
 
       .btn-calendar-view:active {
-        background-color: var(--primary-blue-active);
+        background-color: var(--dark-grey-active);
         transform: scale(0.98);
       }
 
-      /* ===== 編輯欄位：新增預約按鈕 (Btn-Add-Booking) ===== */
+      /* ===== 編輯欄位 / 彈窗內預約按鈕 (Btn-Add-Booking) ===== */
       .btn-add-booking {
         height: 36px;
         min-height: 36px;
         padding: 0 14px;
         border-radius: 6px;
-        border: 1px solid var(--primary-blue);
+        border: 1px solid #cbd5e1;
         background-color: #ffffff;
-        color: var(--primary-blue);
+        color: #475569;
         font-size: 14px;
         font-weight: 700;
         display: inline-flex;
@@ -253,19 +256,58 @@
       }
 
       .btn-add-booking:hover {
-        background-color: var(--primary-blue-light);
+        background-color: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
       }
 
-      /* 已買入綠色預約按鈕樣式 (白底綠框綠字) */
-      .btn-add-booking.is-purchased {
-        border-color: var(--primary-green);
-        background-color: #ffffff;
-        color: var(--primary-green);
+      /* 估價進行中預約按鈕樣式 (藍色框 淺藍底 藍字) */
+      .btn-add-booking.type-valuation {
+        border-color: #2563eb;
+        background-color: #eff6ff;
+        color: #2563eb;
       }
 
-      .btn-add-booking.is-purchased:hover {
+      .btn-add-booking.type-valuation:hover {
+        background-color: #dbeafe;
+        border-color: #1d4ed8;
+      }
+
+      /* 已買入預約按鈕樣式 (綠色框 淺綠底 綠字) */
+      .btn-add-booking.type-delivery {
+        border-color: #16a34a;
         background-color: #f0fdf4;
-        border-color: var(--primary-green-hover);
+        color: #16a34a;
+      }
+
+      .btn-add-booking.type-delivery:hover {
+        background-color: #dcfce7;
+        border-color: #15803d;
+      }
+
+      /* 黑底白字按鈕樣式 (用於 + 新增預約) */
+      .btn-black {
+        height: 32px;
+        min-height: 32px;
+        padding: 0 14px;
+        border-radius: 6px;
+        border: 1px solid #0f172a;
+        background-color: #0f172a;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+      }
+
+      .btn-black:hover {
+        background-color: #1e293b;
+        border-color: #1e293b;
       }
 
       .list-tools {
@@ -471,6 +513,12 @@
       .date-input:active { transform: scale(0.98); }
       .date-separator { color: #64748b; font-size: 14px; font-weight: 700; }
 
+      .print-filter-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
       .btn-clear, .btn-print {
         display: inline-flex;
         align-items: center;
@@ -640,6 +688,34 @@
         border-radius: 12px;
       }
 
+      /* 新增預約時間/交車 彈窗按鈕大小統一 */
+      #bookingDialog .dialog-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        width: 100%;
+        margin-top: 16px;
+      }
+
+      #bookingDialog .dialog-actions button {
+        min-height: 42px;
+        height: 42px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 700;
+        border-radius: 8px;
+        margin: 0;
+      }
+
+      /* 車輛選擇選單焦點樣式：去除藍色外框 */
+      #modalVehicleSelect:focus {
+        border-color: #cbd5e1;
+        box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.2);
+      }
+
       dialog#calendarViewDialog {
         width: min(840px, calc(100% - 32px));
         max-height: 90vh;
@@ -687,8 +763,10 @@
       .calendar-header-row2 {
         display: flex;
         align-items: center;
-        gap: 8px;
+        justify-content: space-between;
+        gap: 12px;
         flex-wrap: wrap;
+        width: 100%;
       }
 
       .month-nav {
@@ -718,8 +796,10 @@
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       }
 
+      /* 「今天」按鈕調整為深灰色字體 */
       .month-nav-btn.today-btn {
-        color: var(--primary-blue);
+        color: var(--dark-grey);
+        font-weight: 800;
       }
 
       .calendar-filter-bar {
@@ -800,10 +880,11 @@
         background: #f8fafc;
       }
 
+      /* 選取日期時，格子呈現黑框 (2px solid #000) 與淺灰底 (#f1f5f9) */
       .calendar-cell.is-selected {
-        outline: 2px solid #2563eb;
+        outline: 2px solid #000000;
         outline-offset: -2px;
-        background: #eff6ff;
+        background: #f1f5f9;
       }
 
       .calendar-cell.other-month > * {
@@ -855,11 +936,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         transition: transform 0.15s ease, box-shadow 0.15s ease;
-      }
-
-      .calendar-badge:hover {
-        transform: scale(1.02);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        pointer-events: none;
       }
 
       .calendar-badge.is-purchased {
@@ -876,6 +953,7 @@
         font-size: 11px;
         font-weight: 800;
         text-align: center;
+        pointer-events: none;
       }
 
       .daily-agenda-panel {
@@ -950,18 +1028,21 @@
         overflow: hidden;
       }
 
-      .agenda-time { font-weight: 800; font-size: 14px; color: #0f172a; }
+      .agenda-time { font-weight: 800; font-size: 16px; color: #0f172a; }
       .agenda-detail { font-size: 13px; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+      /* 彈窗內的操作按鈕：編輯與刪除皆為灰邊白底灰字 */
+      .btn-edit-agenda,
       .btn-delete-agenda {
         height: 32px;
         min-height: 32px;
-        width: 32px;
-        padding: 0;
+        padding: 0 12px;
+        font-size: 13px;
+        font-weight: 700;
         border-radius: 6px;
-        border: 1px solid #fecaca;
-        background-color: #fef2f2;
-        color: #dc2626;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff;
+        color: #475569;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -969,10 +1050,16 @@
         transition: all 0.2s ease;
       }
 
+      .btn-delete-agenda {
+        width: 32px;
+        padding: 0;
+      }
+
+      .btn-edit-agenda:hover,
       .btn-delete-agenda:hover {
-        background-color: #dc2626;
-        border-color: #dc2626;
-        color: #ffffff;
+        background-color: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
       }
 
       @media (max-width: 768px) {
@@ -1122,7 +1209,7 @@
             <div class="search-row">
               <button type="button" class="btn-add-valuation" id="openValuationBtn">+新增估價</button>
 
-              <!-- 操作欄位：藍底 Icon 預約按鈕 (Btn-Calendar-View) -->
+              <!-- 操作欄位：深灰色底 預約按鈕 (Btn-Calendar-View) -->
               <button type="button" class="btn-calendar-view" id="openCalendarViewBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -1321,8 +1408,8 @@
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 4px;">
           <h2 style="margin:0;" id="valuationDialogTitle">新增估價資料</h2>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <!-- 編輯欄位：新增預約按鈕 (Btn-Add-Booking) -->
-            <button type="button" class="btn-add-booking" id="formAddBookingBtn">+ 新增預約</button>
+            <!-- 編輯欄位：預約按鈕 -->
+            <button type="button" class="btn-add-booking type-valuation" id="formAddBookingBtn">+估價預約</button>
             <button class="secondary" type="button" id="closeValuationDialogBtn" style="min-height:36px; padding:0 12px;">✕</button>
           </div>
         </div>
@@ -1445,9 +1532,9 @@
         </div>
         <input type="hidden" id="bookingTargetRecordId" />
         <label id="modalVehicleSelectWrap">
-          <span>選擇車輛</span>
-          <select id="modalVehicleSelect" required>
-            <option value="">請選擇車輛</option>
+          <span>選擇車輛 (選填)</span>
+          <select id="modalVehicleSelect">
+            <option value="">請選擇車輛 (選填)</option>
           </select>
         </label>
         <label>
@@ -1461,8 +1548,8 @@
           </select>
         </label>
         <div class="dialog-actions">
+          <button type="submit" class="btn-add-booking">儲存</button>
           <button type="button" class="secondary" id="cancelBookingBtn">取消</button>
-          <button type="submit" class="action-blue">確認儲存</button>
         </div>
       </form>
     </dialog>
@@ -1481,13 +1568,14 @@
             </div>
             <button type="button" class="secondary" id="closeCalendarViewBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
           </div>
-          <!-- 第二層：橫向 Legend & Filter Bar -->
+          <!-- 第二層：橫向 Legend & Filter Bar + 新增預約按鈕對齊 -->
           <div class="calendar-header-row2">
             <div class="calendar-filter-bar" id="calendarFilterBar">
               <span class="filter-chip is-active" data-filter="all">全部預約</span>
               <span class="filter-chip" data-filter="valuation"><span class="legend-dot dot-valuation"></span>估價預約</span>
               <span class="filter-chip" data-filter="delivery"><span class="legend-dot dot-delivery"></span>交車預約</span>
             </div>
+            <button type="button" class="btn-black" id="agendaAddBookingBtn">+ 新增預約</button>
           </div>
         </div>
 
@@ -1499,7 +1587,6 @@
         <div class="daily-agenda-panel" id="dailyAgendaPanel">
           <div class="agenda-header">
             <h3 class="agenda-title" id="agendaDateTitle">📌 選擇日期的預約行程</h3>
-            <button type="button" class="btn-add-booking" id="agendaAddBookingBtn">+ 本日預約</button>
           </div>
           <div class="agenda-list" id="agendaList">
             <!-- JS 動態渲染行程項目 -->
@@ -1613,7 +1700,6 @@
       const switchCountPurchased = document.querySelector("#switchCountPurchased");
       const switchCountSold = document.querySelector("#switchCountSold");
 
-      // 預約 Modal 相關元件
       const openCalendarViewBtn = document.querySelector("#openCalendarViewBtn");
       const calendarViewDialog = document.querySelector("#calendarViewDialog");
       const closeCalendarViewBtn = document.querySelector("#closeCalendarViewBtn");
@@ -1666,6 +1752,7 @@
       let calendarFilterType = "all";
       let selectedCalendarDateISO = new Date().toISOString().split("T")[0];
 
+      // 將時間字串 (如 9:00 或 10:30) 解析為當日總分鐘數，精準比對排序
       function timeToMinutes(timeStr) {
         if (!timeStr) return 9999;
         const parts = String(timeStr).split(":");
@@ -2080,20 +2167,19 @@
             // 已售出：隱藏按鈕
             formAddBookingBtn.classList.add("is-hidden");
           } else if (record.isPurchased) {
-            // 已買進：顯示「+ 新增交車」白底綠框綠字按鈕
+            // 已買進：顯示「+交車預約」綠色框 淺綠底 綠字
             formAddBookingBtn.classList.remove("is-hidden");
-            formAddBookingBtn.textContent = "+ 新增交車";
-            formAddBookingBtn.classList.add("is-purchased");
+            formAddBookingBtn.textContent = "+交車預約";
+            formAddBookingBtn.className = "btn-add-booking type-delivery";
           } else {
-            // 估價進行中：顯示「+ 新增預約」藍色按鈕
+            // 估價進行中：顯示「+估價預約」藍色框 淺藍底 藍字
             formAddBookingBtn.classList.remove("is-hidden");
-            formAddBookingBtn.textContent = "+ 新增預約";
-            formAddBookingBtn.classList.remove("is-purchased");
+            formAddBookingBtn.textContent = "+估價預約";
+            formAddBookingBtn.className = "btn-add-booking type-valuation";
           }
         }
 
         valuationDialog.showModal();
-        // 取消自動 focus 聚焦至來源下拉選單
       }
 
       function resetForm() {
@@ -2103,8 +2189,8 @@
         if (valuationDialogTitle) valuationDialogTitle.textContent = "新增估價資料";
         if (formAddBookingBtn) {
           formAddBookingBtn.classList.remove("is-hidden");
-          formAddBookingBtn.textContent = "+ 新增預約";
-          formAddBookingBtn.classList.remove("is-purchased");
+          formAddBookingBtn.textContent = "+估價預約";
+          formAddBookingBtn.className = "btn-add-booking type-valuation";
         }
         updateSourceCustomVisibility();
       }
@@ -2157,6 +2243,7 @@
             dateHtml += `<span class="cell-holiday">${holiday}</span>`;
           }
           cell.innerHTML = `<div class="cell-date-row">${dateHtml}</div>`;
+
           // 抓取當日預約並過濾（估價預約 / 交車預約）
           let dayBookings = records.filter((r) => r.bookingDate === dateISO);
           if (calendarFilterType === "valuation") {
@@ -2165,26 +2252,23 @@
             dayBookings = dayBookings.filter((r) => r.isPurchased);
           }
 
-          dayBookings.sort((a, b) => (a.bookingTime || "99:99").localeCompare(b.bookingTime || "99:99"));
+          // 解析時間為當日總分鐘數進行正確升冪排序 (如 9:00 排在 10:00 前面)
+          dayBookings.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
 
           if (dayBookings.length > 0) {
             if (dayBookings.length <= 2) {
               dayBookings.forEach((b) => {
                 const badge = document.createElement("div");
                 badge.className = "calendar-badge" + (b.isPurchased ? " is-purchased" : "");
-                
-                // 僅呈現時間，移除 title 與其他冗餘文字
+                // 純淨化呈現：僅呈現時間如 09:00，移除了標點彈窗與 title 提示
                 badge.textContent = b.bookingTime || '預約';
-                
                 cell.appendChild(badge);
               });
             } else {
               dayBookings.slice(0, 1).forEach((b) => {
                 const badge = document.createElement("div");
                 badge.className = "calendar-badge" + (b.isPurchased ? " is-purchased" : "");
-                
                 badge.textContent = b.bookingTime || '預約';
-                
                 cell.appendChild(badge);
               });
               const moreBadge = document.createElement("div");
@@ -2194,7 +2278,7 @@
             }
           }
 
-          // 點擊日期格子：僅選取該日並渲染下方單日行程清單
+          // 點擊日期格子：選取該日並渲染下方當日行程清單
           cell.addEventListener("click", () => {
             selectedCalendarDateISO = dateISO;
             renderCalendarView();
@@ -2249,7 +2333,13 @@
           dayBookings = dayBookings.filter((r) => r.isPurchased);
         }
 
-        dayBookings.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
+        // 排序規則：優先依照類別（"估價" 排在前面，"已買入" 排在後面），同類別再按預約時間升冪排序
+        dayBookings.sort((a, b) => {
+          const typeA = a.isPurchased ? 1 : 0;
+          const typeB = b.isPurchased ? 1 : 0;
+          if (typeA !== typeB) return typeA - typeB;
+          return timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime);
+        });
 
         agendaList.innerHTML = "";
 
@@ -2261,7 +2351,15 @@
             const isDeliv = b.isPurchased;
             const badgeLabel = isDeliv ? "交車" : "估價";
             const badgeClass = isDeliv ? "type-delivery" : "type-valuation";
-            const infoText = `${b.year ? b.year + '年 ' : ''}${b.model || '未指定車型'} ${b.seller ? '• ' + b.seller : ''} ${b.remarks ? '• ' + b.remarks : ''}`;
+
+            // 格式化車輛與賣家資訊，呈現如：2015 X1 • 林小姐
+            const vehicleStr = [b.year, b.model].filter(Boolean).join(" ");
+            const infoParts = [];
+            if (vehicleStr) infoParts.push(vehicleStr);
+            if (b.seller) infoParts.push(b.seller);
+            if (b.remarks) infoParts.push(b.remarks);
+
+            const infoText = infoParts.join(" • ") || "未指定車輛資訊";
 
             item.innerHTML = `
               <div class="agenda-item-left">
@@ -2272,7 +2370,7 @@
                 </div>
               </div>
               <div style="display: flex; align-items: center; gap: 6px;">
-                <button type="button" class="btn-add-booking btn-edit-agenda" style="height:32px; min-height:32px; font-size:13px;" data-id="${b.id}">編輯</button>
+                <button type="button" class="btn-edit-agenda" data-id="${b.id}">編輯</button>
                 <button type="button" class="btn-delete-agenda" title="清除該筆預約" data-id="${b.id}">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
@@ -2288,6 +2386,7 @@
               openBookingModalForRecord(b.id);
             });
 
+            // 垃圾桶按鈕點擊：快速清除預約日期與時間
             item.querySelector(".btn-delete-agenda")?.addEventListener("click", async () => {
               const idx = records.findIndex((r) => r.id === b.id);
               if (idx >= 0) {
@@ -2307,30 +2406,31 @@
           });
         }
 
-        agendaAddBookingBtn.onclick = () => {
-          bookingTargetRecordId.value = "";
-          populateVehicleSelect("");
-          updateBookingDialogTitle("");
-          modalBookingDate.value = dateISO;
-          modalBookingTime.value = "08:30";
-          bookingDialog.showModal();
-        };
+        if (agendaAddBookingBtn) {
+          agendaAddBookingBtn.onclick = () => {
+            bookingTargetRecordId.value = "";
+            populateVehicleSelect("");
+            updateBookingDialogTitle("");
+            modalBookingDate.value = dateISO;
+            modalBookingTime.value = "08:30";
+            bookingDialog.showModal();
+          };
+        }
       }
 
-      // 動態載入「選擇車輛」選單，僅匯入「估價進行中」與「已買入」的車輛
       function populateVehicleSelect(selectedId) {
         if (!modalVehicleSelect) return;
-        modalVehicleSelect.innerHTML = '<option value="">請選擇車輛</option>';
+        modalVehicleSelect.innerHTML = '<option value="">請選擇車輛 (選填)</option>';
 
-        const availableRecords = records.filter((r) => !r.isSold);
+        const availableRecords = records.filter((r) => !r.isSold || r.id === selectedId);
 
         availableRecords.forEach((r) => {
           const opt = document.createElement("option");
           opt.value = r.id;
           const tag = r.isPurchased ? "[已買入]" : "[估價]";
-          const yearStr = r.year ? `${r.year}年 ` : "";
+          const yearStr = r.year ? `${r.year} ` : "";
           const modelStr = r.model || "未命名車輛";
-          const sellerStr = r.seller ? ` (賣家: ${r.seller})` : "";
+          const sellerStr = r.seller ? ` • ${r.seller}` : "";
           opt.textContent = `${tag} ${yearStr}${modelStr}${sellerStr}`;
           if (r.id === selectedId) {
             opt.selected = true;
@@ -2339,9 +2439,9 @@
         });
 
         modalVehicleSelect.value = selectedId || "";
+        updateBookingDialogTitle(selectedId);
       }
 
-      // 依車輛狀態動態變更標題
       function updateBookingDialogTitle(recordId) {
         const bookingDialogTitle = document.querySelector("#bookingDialogTitle");
         if (!bookingDialogTitle) return;
@@ -2359,7 +2459,6 @@
         updateBookingDialogTitle(selectedId);
       });
 
-      // Legend & Filter 點擊切換事件
       document.querySelectorAll("#calendarFilterBar .filter-chip").forEach((chip) => {
         chip.addEventListener("click", () => {
           document.querySelectorAll("#calendarFilterBar .filter-chip").forEach((c) => c.classList.remove("is-active"));
@@ -2395,7 +2494,6 @@
         renderCalendarView();
       });
 
-      // 觸發預約 Modal
       function openBookingModalForRecord(recId) {
         bookingTargetRecordId.value = recId || "";
         populateVehicleSelect(recId || "");
