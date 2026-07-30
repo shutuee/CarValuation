@@ -24,6 +24,8 @@
         --primary-blue-hover: #1d4ed8;
         --primary-blue-active: #1e40af;
         --primary-blue-light: #eff6ff;
+        --primary-green: #16a34a;
+        --primary-green-hover: #15803d;
         --text-main: #0f172a;
         --text-muted: #64748b;
         --border-color: #e2e8f0;
@@ -180,6 +182,10 @@
         color: #fff;
       }
 
+      button.action-green:hover {
+        background: #15803d;
+      }
+
       /* 紅色 +新增估價 按鈕樣式 & 新增/編輯提交按鈕 */
       button.btn-add-valuation,
       button.action-red,
@@ -250,7 +256,18 @@
         background-color: var(--primary-blue-light);
       }
 
-      /* 資料工具列與快速切換按鈕樣式 */
+      /* 已買入綠色預約按鈕樣式 (白底綠框綠字) */
+      .btn-add-booking.is-purchased {
+        border-color: var(--primary-green);
+        background-color: #ffffff;
+        color: var(--primary-green);
+      }
+
+      .btn-add-booking.is-purchased:hover {
+        background-color: #f0fdf4;
+        border-color: var(--primary-green-hover);
+      }
+
       .list-tools {
         position: sticky;
         top: 0;
@@ -454,12 +471,6 @@
       .date-input:active { transform: scale(0.98); }
       .date-separator { color: #64748b; font-size: 14px; font-weight: 700; }
 
-      .print-filter-actions {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
       .btn-clear, .btn-print {
         display: inline-flex;
         align-items: center;
@@ -572,18 +583,6 @@
       .note-cell { max-width: 220px; white-space: pre-wrap; }
       .wide-cell { max-width: 30ch; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
       .model-cell { font-weight: 600; }
-      .booking-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        background: #eff6ff;
-        color: #1d4ed8;
-        border: 1px solid #bfdbfe;
-        border-radius: 4px;
-        padding: 2px 6px;
-        font-size: 13px;
-        font-weight: 700;
-      }
 
       .sortable-header { text-decoration: underline; cursor: pointer; user-select: none; }
       .sortable-header:hover { color: #000; }
@@ -636,13 +635,11 @@
         overflow-y: auto;
       }
 
-      /* 彈窗一：預約時間填寫 Modal (Modal-Booking-Form) */
       dialog#bookingDialog {
-        width: min(400px, calc(100% - 32px));
+        width: min(420px, calc(100% - 32px));
         border-radius: 12px;
       }
 
-      /* 彈窗二：月曆預約視圖 Modal (Modal-Calendar-View) */
       dialog#calendarViewDialog {
         width: min(840px, calc(100% - 32px));
         max-height: 90vh;
@@ -881,7 +878,6 @@
         text-align: center;
       }
 
-      /* 當日行程列表區 (Daily Agenda View) */
       .daily-agenda-panel {
         margin-top: 16px;
         padding: 16px;
@@ -957,6 +953,28 @@
       .agenda-time { font-weight: 800; font-size: 14px; color: #0f172a; }
       .agenda-detail { font-size: 13px; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+      .btn-delete-agenda {
+        height: 32px;
+        min-height: 32px;
+        width: 32px;
+        padding: 0;
+        border-radius: 6px;
+        border: 1px solid #fecaca;
+        background-color: #fef2f2;
+        color: #dc2626;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn-delete-agenda:hover {
+        background-color: #dc2626;
+        border-color: #dc2626;
+        color: #ffffff;
+      }
+
       @media (max-width: 768px) {
         .btn-calendar-view {
           height: 36px;
@@ -986,7 +1004,6 @@
         }
         .btn-clear, .btn-print { width: 100%; }
 
-        /* 月曆視圖手機版專屬優化 */
         dialog#calendarViewDialog {
           width: calc(100% - 12px);
           max-height: 94vh;
@@ -1045,7 +1062,7 @@
         }
 
         .cell-holiday {
-          display: none; /* 手機端隱藏國定假日字樣，節省極致空間 */
+          display: none;
         }
 
         .calendar-badge {
@@ -1320,16 +1337,6 @@
             <input id="boughtDate" type="date" />
           </label>
           <label>
-            <span>預約日期</span>
-            <input id="bookingDate" type="date" />
-          </label>
-          <label>
-            <span>預約時間</span>
-            <select id="bookingTime">
-              <option value="">請選擇時間</option>
-            </select>
-          </label>
-          <label>
             <span>來源</span>
             <select id="sourceType">
               <option value="">請選擇</option>
@@ -1437,6 +1444,12 @@
           <h2 id="bookingDialogTitle">新增預約時間</h2>
         </div>
         <input type="hidden" id="bookingTargetRecordId" />
+        <label id="modalVehicleSelectWrap">
+          <span>選擇車輛</span>
+          <select id="modalVehicleSelect" required>
+            <option value="">請選擇車輛</option>
+          </select>
+        </label>
         <label>
           <span>預約日期</span>
           <input id="modalBookingDate" type="date" required />
@@ -1551,7 +1564,7 @@
       const FIXED_SOURCES = ["來店", "網站", "自買"];
 
       const fieldNames = [
-        "sourceType", "sourceCustom", "receivedDate", "boughtDate", "bookingDate", "bookingTime", "year", "model",
+        "sourceType", "sourceCustom", "receivedDate", "boughtDate", "year", "model",
         "km", "color", "condition", "version", "authority", "quote",
         "purchasePrice", "actualDealPrice", "salePrice", "remarks",
         "repairItems", "seller", "bonus",
@@ -1614,6 +1627,7 @@
       const bookingForm = document.querySelector("#bookingForm");
       const formAddBookingBtn = document.querySelector("#formAddBookingBtn");
       const cancelBookingBtn = document.querySelector("#cancelBookingBtn");
+      const modalVehicleSelect = document.querySelector("#modalVehicleSelect");
       const modalBookingDate = document.querySelector("#modalBookingDate");
       const modalBookingTime = document.querySelector("#modalBookingTime");
       const bookingTargetRecordId = document.querySelector("#bookingTargetRecordId");
@@ -1649,8 +1663,18 @@
       let soldSortDesc = true;
       let currentStatusFilter = "all";
       let calendarCurrentDate = new Date();
-      let calendarFilterType = "all"; // 月曆篩選: "all", "valuation", "delivery"
-      let selectedCalendarDateISO = new Date().toISOString().split("T")[0]; // 當前點擊選取的月曆日期
+      let calendarFilterType = "all";
+      let selectedCalendarDateISO = new Date().toISOString().split("T")[0];
+
+      function timeToMinutes(timeStr) {
+        if (!timeStr) return 9999;
+        const parts = String(timeStr).split(":");
+        if (parts.length < 2) return 9999;
+        const h = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        if (isNaN(h) || isNaN(m)) return 9999;
+        return h * 60 + m;
+      }
 
       function initTimePickerOptions(selectElem) {
         if (!selectElem) return;
@@ -1669,7 +1693,6 @@
         }
       }
 
-      initTimePickerOptions(fields.bookingTime);
       initTimePickerOptions(modalBookingTime);
 
       function loadLocalRecords() {
@@ -2043,16 +2066,34 @@
       function setFormData(record) {
         fields.recordId.value = record.id;
         for (const name of fieldNames) {
+          if (!fields[name]) continue;
           if (name === "km") fields[name].value = normalizeKm(record[name]);
-          else if (name === "receivedDate" || name === "boughtDate" || name === "bookingDate") fields[name].value = toDateInputValue(record[name]);
+          else if (name === "receivedDate" || name === "boughtDate") fields[name].value = toDateInputValue(record[name]);
           else fields[name].value = record[name] || "";
         }
         updateSourceCustomVisibility();
         submitButton.textContent = "儲存修改";
         if (valuationDialogTitle) valuationDialogTitle.textContent = "編輯估價資料";
-        if (formAddBookingBtn) formAddBookingBtn.textContent = record.isPurchased ? "+ 新增預約交車" : "+ 新增預約";
+        
+        if (formAddBookingBtn) {
+          if (record.isSold) {
+            // 已售出：隱藏按鈕
+            formAddBookingBtn.classList.add("is-hidden");
+          } else if (record.isPurchased) {
+            // 已買進：顯示「+ 新增交車」白底綠框綠字按鈕
+            formAddBookingBtn.classList.remove("is-hidden");
+            formAddBookingBtn.textContent = "+ 新增交車";
+            formAddBookingBtn.classList.add("is-purchased");
+          } else {
+            // 估價進行中：顯示「+ 新增預約」藍色按鈕
+            formAddBookingBtn.classList.remove("is-hidden");
+            formAddBookingBtn.textContent = "+ 新增預約";
+            formAddBookingBtn.classList.remove("is-purchased");
+          }
+        }
+
         valuationDialog.showModal();
-        fields.sourceType.focus();
+        // 取消自動 focus 聚焦至來源下拉選單
       }
 
       function resetForm() {
@@ -2060,7 +2101,11 @@
         fields.recordId.value = "";
         submitButton.textContent = "新增資料";
         if (valuationDialogTitle) valuationDialogTitle.textContent = "新增估價資料";
-        if (formAddBookingBtn) formAddBookingBtn.textContent = "+ 新增預約";
+        if (formAddBookingBtn) {
+          formAddBookingBtn.classList.remove("is-hidden");
+          formAddBookingBtn.textContent = "+ 新增預約";
+          formAddBookingBtn.classList.remove("is-purchased");
+        }
         updateSourceCustomVisibility();
       }
 
@@ -2070,7 +2115,6 @@
         calendarMonthTitle.textContent = `${year}年 ${month + 1}月`;
 
         calendarGrid.innerHTML = "";
-        // 標準單字星期標題：日、一、二、三、四、五、六
         const daysOfWeek = ["日", "一", "二", "三", "四", "五", "六"];
         daysOfWeek.forEach((d, idx) => {
           const h = document.createElement("div");
@@ -2090,7 +2134,6 @@
           return holidays[dateISO] || holidays[dateISO.substring(5)] || null;
         };
 
-        // 建立日期格子的共用函式
         const createCell = (cellYear, cellMonth, cellDay, isOtherMonth) => {
           const cell = document.createElement("div");
           cell.className = "calendar-cell" + (isOtherMonth ? " other-month" : "");
@@ -2114,7 +2157,6 @@
             dateHtml += `<span class="cell-holiday">${holiday}</span>`;
           }
           cell.innerHTML = `<div class="cell-date-row">${dateHtml}</div>`;
-
           // 抓取當日預約並過濾（估價預約 / 交車預約）
           let dayBookings = records.filter((r) => r.bookingDate === dateISO);
           if (calendarFilterType === "valuation") {
@@ -2131,17 +2173,9 @@
                 const badge = document.createElement("div");
                 badge.className = "calendar-badge" + (b.isPurchased ? " is-purchased" : "");
                 
-                const timeStr = b.bookingTime || '預約';
-                const carStr = b.model || b.seller || '車輛';
+                // 僅呈現時間，移除 title 與其他冗餘文字
+                badge.textContent = b.bookingTime || '預約';
                 
-                badge.textContent = timeStr;
-                badge.title = `${timeStr} ${carStr}`;
-                
-                badge.addEventListener("click", (e) => {
-                  e.stopPropagation();
-                  openBookingModalForRecord(b.id);
-                });
-
                 cell.appendChild(badge);
               });
             } else {
@@ -2149,17 +2183,8 @@
                 const badge = document.createElement("div");
                 badge.className = "calendar-badge" + (b.isPurchased ? " is-purchased" : "");
                 
-                const timeStr = b.bookingTime || '預約';
-                const carStr = b.model || b.seller || '車輛';
+                badge.textContent = b.bookingTime || '預約';
                 
-                badge.textContent = timeStr;
-                badge.title = `${timeStr} ${carStr}`;
-                
-                badge.addEventListener("click", (e) => {
-                  e.stopPropagation();
-                  openBookingModalForRecord(b.id);
-                });
-
                 cell.appendChild(badge);
               });
               const moreBadge = document.createElement("div");
@@ -2169,7 +2194,7 @@
             }
           }
 
-          // 點擊日期格子：選取該日並渲染下方單日行程清單
+          // 點擊日期格子：僅選取該日並渲染下方單日行程清單
           cell.addEventListener("click", () => {
             selectedCalendarDateISO = dateISO;
             renderCalendarView();
@@ -2179,7 +2204,7 @@
         };
 
         const firstDayOfMonth = new Date(year, month, 1);
-        let startingDay = firstDayOfMonth.getDay(); // 星期日為 0
+        let startingDay = firstDayOfMonth.getDay();
 
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const prevMonthLastDate = new Date(year, month, 0).getDate();
@@ -2190,24 +2215,20 @@
         let nextY = year; let nextM = month + 1;
         if (nextM > 11) { nextM = 0; nextY++; }
 
-        // 填補上個月尾數
         for (let i = startingDay; i > 0; i--) {
           calendarGrid.appendChild(createCell(prevY, prevM, prevMonthLastDate - i + 1, true));
         }
 
-        // 當月日期
         for (let day = 1; day <= daysInMonth; day++) {
           calendarGrid.appendChild(createCell(year, month, day, false));
         }
 
-        // 填補下個月開頭
         const totalCells = startingDay + daysInMonth;
         const nextDays = (7 - (totalCells % 7)) % 7;
         for (let j = 1; j <= nextDays; j++) {
           calendarGrid.appendChild(createCell(nextY, nextM, j, true));
         }
 
-        // 同步渲染單日行程詳細清單 (Agenda View)
         renderDailyAgenda(selectedCalendarDateISO);
       }
 
@@ -2228,13 +2249,11 @@
           dayBookings = dayBookings.filter((r) => r.isPurchased);
         }
 
-        dayBookings.sort((a, b) => (a.bookingTime || "99:99").localeCompare(b.bookingTime || "99:99"));
+        dayBookings.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
 
         agendaList.innerHTML = "";
 
-        if (dayBookings.length === 0) {
-          agendaList.innerHTML = "";
-        } else {
+        if (dayBookings.length > 0) {
           dayBookings.forEach((b) => {
             const item = document.createElement("div");
             item.className = "agenda-item";
@@ -2242,7 +2261,7 @@
             const isDeliv = b.isPurchased;
             const badgeLabel = isDeliv ? "交車" : "估價";
             const badgeClass = isDeliv ? "type-delivery" : "type-valuation";
-            const infoText = `${b.model || '未指定車型'} ${b.seller ? '• ' + b.seller : ''} ${b.remarks ? '• ' + b.remarks : ''}`;
+            const infoText = `${b.year ? b.year + '年 ' : ''}${b.model || '未指定車型'} ${b.seller ? '• ' + b.seller : ''} ${b.remarks ? '• ' + b.remarks : ''}`;
 
             item.innerHTML = `
               <div class="agenda-item-left">
@@ -2252,11 +2271,36 @@
                   <span class="agenda-detail" title="${infoText}">${infoText}</span>
                 </div>
               </div>
-              <button type="button" class="btn-add-booking" style="height:32px; min-height:32px; font-size:13px;" data-id="${b.id}">編輯</button>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <button type="button" class="btn-add-booking btn-edit-agenda" style="height:32px; min-height:32px; font-size:13px;" data-id="${b.id}">編輯</button>
+                <button type="button" class="btn-delete-agenda" title="清除該筆預約" data-id="${b.id}">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                </button>
+              </div>
             `;
 
-            item.querySelector("button")?.addEventListener("click", () => {
+            item.querySelector(".btn-edit-agenda")?.addEventListener("click", () => {
               openBookingModalForRecord(b.id);
+            });
+
+            item.querySelector(".btn-delete-agenda")?.addEventListener("click", async () => {
+              const idx = records.findIndex((r) => r.id === b.id);
+              if (idx >= 0) {
+                records[idx] = await persistUpdate(normalizeRecord({
+                  ...records[idx],
+                  bookingDate: "",
+                  bookingTime: "",
+                  updatedAt: new Date().toISOString()
+                }));
+                saveLocalRecords();
+                render();
+                renderCalendarView();
+              }
             });
 
             agendaList.appendChild(item);
@@ -2265,11 +2309,55 @@
 
         agendaAddBookingBtn.onclick = () => {
           bookingTargetRecordId.value = "";
+          populateVehicleSelect("");
+          updateBookingDialogTitle("");
           modalBookingDate.value = dateISO;
           modalBookingTime.value = "08:30";
           bookingDialog.showModal();
         };
       }
+
+      // 動態載入「選擇車輛」選單，僅匯入「估價進行中」與「已買入」的車輛
+      function populateVehicleSelect(selectedId) {
+        if (!modalVehicleSelect) return;
+        modalVehicleSelect.innerHTML = '<option value="">請選擇車輛</option>';
+
+        const availableRecords = records.filter((r) => !r.isSold);
+
+        availableRecords.forEach((r) => {
+          const opt = document.createElement("option");
+          opt.value = r.id;
+          const tag = r.isPurchased ? "[已買入]" : "[估價]";
+          const yearStr = r.year ? `${r.year}年 ` : "";
+          const modelStr = r.model || "未命名車輛";
+          const sellerStr = r.seller ? ` (賣家: ${r.seller})` : "";
+          opt.textContent = `${tag} ${yearStr}${modelStr}${sellerStr}`;
+          if (r.id === selectedId) {
+            opt.selected = true;
+          }
+          modalVehicleSelect.appendChild(opt);
+        });
+
+        modalVehicleSelect.value = selectedId || "";
+      }
+
+      // 依車輛狀態動態變更標題
+      function updateBookingDialogTitle(recordId) {
+        const bookingDialogTitle = document.querySelector("#bookingDialogTitle");
+        if (!bookingDialogTitle) return;
+        const targetRec = records.find((r) => r.id === recordId);
+        if (targetRec && targetRec.isPurchased) {
+          bookingDialogTitle.textContent = "新增預約交車";
+        } else {
+          bookingDialogTitle.textContent = "新增預約時間";
+        }
+      }
+
+      modalVehicleSelect?.addEventListener("change", (e) => {
+        const selectedId = e.target.value;
+        bookingTargetRecordId.value = selectedId;
+        updateBookingDialogTitle(selectedId);
+      });
 
       // Legend & Filter 點擊切換事件
       document.querySelectorAll("#calendarFilterBar .filter-chip").forEach((chip) => {
@@ -2310,12 +2398,10 @@
       // 觸發預約 Modal
       function openBookingModalForRecord(recId) {
         bookingTargetRecordId.value = recId || "";
-        const targetRec = records.find((r) => r.id === recId);
-        const bookingDialogTitle = document.querySelector("#bookingDialogTitle");
-        if (bookingDialogTitle) {
-          bookingDialogTitle.textContent = (targetRec && targetRec.isPurchased) ? "新增預約交車" : "新增預約時間";
-        }
+        populateVehicleSelect(recId || "");
+        updateBookingDialogTitle(recId || "");
 
+        const targetRec = records.find((r) => r.id === recId);
         const todayStr = new Date().toISOString().split("T")[0];
         modalBookingDate.value = targetRec?.bookingDate || todayStr;
         modalBookingTime.value = targetRec?.bookingTime || "09:00";
@@ -2330,33 +2416,22 @@
         bookingDialog.close();
       });
 
-      // 防誤觸點擊遮罩不關閉
-      bookingDialog.addEventListener("click", (e) => {
-        if (e.target === bookingDialog) {
-          // 保持開啟以防誤觸遺失資料
-        }
-      });
-
       bookingForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const targetId = bookingTargetRecordId.value;
+        const targetId = modalVehicleSelect.value || bookingTargetRecordId.value;
         const bDate = modalBookingDate.value;
         const bTime = modalBookingTime.value;
 
-        if (targetId) {
-          const idx = records.findIndex((r) => r.id === targetId);
-          if (idx >= 0) {
-            records[idx] = await persistUpdate(normalizeRecord({
-              ...records[idx],
-              bookingDate: bDate,
-              bookingTime: bTime,
-              updatedAt: new Date().toISOString()
-            }));
-          }
-        } else {
-          // 若在編輯對話框中，則直接更新對話框欄位
-          fields.bookingDate.value = bDate;
-          fields.bookingTime.value = bTime;
+        if (!targetId) return;
+
+        const idx = records.findIndex((r) => r.id === targetId);
+        if (idx >= 0) {
+          records[idx] = await persistUpdate(normalizeRecord({
+            ...records[idx],
+            bookingDate: bDate,
+            bookingTime: bTime,
+            updatedAt: new Date().toISOString()
+          }));
         }
 
         saveLocalRecords();
@@ -2379,17 +2454,37 @@
         submitButton.disabled = true;
 
         const data = { id: fields.recordId.value || createId(), updatedAt: new Date().toISOString() };
-        for (const name of fieldNames) data[name] = fields[name].value.trim();
+        for (const name of fieldNames) {
+          if (fields[name]) {
+            data[name] = fields[name].value.trim();
+          }
+        }
         if (data.sourceType !== CUSTOM_SOURCE) data.sourceCustom = "";
         data.km = normalizeKm(data.km);
 
         const existingIndex = records.findIndex((r) => r.id === data.id);
         if (existingIndex >= 0) {
           const isPurchased = records[existingIndex].isPurchased || Boolean(data.boughtDate);
-          records[existingIndex] = await persistUpdate(normalizeRecord({ ...records[existingIndex], ...data, isPurchased }));
+          const bookingDate = records[existingIndex].bookingDate || "";
+          const bookingTime = records[existingIndex].bookingTime || "";
+          records[existingIndex] = await persistUpdate(normalizeRecord({
+            ...records[existingIndex],
+            ...data,
+            bookingDate,
+            bookingTime,
+            isPurchased
+          }));
         } else {
           const isPurchased = Boolean(data.boughtDate);
-          records.push(await persistCreate(normalizeRecord({ ...data, isPurchased: isPurchased, isSold: false, state: "N", createdAt: new Date().toISOString() })));
+          records.push(await persistCreate(normalizeRecord({
+            ...data,
+            bookingDate: "",
+            bookingTime: "",
+            isPurchased: isPurchased,
+            isSold: false,
+            state: "N",
+            createdAt: new Date().toISOString()
+          })));
         }
 
         saveLocalRecords();
