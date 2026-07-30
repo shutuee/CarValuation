@@ -645,27 +645,16 @@
       /* 彈窗二：月曆預約視圖 Modal (Modal-Calendar-View) */
       dialog#calendarViewDialog {
         width: min(840px, calc(100% - 32px));
-        height: 85vh; /* 拉高總高度 */
-        max-height: 900px;
+        max-height: 90vh;
         border-radius: 16px;
-        overflow: hidden;
+        overflow-y: auto;
         box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
-        display: flex;
-        flex-direction: column;
       }
 
       dialog form, .modal-content-wrap {
         display: grid;
         gap: 16px;
         padding: 24px;
-      }
-
-      .modal-content-wrap {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        padding: 20px;
-        gap: 12px;
       }
 
       dialog h2 {
@@ -683,40 +672,27 @@
 
       /* ===== 月曆視圖 (Grid View) 樣式 ===== */
       .calendar-header {
-        position: relative;
         display: flex;
         flex-direction: column;
         gap: 12px;
-        padding-bottom: 12px;
         border-bottom: 1px solid var(--border-color);
+        padding-bottom: 14px;
       }
 
-      .calendar-header-top {
+      .calendar-header-row1 {
         display: flex;
         align-items: center;
-        gap: 16px;
-        padding-right: 48px; /* 留給絕對定位的關閉按鈕 */
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
       }
 
-      .calendar-header-bottom {
+      .calendar-header-row2 {
         display: flex;
         align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
       }
-
-      .close-btn-absolute {
-        position: absolute;
-        top: 0;
-        right: 0;
-        min-height: 36px !important;
-        height: 36px;
-        padding: 0 12px !important;
-        border-radius: 8px;
-        background: #f1f5f9;
-        border: 1px solid #cbd5e1;
-        color: #475569;
-        cursor: pointer;
-      }
-      .close-btn-absolute:hover { background: #e2e8f0; }
 
       .month-nav {
         display: flex;
@@ -749,24 +725,34 @@
         color: var(--primary-blue);
       }
 
-      .calendar-legend {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 13px;
-        font-weight: 700;
-        color: #475569;
-        background: #f8fafc;
-        padding: 6px 12px;
-        border-radius: 20px;
-        border: 1px solid #e2e8f0;
-      }
-
-      .legend-item {
+      .calendar-filter-bar {
         display: flex;
         align-items: center;
         gap: 6px;
+        font-size: 13px;
+        font-weight: 700;
       }
+
+      .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        color: #475569;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+        transition: all 0.15s ease;
+        user-select: none;
+      }
+
+      .filter-chip:hover { opacity: 0.88; }
+      .filter-chip.is-active { background: #0f172a; color: #ffffff; border-color: #0f172a; }
+      .filter-chip.is-active[data-filter="valuation"] { background: #2563eb; border-color: #2563eb; color: #ffffff; }
+      .filter-chip.is-active[data-filter="delivery"] { background: #16a34a; border-color: #16a34a; color: #ffffff; }
 
       .legend-dot {
         width: 8px;
@@ -779,12 +765,9 @@
       .legend-dot.dot-delivery { background-color: #16a34a; }
 
       .calendar-grid {
-        flex: 1; /* 延展剩餘高度 */
         display: grid;
-        grid-template-columns: repeat(7, minmax(0, 1fr)); /* 強制等分7等分 */
-        grid-template-rows: auto; /* 標題列高度由內容決定 */
-        grid-auto-rows: minmax(0, 1fr); /* 所有的日期列自動均分高度 */
-        gap: 1px;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 2px;
         background: #cbd5e1;
         border: 1px solid #cbd5e1;
         border-radius: 12px;
@@ -794,13 +777,10 @@
       .calendar-day-header {
         background: #ffffff;
         text-align: center;
-        padding: 10px 0;
+        padding: 8px 0;
         font-size: 14px;
         font-weight: 800;
         color: #475569;
-        display: flex;
-        align-items: center;
-        justify-content: center;
       }
 
       .calendar-day-header.is-weekend {
@@ -809,25 +789,28 @@
 
       .calendar-cell {
         background: #ffffff;
-        padding: 6px;
+        min-height: 88px;
+        padding: 8px 6px;
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 5px;
         cursor: pointer;
-        transition: background 0.15s ease;
-        overflow: hidden; /* 防止內容溢出 */
+        transition: all 0.15s ease;
+        box-sizing: border-box;
       }
 
       .calendar-cell:hover {
         background: #f8fafc;
       }
 
-      .calendar-cell.other-month > * {
-        opacity: 0.3; /* 淡化非本月日期 */
+      .calendar-cell.is-selected {
+        outline: 2px solid #2563eb;
+        outline-offset: -2px;
+        background: #eff6ff;
       }
 
-      .calendar-cell.is-today {
-        background: #ffffff;
+      .calendar-cell.other-month > * {
+        opacity: 0.3;
       }
 
       .cell-date-row {
@@ -841,7 +824,6 @@
         font-size: 11px;
         font-weight: 700;
         color: #ef4444;
-        white-space: nowrap;
       }
 
       .cell-date-num {
@@ -854,12 +836,11 @@
         width: 24px;
         height: 24px;
         border-radius: 50%;
-        flex-shrink: 0;
       }
 
       .calendar-cell.is-today .cell-date-num {
-        background: #dc2626; /* 實心紅底 */
-        color: #ffffff; /* 白字 */
+        background: #dc2626;
+        color: #ffffff;
         font-weight: 800;
         box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
       }
@@ -867,27 +848,27 @@
       .calendar-badge {
         background: #2563eb;
         color: #ffffff;
+        border: 1px solid #1d4ed8;
         border-radius: 6px;
-        padding: 2px 6px;
+        padding: 3px 6px;
         font-size: 12px;
         font-weight: 700;
         line-height: 1.3;
         white-space: nowrap;
         overflow: hidden;
-        text-overflow: ellipsis; /* 文字過長顯示... */
+        text-overflow: ellipsis;
         transition: transform 0.15s ease, box-shadow 0.15s ease;
-        display: flex;
-        align-items: center;
-        gap: 4px;
       }
 
       .calendar-badge:hover {
         transform: scale(1.02);
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
       }
 
       .calendar-badge.is-purchased {
         background: #16a34a;
+        color: #ffffff;
+        border-color: #15803d;
       }
 
       .calendar-more-badge {
@@ -899,6 +880,82 @@
         font-weight: 800;
         text-align: center;
       }
+
+      /* 當日行程列表區 (Daily Agenda View) */
+      .daily-agenda-panel {
+        margin-top: 16px;
+        padding: 16px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .agenda-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .agenda-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .agenda-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .agenda-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        gap: 12px;
+      }
+
+      .agenda-item-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .agenda-type-badge {
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #fff;
+        white-space: nowrap;
+      }
+
+      .agenda-type-badge.type-valuation { background: #2563eb; }
+      .agenda-type-badge.type-delivery { background: #16a34a; }
+
+      .agenda-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        overflow: hidden;
+      }
+
+      .agenda-time { font-weight: 800; font-size: 14px; color: #0f172a; }
+      .agenda-detail { font-size: 13px; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
       @media (max-width: 768px) {
         .btn-calendar-view {
@@ -931,44 +988,35 @@
 
         /* 月曆視圖手機版專屬優化 */
         dialog#calendarViewDialog {
-          width: 100%;
-          height: 100dvh; /* 手機端填滿全螢幕高度 */
-          max-height: none;
-          border-radius: 0;
-          margin: 0;
+          width: calc(100% - 12px);
+          max-height: 94vh;
+          border-radius: 12px;
         }
         
         .modal-content-wrap {
-          padding: 12px 8px; /* 縮小左右 padding 增加網格空間 */
-          gap: 8px;
+          padding: 12px 6px;
+          position: relative;
         }
 
-        .calendar-header {
-          padding-bottom: 8px;
-        }
-
-        .calendar-header-top {
-          padding-right: 40px; /* 保留給 X 按鈕 */
+        .calendar-header-row1 {
+          padding-right: 36px;
         }
 
         #calendarMonthTitle {
-          font-size: 20px !important;
-          line-height: 1.1;
-        }
-
-        .calendar-legend {
-          font-size: 11px;
-          padding: 4px 8px;
+          font-size: 18px !important;
         }
 
         #closeCalendarViewBtn {
+          position: absolute;
+          top: 10px;
+          right: 6px;
           min-height: 32px !important;
-          height: 32px;
-          padding: 0 8px !important;
+          padding: 0 10px !important;
         }
 
         .calendar-cell {
-          padding: 4px 2px; /* 極小化 padding 爭取標籤字體空間 */
+          min-height: 52px;
+          padding: 3px 2px;
           gap: 2px;
         }
 
@@ -978,38 +1026,42 @@
         }
 
         .cell-date-row {
-          flex-direction: column;
-          align-items: center;
-          gap: 1px;
-          margin-bottom: 2px;
+          flex-direction: row;
+          justify-content: center;
+          gap: 2px;
+          margin-bottom: 1px;
         }
 
         .cell-date-num {
-          width: 22px;
-          height: 22px;
-          font-size: 13px;
+          width: 20px;
+          height: 20px;
+          font-size: 12px;
         }
 
         .cell-holiday {
-          display: none; /* 手機版隱藏國定假日文字，節省垂直空間給預約標籤 */
+          display: none; /* 手機端隱藏國定假日字樣，節省極致空間 */
         }
 
         .calendar-badge {
-          font-size: 10px; /* 縮小字級 */
-          padding: 2px 3px;
+          font-size: 10px;
+          padding: 1px 3px;
           border-radius: 4px;
-          justify-content: center;
-        }
-        
-        /* 手機版隱藏車型名稱，僅顯示時間 */
-        .badge-title {
-          display: none; 
+          text-align: center;
         }
 
+        /* 手機端預約卡片簡化為：純圓點 + 時間 */
+        .calendar-badge .badge-text-full { display: none; }
+        .calendar-badge .badge-text-short { display: inline; }
+
         .calendar-more-badge {
-          font-size: 10px;
-          padding: 2px;
+          font-size: 9px;
+          padding: 1px 2px;
         }
+      }
+
+      @media (min-width: 769px) {
+        .calendar-badge .badge-text-full { display: inline; }
+        .calendar-badge .badge-text-short { display: none; }
       }
 
       @media (max-width: 620px) {
@@ -1409,24 +1461,39 @@
     <dialog id="calendarViewDialog">
       <div class="modal-content-wrap">
         <div class="calendar-header">
-          <div class="calendar-header-top">
-            <h2 id="calendarMonthTitle" style="margin:0; font-size:24px; font-weight:800; color:var(--text-main);">2026年 7月</h2>
+          <!-- 第一層：標題、導覽與關閉按鈕 -->
+          <div class="calendar-header-row1">
+            <h2 id="calendarMonthTitle" style="margin:0; font-size:20px; font-weight:800; color:var(--text-main);">2026年 7月</h2>
             <div class="month-nav">
               <button type="button" class="month-nav-btn" id="prevMonthBtn" title="上個月">＜</button>
               <button type="button" class="month-nav-btn today-btn" id="todayMonthBtn">今天</button>
               <button type="button" class="month-nav-btn" id="nextMonthBtn" title="下個月">＞</button>
             </div>
+            <button type="button" class="secondary" id="closeCalendarViewBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
           </div>
-          <div class="calendar-header-bottom">
-            <div class="calendar-legend">
-              <span class="legend-item"><span class="legend-dot dot-valuation"></span>估價預約</span>
-              <span class="legend-item"><span class="legend-dot dot-delivery"></span>交車預約</span>
+          <!-- 第二層：橫向 Legend & Filter Bar -->
+          <div class="calendar-header-row2">
+            <div class="calendar-filter-bar" id="calendarFilterBar">
+              <span class="filter-chip is-active" data-filter="all">全部預約</span>
+              <span class="filter-chip" data-filter="valuation"><span class="legend-dot dot-valuation"></span>估價預約</span>
+              <span class="filter-chip" data-filter="delivery"><span class="legend-dot dot-delivery"></span>交車預約</span>
             </div>
           </div>
-          <button type="button" class="close-btn-absolute" id="closeCalendarViewBtn">✕</button>
         </div>
+
         <div class="calendar-grid" id="calendarGrid">
           <!-- JS 動態生成月曆網格 -->
+        </div>
+
+        <!-- 當日行程詳細清單 (Agenda View) -->
+        <div class="daily-agenda-panel" id="dailyAgendaPanel">
+          <div class="agenda-header">
+            <h3 class="agenda-title" id="agendaDateTitle">📌 選擇日期的預約行程</h3>
+            <button type="button" class="btn-add-booking" id="agendaAddBookingBtn">+ 本日預約</button>
+          </div>
+          <div class="agenda-list" id="agendaList">
+            <!-- JS 動態渲染行程項目 -->
+          </div>
         </div>
       </div>
     </dialog>
@@ -1585,6 +1652,8 @@
       let soldSortDesc = true;
       let currentStatusFilter = "all";
       let calendarCurrentDate = new Date();
+      let calendarFilterType = "all"; // 月曆篩選: "all", "valuation", "delivery"
+      let selectedCalendarDateISO = new Date().toISOString().split("T")[0]; // 當前點擊選取的月曆日期
 
       function initTimePickerOptions(selectElem) {
         if (!selectElem) return;
@@ -2004,17 +2073,16 @@
         calendarMonthTitle.textContent = `${year}年 ${month + 1}月`;
 
         calendarGrid.innerHTML = "";
-        // 修正：依據通用曆法，從星期日開始排列
+        // 標準單字星期標題：日、一、二、三、四、五、六
         const daysOfWeek = ["日", "一", "二", "三", "四", "五", "六"];
         daysOfWeek.forEach((d, idx) => {
           const h = document.createElement("div");
-          // 星期日 (idx=0) 或 星期六 (idx=6) 為紅字
           h.className = "calendar-day-header" + (idx === 0 || idx === 6 ? " is-weekend" : "");
           h.textContent = d;
           calendarGrid.appendChild(h);
         });
 
-        // 台灣國定假日字典 (含固定假日與 2024-2026 變動假日)
+        // 台灣國定假日字典
         const getTaiwanHoliday = (dateISO) => {
           const holidays = {
             "01-01": "元旦", "02-28": "和平紀念日", "04-04": "兒童節", "05-01": "勞動節", "10-10": "國慶日",
@@ -2039,6 +2107,10 @@
             cell.classList.add("is-today");
           }
 
+          if (dateISO === selectedCalendarDateISO) {
+            cell.classList.add("is-selected");
+          }
+
           const holiday = getTaiwanHoliday(dateISO);
           let dateHtml = `<span class="cell-date-num">${cellDay}</span>`;
           if (holiday) {
@@ -2046,35 +2118,54 @@
           }
           cell.innerHTML = `<div class="cell-date-row">${dateHtml}</div>`;
 
-          // 抓取當日預約並按時間由早到晚排序
-          const dayBookings = records.filter((r) => r.bookingDate === dateISO);
+          // 抓取當日預約並過濾（估價預約 / 交車預約）
+          let dayBookings = records.filter((r) => r.bookingDate === dateISO);
+          if (calendarFilterType === "valuation") {
+            dayBookings = dayBookings.filter((r) => !r.isPurchased);
+          } else if (calendarFilterType === "delivery") {
+            dayBookings = dayBookings.filter((r) => r.isPurchased);
+          }
+
           dayBookings.sort((a, b) => (a.bookingTime || "99:99").localeCompare(b.bookingTime || "99:99"));
 
           if (dayBookings.length > 0) {
-            // 最多顯示兩筆，超過顯示 +N
-            const displayLimit = 2;
-            const toDisplay = dayBookings.length <= displayLimit ? dayBookings : dayBookings.slice(0, 1);
-            
-            toDisplay.forEach((b) => {
-              const badge = document.createElement("div");
-              badge.className = "calendar-badge" + (b.isPurchased ? " is-purchased" : "");
-              const timeStr = b.bookingTime || '預約';
-              const carStr = b.model || b.seller || '車輛';
-              
-              // 拆分 HTML 以便在手機版隱藏標題，只留時間
-              badge.innerHTML = `<span class="badge-time">${timeStr}</span><span class="badge-title">${carStr}</span>`;
-              badge.title = `${timeStr} ${carStr}`;
-              
-              // 點擊具體的預約標籤，開啟該筆資料的編輯視窗
-              badge.addEventListener("click", (e) => {
-                e.stopPropagation(); // 阻止觸發外層格子的「新增預約」事件
-                openBookingModalForRecord(b.id);
+            if (dayBookings.length <= 2) {
+              dayBookings.forEach((b) => {
+                const badge = document.createElement("div");
+                badge.className = "calendar-badge" + (b.isPurchased ? " is-purchased" : "");
+                
+                const timeStr = b.bookingTime || '預約';
+                const carStr = b.model || b.seller || '車輛';
+                
+                // 桌機顯示完整文字、手機顯示縮寫/純時間
+                badge.innerHTML = `<span class="badge-text-full">${timeStr} ${carStr}</span><span class="badge-text-short">• ${timeStr}</span>`;
+                badge.title = `${timeStr} ${carStr}`;
+                
+                badge.addEventListener("click", (e) => {
+                  e.stopPropagation();
+                  openBookingModalForRecord(b.id);
+                });
+
+                cell.appendChild(badge);
               });
+            } else {
+              dayBookings.slice(0, 1).forEach((b) => {
+                const badge = document.createElement("div");
+                badge.className = "calendar-badge" + (b.isPurchased ? " is-purchased" : "");
+                
+                const timeStr = b.bookingTime || '預約';
+                const carStr = b.model || b.seller || '車輛';
+                
+                badge.innerHTML = `<span class="badge-text-full">${timeStr} ${carStr}</span><span class="badge-text-short">• ${timeStr}</span>`;
+                badge.title = `${timeStr} ${carStr}`;
+                
+                badge.addEventListener("click", (e) => {
+                  e.stopPropagation();
+                  openBookingModalForRecord(b.id);
+                });
 
-              cell.appendChild(badge);
-            });
-
-            if (dayBookings.length > displayLimit) {
+                cell.appendChild(badge);
+              });
               const moreBadge = document.createElement("div");
               moreBadge.className = "calendar-more-badge";
               moreBadge.textContent = `+${dayBookings.length - 1} 筆`;
@@ -2082,24 +2173,21 @@
             }
           }
 
-          // 點擊格子快速預約
+          // 點擊日期格子：選取該日並渲染下方單日行程清單
           cell.addEventListener("click", () => {
-            bookingTargetRecordId.value = "";
-            modalBookingDate.value = dateISO;
-            modalBookingTime.value = "08:30";
-            bookingDialog.showModal();
+            selectedCalendarDateISO = dateISO;
+            renderCalendarView();
           });
 
           return cell;
         };
 
         const firstDayOfMonth = new Date(year, month, 1);
-        let startingDay = firstDayOfMonth.getDay(); // 0 is Sunday, 對齊 daysOfWeek
+        let startingDay = firstDayOfMonth.getDay(); // 星期日為 0
 
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const prevMonthLastDate = new Date(year, month, 0).getDate();
 
-        // 處理跨月年份與月份計算
         let prevY = year; let prevM = month - 1;
         if (prevM < 0) { prevM = 11; prevY--; }
         
@@ -2122,10 +2210,84 @@
         for (let j = 1; j <= nextDays; j++) {
           calendarGrid.appendChild(createCell(nextY, nextM, j, true));
         }
+
+        // 同步渲染單日行程詳細清單 (Agenda View)
+        renderDailyAgenda(selectedCalendarDateISO);
       }
+
+      function renderDailyAgenda(dateISO) {
+        const agendaDateTitle = document.querySelector("#agendaDateTitle");
+        const agendaList = document.querySelector("#agendaList");
+        const agendaAddBookingBtn = document.querySelector("#agendaAddBookingBtn");
+
+        if (!agendaDateTitle || !agendaList) return;
+
+        const dateFormatted = dateISO.replaceAll("-", "/");
+        agendaDateTitle.textContent = `📌 ${dateFormatted} 預約行程列表`;
+
+        let dayBookings = records.filter((r) => r.bookingDate === dateISO);
+        if (calendarFilterType === "valuation") {
+          dayBookings = dayBookings.filter((r) => !r.isPurchased);
+        } else if (calendarFilterType === "delivery") {
+          dayBookings = dayBookings.filter((r) => r.isPurchased);
+        }
+
+        dayBookings.sort((a, b) => (a.bookingTime || "99:99").localeCompare(b.bookingTime || "99:99"));
+
+        agendaList.innerHTML = "";
+
+        if (dayBookings.length === 0) {
+          agendaList.innerHTML = `<div style="padding:16px; text-align:center; color:#64748b; font-size:14px; font-weight:600;">當日無預約行程，點擊右上角「+ 本日預約」新增。</div>`;
+        } else {
+          dayBookings.forEach((b) => {
+            const item = document.createElement("div");
+            item.className = "agenda-item";
+
+            const isDeliv = b.isPurchased;
+            const badgeLabel = isDeliv ? "交車" : "估價";
+            const badgeClass = isDeliv ? "type-delivery" : "type-valuation";
+            const infoText = `${b.model || '未指定車型'} ${b.seller ? '• ' + b.seller : ''} ${b.remarks ? '• ' + b.remarks : ''}`;
+
+            item.innerHTML = `
+              <div class="agenda-item-left">
+                <span class="agenda-type-badge ${badgeClass}">${badgeLabel}</span>
+                <div class="agenda-info">
+                  <span class="agenda-time">⏰ ${b.bookingTime || '未定時間'}</span>
+                  <span class="agenda-detail" title="${infoText}">${infoText}</span>
+                </div>
+              </div>
+              <button type="button" class="btn-add-booking" style="height:32px; min-height:32px; font-size:13px;" data-id="${b.id}">編輯</button>
+            `;
+
+            item.querySelector("button")?.addEventListener("click", () => {
+              openBookingModalForRecord(b.id);
+            });
+
+            agendaList.appendChild(item);
+          });
+        }
+
+        agendaAddBookingBtn.onclick = () => {
+          bookingTargetRecordId.value = "";
+          modalBookingDate.value = dateISO;
+          modalBookingTime.value = "08:30";
+          bookingDialog.showModal();
+        };
+      }
+
+      // Legend & Filter 點擊切換事件
+      document.querySelectorAll("#calendarFilterBar .filter-chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          document.querySelectorAll("#calendarFilterBar .filter-chip").forEach((c) => c.classList.remove("is-active"));
+          chip.classList.add("is-active");
+          calendarFilterType = chip.dataset.filter;
+          renderCalendarView();
+        });
+      });
 
       openCalendarViewBtn?.addEventListener("click", () => {
         calendarCurrentDate = new Date();
+        selectedCalendarDateISO = new Date().toISOString().split("T")[0];
         renderCalendarView();
         calendarViewDialog.showModal();
       });
