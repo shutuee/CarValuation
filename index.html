@@ -805,9 +805,67 @@
       .calendar-filter-bar {
         display: flex;
         align-items: center;
-        gap: 6px;
-        font-size: 13px;
+        gap: 8px;
+        font-size: 15px;
         font-weight: 700;
+        flex-wrap: nowrap;
+      }
+
+      .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        color: #475569;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 700;
+        transition: all 0.15s ease;
+        user-select: none;
+        white-space: nowrap;
+      }
+
+      .filter-chip:hover { opacity: 0.88; }
+      .filter-chip.is-active { background: #0f172a; color: #ffffff; border-color: #0f172a; }
+      .filter-chip.is-active[data-filter="valuation"] { background: #2563eb; border-color: #2563eb; color: #ffffff; }
+      .filter-chip.is-active[data-filter="delivery"] { background: #16a34a; border-color: #16a34a; color: #ffffff; }
+
+      .legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .legend-dot.dot-valuation { background-color: #2563eb; }
+      .legend-dot.dot-delivery { background-color: #16a34a; }
+
+      /* 黑底白字按鈕樣式 (用於 + 新增) */
+      .btn-black {
+        height: 38px;
+        min-height: 38px;
+        padding: 0 18px;
+        border-radius: 20px;
+        border: 1px solid #0f172a;
+        background-color: #0f172a;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+      }
+
+      .btn-black:hover {
+        background-color: #1e293b;
+        border-color: #1e293b;
       }
 
       .filter-chip {
@@ -1569,13 +1627,13 @@
             <button type="button" class="secondary" id="closeCalendarViewBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
           </div>
           <!-- 第二層：橫向 Legend & Filter Bar + 新增預約按鈕對齊 -->
-          <div class="calendar-header-row2">
-            <div class="calendar-filter-bar" id="calendarFilterBar">
-              <span class="filter-chip is-active" data-filter="all">全部預約</span>
-              <span class="filter-chip" data-filter="valuation"><span class="legend-dot dot-valuation"></span>估價預約</span>
-              <span class="filter-chip" data-filter="delivery"><span class="legend-dot dot-delivery"></span>交車預約</span>
+          <div class="calendar-header-row2" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: nowrap; width: 100%;">
+            <div class="calendar-filter-bar" id="calendarFilterBar" style="display: flex; align-items: center; gap: 6px; flex-wrap: nowrap;">
+              <span class="filter-chip is-active" data-filter="all">全部</span>
+              <span class="filter-chip" data-filter="valuation"><span class="legend-dot dot-valuation"></span>估價</span>
+              <span class="filter-chip" data-filter="delivery"><span class="legend-dot dot-delivery"></span>交車</span>
             </div>
-            <button type="button" class="btn-black" id="agendaAddBookingBtn">+ 新增預約</button>
+            <button type="button" class="btn-black" id="agendaAddBookingBtn" style="white-space: nowrap; flex-shrink: 0;">+新增</button>
           </div>
         </div>
 
@@ -2504,6 +2562,11 @@
         modalBookingDate.value = targetRec?.bookingDate || todayStr;
         modalBookingTime.value = targetRec?.bookingTime || "09:00";
         bookingDialog.showModal();
+
+        // 移開選單焦點，防止瀏覽器主動彈出選單下拉列表
+        if (modalVehicleSelect) {
+          modalVehicleSelect.blur();
+        }
       }
 
       formAddBookingBtn?.addEventListener("click", () => {
