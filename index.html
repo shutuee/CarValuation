@@ -900,10 +900,94 @@
         }
         .btn-clear, .btn-print { width: 100%; }
 
+        /* 月曆視圖手機版專屬優化 */
         dialog#calendarViewDialog {
-          width: calc(100% - 16px);
-          height: calc(100% - 32px);
+          width: calc(100% - 12px);
+          height: calc(100% - 24px);
           max-height: none;
+          border-radius: 12px;
+        }
+        
+        .modal-content-wrap {
+          padding: 12px 6px; /* 縮小內外邊距，釋放最大空間給月曆網格 */
+          position: relative;
+        }
+
+        .calendar-header {
+          flex-direction: column; /* 將標題區直向排列 */
+          align-items: flex-start;
+          gap: 10px;
+          padding-bottom: 10px;
+          padding-right: 36px; /* 預留給絕對定位的關閉按鈕空間，避免重疊 */
+        }
+
+        .calendar-header-left {
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        #calendarMonthTitle {
+          font-size: 20px !important;
+        }
+
+        .calendar-header-right {
+          width: 100%;
+        }
+
+        .calendar-legend {
+          font-size: 11px;
+          padding: 4px 8px;
+        }
+
+        #closeCalendarViewBtn {
+          position: absolute;
+          top: 12px;
+          right: 6px;
+          min-height: 32px !important;
+          padding: 0 10px !important;
+        }
+
+        .calendar-cell {
+          min-height: 60px; /* 縮短手機版高度可看見更多排 */
+          padding: 4px 2px; /* 極小化 padding 爭取標籤字體空間 */
+          gap: 2px;
+        }
+
+        .calendar-day-header {
+          font-size: 12px;
+          padding: 6px 0;
+        }
+
+        .cell-date-row {
+          flex-direction: column; /* 讓日期與節慶直向疊放，避免太擠 */
+          align-items: center;
+          gap: 1px;
+          margin-bottom: 2px;
+        }
+
+        .cell-date-num {
+          width: 22px;
+          height: 22px;
+          font-size: 13px;
+        }
+
+        .cell-holiday {
+          font-size: 9px;
+          transform: scale(0.9);
+          white-space: nowrap;
+        }
+
+        .calendar-badge {
+          font-size: 10px;
+          padding: 2px;
+          border-radius: 4px;
+          text-align: center; /* 空間狹小時文字置中 */
+          letter-spacing: -0.5px;
+        }
+
+        .calendar-more-badge {
+          font-size: 10px;
+          padding: 2px;
         }
       }
 
