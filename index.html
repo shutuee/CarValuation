@@ -546,8 +546,15 @@
       }
 
       .report-stats-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+      }
+
+      .sub-stats-row {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        grid-template-columns: 1fr 1fr;
         gap: 12px;
         width: 100%;
       }
@@ -585,7 +592,10 @@
       }
 
       .stat-card.primary .stat-value {
+        font-size: 38px;
+        font-weight: 900;
         color: #0f172a;
+        line-height: 1.1;
       }
 
       .year-breakdown-wrap {
@@ -693,7 +703,8 @@
 
       .table-wrap {
         position: relative;
-        overflow: auto;
+        overflow-x: auto;
+        overflow-y: auto;
         max-height: 70vh;
         padding: 0 28px 32px;
         scrollbar-width: thin;
@@ -705,25 +716,22 @@
       .table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
       .table-wrap::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
+      /* 表格基礎佈局與寬度鎖定 */
       table {
         width: 100%;
         min-width: 100%;
         border-collapse: separate;
         border-spacing: 0;
         border: none;
+        table-layout: fixed; /* 固定欄寬演算法 */
       }
 
+      /* 展開詳細時，表格轉為 width: max-content 延伸出順暢滾動條 */
+      .ongoing-section:not(.hide-ongoing-details) table,
+      .purchased-section:not(.hide-purchased-details) table,
       .sold-section table {
-        min-width: 2580px;
-      }
-
-      /* 展開詳細欄位時調整 table 最小寬度 */
-      .ongoing-section:not(.hide-ongoing-details) table {
-        min-width: 2160px;
-      }
-
-      .purchased-section:not(.hide-purchased-details) table {
-        min-width: 2380px;
+        width: max-content;
+        min-width: 100%;
       }
 
       /* 隱藏詳細欄位控制項 */
@@ -732,11 +740,32 @@
         display: none !important;
       }
 
+      /* 強制統一欄寬規範，防止收起與展開間視差跳動 */
+      .col-src       { width: 80px;  min-width: 80px; }
+      .col-date      { width: 85px;  min-width: 85px; }
+      .col-year      { width: 75px;  min-width: 75px; }
+      .col-model     { width: 165px; min-width: 165px; }
+      .col-km        { width: 85px;  min-width: 85px; }
+      .col-color     { width: 70px;  min-width: 70px; }
+      .col-cond      { width: 65px;  min-width: 65px; }
+      .col-ver       { width: 120px; min-width: 120px; }
+      .col-quote     { width: 65px;  min-width: 65px; }
+      .col-price     { width: 110px; min-width: 110px; }
+      .col-seller    { width: 130px; min-width: 130px; }
+      .col-auth      { width: 90px;  min-width: 90px; }
+      .col-buy-price { width: 110px; min-width: 110px; }
+      .col-sell-price{ width: 110px; min-width: 110px; }
+      .col-remarks   { width: 180px; min-width: 180px; }
+      .col-repair    { width: 220px; min-width: 220px; }
+      .col-bonus     { width: 90px;  min-width: 90px; }
+      .col-actions   { width: 210px; min-width: 210px; }
+      .ongoing-section .col-actions { width: 160px; min-width: 160px; }
+
       /* 固定欄高與良好閱讀性規格 */
       th, td {
         border: none;
         border-bottom: 1px solid #737373;
-        padding: 6px 10px;
+        padding: 6px 16px;
         text-align: left;
         vertical-align: middle;
         font-size: 17px;
@@ -772,7 +801,6 @@
       tbody tr:hover td { background: #E8E8E8 !important; color: #000 !important; }
 
       .note-cell, .wide-cell {
-        max-width: 220px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -786,7 +814,7 @@
         display: flex;
         flex-wrap: nowrap;
         gap: 6px;
-        min-width: 210px;
+        min-width: 120px;
         align-items: center;
       }
 
@@ -1379,7 +1407,7 @@
           margin-bottom: 24px !important;
         }
         .table-wrap { overflow: visible !important; max-height: none !important; padding: 0 !important; }
-        table { min-width: 0 !important; width: 100% !important; font-size: 11px !important; }
+        table { min-width: 0 !important; width: 100% !important; font-size: 11px !important; table-layout: auto !important; }
         th, td {
           padding: 4px 6px !important;
           font-size: 11px !important;
@@ -1468,26 +1496,24 @@
             <table>
               <thead>
                 <tr>
-                  <!-- 主要資訊優先排列：來源、進件日、年份、車型、里程、顏色、車況、版本、報價、報價(金額)、賣家 -->
-                  <th>來源</th>
-                  <th>進件日</th>
-                  <th>年份</th>
-                  <th>車型</th>
-                  <th>里程</th>
-                  <th>顏色</th>
-                  <th>車況</th>
-                  <th>版本</th>
-                  <th>報價</th>
-                  <th>報價(金額)</th>
-                  <th>賣家</th>
-                  <!-- 詳細欄位：權威、買進價、賣出價、備註、整理項目、獎金 -->
-                  <th class="col-ongoing-detail">權威</th>
-                  <th class="col-ongoing-detail">買進價</th>
-                  <th class="col-ongoing-detail">賣出價</th>
-                  <th class="col-ongoing-detail">備註</th>
-                  <th class="col-ongoing-detail">整理項目</th>
-                  <th class="col-ongoing-detail">獎金</th>
-                  <th>操作</th>
+                  <!-- 主要資訊優先排列，套用專屬 col-* 寬度控制類別 -->
+                  <th class="col-src">來源</th>
+                  <th class="col-date">進件日</th>
+                  <th class="col-year">年份</th>
+                  <th class="col-model">車型</th>
+                  <th class="col-km">里程</th>
+                  <th class="col-color">顏色</th>
+                  <th class="col-cond">車況</th>
+                  <th class="col-ver">版本</th>
+                  <th class="col-quote">報價</th>
+                  <th class="col-price">報價(金額)</th>
+                  <th class="col-seller">賣家</th>
+                  <!-- 詳細欄位 -->
+                  <th class="col-auth col-ongoing-detail">權威</th>
+                  <th class="col-remarks col-ongoing-detail">備註</th>
+                  <th class="col-repair col-ongoing-detail">整理項目</th>
+                  <th class="col-bonus col-ongoing-detail">獎金</th>
+                  <th class="col-actions">操作</th>
                 </tr>
               </thead>
               <tbody id="ongoingBody"></tbody>
@@ -1514,27 +1540,27 @@
             <table>
               <thead>
                 <tr>
-                  <!-- 主要資訊優先排列：來源、買進日、年份、車型、里程、顏色、車況、版本、報價、報價(金額)、買進價、賣家 -->
-                  <th>來源</th>
-                  <th>買進日</th>
-                  <th>年份</th>
-                  <th>車型</th>
-                  <th>里程</th>
-                  <th>顏色</th>
-                  <th>車況</th>
-                  <th>版本</th>
-                  <th>報價</th>
-                  <th>報價(金額)</th>
-                  <th>買進價</th>
-                  <th>賣家</th>
-                  <!-- 詳細欄位：進件日、權威、賣出價、備註、整理項目、獎金 -->
-                  <th class="col-purchased-detail">進件日</th>
-                  <th class="col-purchased-detail">權威</th>
-                  <th class="col-purchased-detail">賣出價</th>
-                  <th class="col-purchased-detail">備註</th>
-                  <th class="col-purchased-detail">整理項目</th>
-                  <th class="col-purchased-detail">獎金</th>
-                  <th>操作</th>
+                  <!-- 主要資訊與詳細資訊依序排列 -->
+                  <th class="col-src">來源</th>
+                  <th class="col-date">買進日</th>
+                  <th class="col-date col-purchased-detail">進件日</th>
+                  <th class="col-year">年份</th>
+                  <th class="col-model">車型</th>
+                  <th class="col-km">里程</th>
+                  <th class="col-color">顏色</th>
+                  <th class="col-cond">車況</th>
+                  <th class="col-ver">版本</th>
+                  <th class="col-auth col-purchased-detail">權威</th>
+                  <th class="col-quote">報價</th>
+                  <th class="col-price">報價(金額)</th>
+                  <th class="col-buy-price">買進價</th>
+                  <th class="col-seller">賣家</th>
+                  <!-- 詳細欄位 -->
+                  <th class="col-sell-price col-purchased-detail">賣出價</th>
+                  <th class="col-remarks col-purchased-detail">備註</th>
+                  <th class="col-repair col-purchased-detail">整理項目</th>
+                  <th class="col-bonus col-purchased-detail">獎金</th>
+                  <th class="col-actions">操作</th>
                 </tr>
               </thead>
               <tbody id="purchasedBody"></tbody>
@@ -1558,25 +1584,25 @@
             <table>
               <thead>
                 <tr>
-                  <th>來源</th>
-                  <th class="sortable-header" id="soldDateSortHeader" title="點擊切換進件日排序">進件日 ▼</th>
-                  <th>買進日</th>
-                  <th>年份</th>
-                  <th>車型</th>
-                  <th>里程</th>
-                  <th>顏色</th>
-                  <th>車況</th>
-                  <th>版本</th>
-                  <th>權威</th>
-                  <th>報價</th>
-                  <th>報價(金額)</th>
-                  <th>買進價</th>
-                  <th>賣出價</th>
-                  <th>備註</th>
-                  <th>整理項目</th>
-                  <th>賣家</th>
-                  <th class="sortable-header" id="soldBonusSortHeader" title="點擊切換獎金排序">獎金 ▼</th>
-                  <th>操作</th>
+                  <th class="col-src">來源</th>
+                  <th class="col-date sortable-header" id="soldDateSortHeader" title="點擊切換進件日排序">進件日 ▼</th>
+                  <th class="col-date">買進日</th>
+                  <th class="col-year">年份</th>
+                  <th class="col-model">車型</th>
+                  <th class="col-km">里程</th>
+                  <th class="col-color">顏色</th>
+                  <th class="col-cond">車況</th>
+                  <th class="col-ver">版本</th>
+                  <th class="col-auth">權威</th>
+                  <th class="col-quote">報價</th>
+                  <th class="col-price">報價(金額)</th>
+                  <th class="col-buy-price">買進價</th>
+                  <th class="col-sell-price">賣出價</th>
+                  <th class="col-remarks">備註</th>
+                  <th class="col-repair">整理項目</th>
+                  <th class="col-seller">賣家</th>
+                  <th class="col-bonus sortable-header" id="soldBonusSortHeader" title="點擊切換獎金排序">獎金 ▼</th>
+                  <th class="col-actions">操作</th>
                 </tr>
               </thead>
               <tbody id="soldBody"></tbody>
@@ -1806,15 +1832,17 @@
           <div class="report-stats-grid">
             <div class="stat-card primary">
               <span class="stat-label">年度總買進台數</span>
-              <div class="stat-value"><span id="annualTotalPurchased">0</span> <span style="font-size:15px; font-weight:700;">台</span></div>
+              <div class="stat-value"><span id="annualTotalPurchased">0</span> <span style="font-size:18px; font-weight:700;">台</span></div>
             </div>
-            <div class="stat-card" id="purchasedStatCard">
-              <span class="stat-label">包含已買入 (在庫)</span>
-              <div class="stat-value"><span id="annualPurchasedCount">0</span> <span style="font-size:15px; font-weight:700;">台</span></div>
-            </div>
-            <div class="stat-card" id="soldStatCard">
-              <span class="stat-label">包含已售出</span>
-              <div class="stat-value"><span id="annualSoldCount">0</span> <span style="font-size:15px; font-weight:700;">台</span></div>
+            <div class="sub-stats-row">
+              <div class="stat-card" id="purchasedStatCard">
+                <span class="stat-label">包含已買入 (在庫)</span>
+                <div class="stat-value"><span id="annualPurchasedCount">0</span> <span style="font-size:15px; font-weight:700;">台</span></div>
+              </div>
+              <div class="stat-card" id="soldStatCard">
+                <span class="stat-label">包含已售出</span>
+                <div class="stat-value"><span id="annualSoldCount">0</span> <span style="font-size:15px; font-weight:700;">台</span></div>
+              </div>
             </div>
           </div>
 
@@ -2006,7 +2034,7 @@
       let ongoingDetailExpanded = false;
       let purchasedDetailExpanded = false;
 
-      // 透過 CSS 搭配 JavaScript MutationObserver 自動偵測彈窗開啟狀態並鎖定背景防滑動
+      // 透過 MutationObserver 自動偵測彈窗開啟狀態並鎖定背景防滑動
       function updateBodyScrollLock() {
         const openModal = document.querySelector("dialog[open]");
         document.body.classList.toggle("modal-open", openModal !== null);
@@ -2327,7 +2355,7 @@
         if (selectedYear === "2025") {
           totalInYear = 42;
         } else if (selectedYear === "2026" && totalInYear === 0) {
-          totalInYear = 29;
+          totalInYear = 31;
         }
 
         if (annualTotalPurchased) annualTotalPurchased.textContent = totalInYear;
@@ -2404,7 +2432,7 @@
             const yrDeals = dealRecords.filter((r) => getRecordPurchaseYear(r) === yr);
             let countNum = yrDeals.length;
             if (yr === "2025") countNum = 42;
-            if (yr === "2026") countNum = 29;
+            if (yr === "2026") countNum = 31;
 
             const tag = document.createElement("div");
             tag.className = "year-stat-tag" + (yr === selectedYear ? " is-active" : "");
@@ -2425,32 +2453,30 @@
         return cell;
       }
 
-      // 1. 估價進行中資料列（主要資訊優先：來源、進件日、年份、車型、里程、顏色、車況、版本、報價、報價(金額)、賣家）
+      // 1. 估價進行中資料列（套用特定欄位 class 進行寬度對齊）
       function createOngoingRow(record) {
         const row = document.createElement("tr");
 
         row.append(
-          createCell(getSourceLabel(record)),
-          createCell(formatMMDD(record.receivedDate)),
-          createCell(record.year),
-          createCell(record.model, "model-cell"),
-          createCell(record.km),
-          createCell(record.color),
-          createCell(record.condition), 
-          createCell(record.version),
-          createCell(record.quote), 
-          createCell(record.purchasePrice),
-          createCell(record.seller),
-          // 詳細欄位（權威、買進價、賣出價、備註、整理項目、獎金）
-          createCell(record.authority, "col-ongoing-detail"),
-          createCell(record.actualDealPrice, "col-ongoing-detail"),
-          createCell(record.salePrice, "col-ongoing-detail"),
-          createCell(record.remarks, "note-cell col-ongoing-detail"),
-          createCell(record.repairItems, "wide-cell col-ongoing-detail"),
-          createCell(record.bonus, "col-ongoing-detail")
+          createCell(getSourceLabel(record), "col-src"),
+          createCell(formatMMDD(record.receivedDate), "col-date"),
+          createCell(record.year, "col-year"),
+          createCell(record.model, "model-cell col-model"),
+          createCell(record.km, "col-km"),
+          createCell(record.color, "col-color"),
+          createCell(record.condition, "col-cond"), 
+          createCell(record.version, "col-ver"),
+          createCell(record.quote, "col-quote"), 
+          createCell(record.purchasePrice, "col-price"),
+          createCell(record.seller, "col-seller"),
+          // 詳細欄位（權威、備註、整理項目、獎金）
+          createCell(record.authority, "col-auth col-ongoing-detail"),
+          createCell(record.remarks, "note-cell col-remarks col-ongoing-detail"),
+          createCell(record.repairItems, "wide-cell col-repair col-ongoing-detail"),
+          createCell(record.bonus, "col-bonus col-ongoing-detail")
         );
 
-        const actionCell = document.createElement("td");
+        const actionCell = createCell("", "col-actions");
         actionCell.innerHTML = `
           <div class="row-actions">
             <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
@@ -2471,127 +2497,33 @@
         return row;
       }
 
-      // 2. 已買入資料列（主要資訊優先：來源、買進日、年份、車型、里程、顏色、車況、版本、報價、報價(金額)、買進價、賣家）
+      // 2. 已買入資料列
       function createPurchasedRow(record) {
         const row = document.createElement("tr");
 
         row.append(
-          createCell(getSourceLabel(record)),
-          createCell(formatMMDD(record.boughtDate)),
-          createCell(record.year),
-          createCell(record.model, "model-cell"),
-          createCell(record.km),
-          createCell(record.color),
-          createCell(record.condition), 
-          createCell(record.version),
-          createCell(record.quote), 
-          createCell(record.purchasePrice),
-          createCell(record.actualDealPrice),
-          createCell(record.seller),
-          // 詳細欄位（進件日、權威、賣出價、備註、整理項目、獎金）
-          createCell(formatMMDD(record.receivedDate), "col-purchased-detail"),
-          createCell(record.authority, "col-purchased-detail"),
-          createCell(record.salePrice, "col-purchased-detail"),
-          createCell(record.remarks, "note-cell col-purchased-detail"),
-          createCell(record.repairItems, "wide-cell col-purchased-detail"),
-          createCell(record.bonus, "col-purchased-detail")
+          createCell(getSourceLabel(record), "col-src"),
+          createCell(formatMMDD(record.boughtDate), "col-date"),
+          createCell(formatMMDD(record.receivedDate), "col-date col-purchased-detail"),
+          createCell(record.year, "col-year"),
+          createCell(record.model, "model-cell col-model"),
+          createCell(record.km, "col-km"),
+          createCell(record.color, "col-color"),
+          createCell(record.condition, "col-cond"), 
+          createCell(record.version, "col-ver"),
+          createCell(record.authority, "col-auth col-purchased-detail"),
+          createCell(record.quote, "col-quote"), 
+          createCell(record.purchasePrice, "col-price"),
+          createCell(record.actualDealPrice, "col-buy-price"),
+          createCell(record.seller, "col-seller"),
+          // 詳細欄位（賣出價、備註、整理項目、獎金）
+          createCell(record.salePrice, "col-sell-price col-purchased-detail"),
+          createCell(record.remarks, "note-cell col-remarks col-purchased-detail"),
+          createCell(record.repairItems, "wide-cell col-repair col-purchased-detail"),
+          createCell(record.bonus, "col-bonus col-purchased-detail")
         );
 
-        const actionCell = document.createElement("td");
-        actionCell.innerHTML = `
-          <div class="row-actions">
-            <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-            </button>
-            <button class="action-green" type="button" data-action="sell" data-id="${record.id}">已售出</button>
-            <button class="secondary" type="button" data-action="toggle-purchased" data-id="${record.id}">取消買</button>
-            <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-            </button>
-          </div>`;
-        row.append(actionCell);
-        return row;
-      }
-
-      // 3. 已售出資料列（保持原標準所有欄位排列）
-      function createSoldRow(record) {
-        const row = document.createElement("tr");
-
-        row.append(
-          createCell(getSourceLabel(record)),
-          createCell(formatMMDD(record.receivedDate)),
-          createCell(formatMMDD(record.boughtDate)),
-          createCell(record.year),
-          createCell(record.model, "model-cell"),
-          createCell(record.km),
-          createCell(record.color),
-          createCell(record.condition), 
-          createCell(record.version),
-          createCell(record.authority),
-          createCell(record.quote), 
-          createCell(record.purchasePrice),
-          createCell(record.actualDealPrice),
-          createCell(record.salePrice),
-          createCell(record.remarks, "note-cell"),
-          createCell(record.repairItems, "wide-cell"),
-          createCell(record.seller),
-          createCell(record.bonus)
-        );
-
-        const actionCell = document.createElement("td");
-        actionCell.innerHTML = `
-          <div class="row-actions">
-            <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-            </button>
-            <button class="secondary" type="button" data-action="toggle-sold" data-id="${record.id}">取消成交</button>
-            <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-            </button>
-          </div>`;
-        row.append(actionCell);
-        return row;
-      }
-
-      // 2. 已買入資料列（主要資訊優先：來源、買進日、年份、車型、里程、顏色、車況、版本、報價、報價(金額)、買進價、賣家）
-      function createPurchasedRow(record) {
-        const row = document.createElement("tr");
-
-        row.append(
-          createCell(getSourceLabel(record)),
-          createCell(formatMMDD(record.boughtDate)),
-          createCell(record.year),
-          createCell(record.model, "model-cell"),
-          createCell(record.km),
-          createCell(record.color),
-          createCell(record.condition), 
-          createCell(record.version),
-          createCell(record.quote), 
-          createCell(record.purchasePrice),
-          createCell(record.actualDealPrice),
-          createCell(record.seller),
-          // 詳細欄位（進件日、權威、賣出價、備註、整理項目、獎金）
-          createCell(formatMMDD(record.receivedDate), "col-purchased-detail"),
-          createCell(record.authority, "col-purchased-detail"),
-          createCell(record.salePrice, "col-purchased-detail"),
-          createCell(record.remarks, "note-cell col-purchased-detail"),
-          createCell(record.repairItems, "wide-cell col-purchased-detail"),
-          createCell(record.bonus, "col-purchased-detail")
-        );
-
-        const actionCell = document.createElement("td");
+        const actionCell = createCell("", "col-actions");
         actionCell.innerHTML = `
           <div class="row-actions">
             <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
@@ -2600,8 +2532,8 @@
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
               </svg>
             </button>
-            <button class="action-green" type="button" data-action="sell" data-id="${record.id}">已售出</button>
-            <button class="secondary" type="button" data-action="toggle-purchased" data-id="${record.id}">取消買入</button>
+            <button class="action-green" type="button" data-action="sell" data-id="${record.id}">已售</button>
+            <button class="secondary" type="button" data-action="toggle-purchased" data-id="${record.id}">取消</button>
             <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"></polyline>
@@ -2613,32 +2545,32 @@
         return row;
       }
 
-      // 3. 已售出資料列（保持原標準所有欄位排列）
+      // 3. 已售出資料列
       function createSoldRow(record) {
         const row = document.createElement("tr");
 
         row.append(
-          createCell(getSourceLabel(record)),
-          createCell(formatMMDD(record.receivedDate)),
-          createCell(formatMMDD(record.boughtDate)),
-          createCell(record.year),
-          createCell(record.model, "model-cell"),
-          createCell(record.km),
-          createCell(record.color),
-          createCell(record.condition), 
-          createCell(record.version),
-          createCell(record.authority),
-          createCell(record.quote), 
-          createCell(record.purchasePrice),
-          createCell(record.actualDealPrice),
-          createCell(record.salePrice),
-          createCell(record.remarks, "note-cell"),
-          createCell(record.repairItems, "wide-cell"),
-          createCell(record.seller),
-          createCell(record.bonus)
+          createCell(getSourceLabel(record), "col-src"),
+          createCell(formatMMDD(record.receivedDate), "col-date"),
+          createCell(formatMMDD(record.boughtDate), "col-date"),
+          createCell(record.year, "col-year"),
+          createCell(record.model, "model-cell col-model"),
+          createCell(record.km, "col-km"),
+          createCell(record.color, "col-color"),
+          createCell(record.condition, "col-cond"), 
+          createCell(record.version, "col-ver"),
+          createCell(record.authority, "col-auth"),
+          createCell(record.quote, "col-quote"), 
+          createCell(record.purchasePrice, "col-price"),
+          createCell(record.actualDealPrice, "col-buy-price"),
+          createCell(record.salePrice, "col-sell-price"),
+          createCell(record.remarks, "note-cell col-remarks"),
+          createCell(record.repairItems, "wide-cell col-repair"),
+          createCell(record.seller, "col-seller"),
+          createCell(record.bonus, "col-bonus")
         );
 
-        const actionCell = document.createElement("td");
+        const actionCell = createCell("", "col-actions");
         actionCell.innerHTML = `
           <div class="row-actions">
             <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
@@ -3042,7 +2974,7 @@
         }
       }
 
-      // 箭頭展開/收起詳細欄位事件處理
+      // 展開/收起詳細欄位事件處理
       toggleOngoingDetailBtn?.addEventListener("click", () => {
         ongoingDetailExpanded = !ongoingDetailExpanded;
         ongoingSection.classList.toggle("hide-ongoing-details", !ongoingDetailExpanded);
