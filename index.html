@@ -39,6 +39,12 @@
         box-sizing: border-box;
       }
 
+      /* 背景防捲動鎖定樣式 */
+      body.modal-open {
+        overflow: hidden !important;
+        touch-action: none;
+      }
+
       body {
         margin: 0;
         min-height: 100vh;
@@ -189,7 +195,6 @@
         background: #15803d;
       }
 
-      /* 紅色 +新增估價 按鈕樣式 & 新增/編輯提交按鈕 */
       button.btn-add-valuation,
       button.action-red,
       #submitButton {
@@ -319,6 +324,31 @@
         transform: translateY(0);
       }
 
+      /* 詳細欄位展開/收起按鈕樣式 */
+      .btn-toggle-detail {
+        min-height: 36px;
+        height: 36px;
+        padding: 0 14px;
+        font-size: 14px;
+        font-weight: 700;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff;
+        color: #334155;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+      }
+
+      .btn-toggle-detail:hover {
+        background-color: #f1f5f9;
+        border-color: #94a3b8;
+        color: #0f172a;
+      }
+
       .list-tools {
         position: sticky;
         top: 0;
@@ -431,7 +461,7 @@
 
       .section-title {
         display: flex;
-        align-items: flex-end;
+        align-items: center;
         justify-content: space-between;
         gap: 16px;
         padding: 0 28px 14px;
@@ -467,7 +497,6 @@
         font-weight: 700;
       }
 
-      /* ===== 數據報告區塊樣式 ===== */
       .report-wrapper {
         display: flex;
         flex-direction: column;
@@ -597,6 +626,71 @@
         font-weight: 800;
       }
 
+      .channel-breakdown-wrap {
+        margin-top: 8px;
+        padding-top: 16px;
+        border-top: 1px dashed #cbd5e1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .channel-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .channel-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 10px;
+      }
+
+      .channel-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .channel-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+      }
+
+      .channel-card-val {
+        font-size: 18px;
+        font-weight: 800;
+        color: #0f172a;
+      }
+
+      .channel-progress-bg {
+        height: 6px;
+        width: 100%;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 4px;
+      }
+
+      .channel-progress-fill {
+        height: 100%;
+        background: #0f172a;
+        border-radius: 3px;
+        transition: width 0.3s ease;
+      }
+
       .table-wrap {
         position: relative;
         overflow: auto;
@@ -613,26 +707,43 @@
 
       table {
         width: 100%;
-        min-width: 2160px;
+        min-width: 100%;
         border-collapse: separate;
         border-spacing: 0;
         border: none;
       }
 
-      .purchased-section table,
       .sold-section table {
         min-width: 2580px;
       }
 
+      /* 展開詳細欄位時調整 table 最小寬度 */
+      .ongoing-section:not(.hide-ongoing-details) table {
+        min-width: 2160px;
+      }
+
+      .purchased-section:not(.hide-purchased-details) table {
+        min-width: 2380px;
+      }
+
+      /* 隱藏詳細欄位控制項 */
+      .ongoing-section.hide-ongoing-details .col-ongoing-detail,
+      .purchased-section.hide-purchased-details .col-purchased-detail {
+        display: none !important;
+      }
+
+      /* 固定欄高與良好閱讀性規格 */
       th, td {
         border: none;
         border-bottom: 1px solid #737373;
-        padding: 0 6px;
+        padding: 6px 10px;
         text-align: left;
         vertical-align: middle;
-        font-size: 18px;
-        line-height: 3;
+        font-size: 17px;
+        height: 52px;
+        max-height: 52px;
         white-space: nowrap;
+        box-sizing: border-box;
       }
 
       th {
@@ -641,7 +752,9 @@
         z-index: 10;
         background: #f8fafc;
         color: #42505d;
-        font-size: 17px;
+        font-size: 16px;
+        font-weight: 700;
+        height: 48px;
         box-shadow: inset 0 -1px 0 #737373;
       }
 
@@ -658,8 +771,12 @@
       tbody tr td { transition: background-color 140ms ease, color 140ms ease; }
       tbody tr:hover td { background: #E8E8E8 !important; color: #000 !important; }
 
-      .note-cell { max-width: 220px; white-space: pre-wrap; }
-      .wide-cell { max-width: 30ch; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
+      .note-cell, .wide-cell {
+        max-width: 220px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .model-cell { font-weight: 600; }
 
       .sortable-header { text-decoration: underline; cursor: pointer; user-select: none; }
@@ -667,18 +784,30 @@
 
       .row-actions {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         gap: 6px;
         min-width: 210px;
         align-items: center;
       }
 
       .row-actions button {
-        min-height: 28px;
-        padding: 0 8px;
+        min-height: 32px;
+        height: 32px;
+        padding: 0 10px;
         font-size: 14px;
         font-weight: 600; 
-        border-radius: 4px;
+        border-radius: 6px;
+      }
+
+      .row-actions button.btn-icon {
+        width: 32px;
+        min-width: 32px;
+        height: 32px;
+        min-height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .empty-state {
@@ -751,6 +880,11 @@
         border: 1px solid rgba(226, 232, 240, 0.8);
         overflow-y: auto;
         box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.05);
+      }
+
+      dialog#reportDialog {
+        width: min(640px, calc(100% - 32px));
+        border-radius: 16px;
       }
 
       dialog form, .modal-content-wrap {
@@ -1277,6 +1411,15 @@
                 預約
               </button>
 
+              <button type="button" class="btn-calendar-view" id="openReportModalBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="20" x2="18" y2="10"></line>
+                  <line x1="12" y1="20" x2="12" y2="4"></line>
+                  <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                數據
+              </button>
+
               <label class="search-box">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%);">
                   <circle cx="11" cy="11" r="8"></circle>
@@ -1310,17 +1453,22 @@
           </div>
         </section>
 
-        <section class="records-section ongoing-section" id="ongoingSection" aria-labelledby="ongoingTitle">
+        <!-- 估價進行中 (預設折疊詳細欄位) -->
+        <section class="records-section ongoing-section hide-ongoing-details" id="ongoingSection" aria-labelledby="ongoingTitle">
           <header class="section-title">
             <div>
               <h2 id="ongoingTitle"><span class="status-dot dot-ongoing"></span>估價進行中</h2>
               <span id="ongoingCount">0 筆</span>
             </div>
+            <button type="button" class="btn-toggle-detail" id="toggleOngoingDetailBtn" aria-expanded="false">
+              ▼ 展開詳細
+            </button>
           </header>
           <div class="table-wrap" aria-label="估價進行中清單">
             <table>
               <thead>
                 <tr>
+                  <!-- 主要資訊優先排列：來源、進件日、年份、車型、里程、顏色、車況、版本、報價、報價(金額)、賣家 -->
                   <th>來源</th>
                   <th>進件日</th>
                   <th>年份</th>
@@ -1329,15 +1477,16 @@
                   <th>顏色</th>
                   <th>車況</th>
                   <th>版本</th>
-                  <th>權威</th>
                   <th>報價</th>
                   <th>報價(金額)</th>
-                  <th>買進價</th>
-                  <th>賣出價</th>
-                  <th>備註</th>
-                  <th>整理項目</th>
                   <th>賣家</th>
-                  <th>獎金</th>
+                  <!-- 詳細欄位：權威、買進價、賣出價、備註、整理項目、獎金 -->
+                  <th class="col-ongoing-detail">權威</th>
+                  <th class="col-ongoing-detail">買進價</th>
+                  <th class="col-ongoing-detail">賣出價</th>
+                  <th class="col-ongoing-detail">備註</th>
+                  <th class="col-ongoing-detail">整理項目</th>
+                  <th class="col-ongoing-detail">獎金</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -1350,19 +1499,23 @@
           </div>
         </section>
 
-        <section class="records-section purchased-section" id="purchasedSection" aria-labelledby="purchasedTitle">
+        <!-- 已買入 (預設折疊詳細欄位) -->
+        <section class="records-section purchased-section hide-purchased-details" id="purchasedSection" aria-labelledby="purchasedTitle">
           <header class="section-title">
             <div>
               <h2 id="purchasedTitle"><span class="status-dot dot-purchased"></span>已買入</h2>
               <span id="purchasedCount">0 筆</span>
             </div>
+            <button type="button" class="btn-toggle-detail" id="togglePurchasedDetailBtn" aria-expanded="false">
+              ▼ 展開詳細
+            </button>
           </header>
           <div class="table-wrap" aria-label="已買入清單">
             <table>
               <thead>
                 <tr>
+                  <!-- 主要資訊優先排列：來源、買進日、年份、車型、里程、顏色、車況、版本、報價、報價(金額)、買進價、賣家 -->
                   <th>來源</th>
-                  <th>進件日</th>
                   <th>買進日</th>
                   <th>年份</th>
                   <th>車型</th>
@@ -1370,15 +1523,17 @@
                   <th>顏色</th>
                   <th>車況</th>
                   <th>版本</th>
-                  <th>權威</th>
                   <th>報價</th>
                   <th>報價(金額)</th>
                   <th>買進價</th>
-                  <th>賣出價</th>
-                  <th>備註</th>
-                  <th>整理項目</th>
                   <th>賣家</th>
-                  <th>獎金</th>
+                  <!-- 詳細欄位：進件日、權威、賣出價、備註、整理項目、獎金 -->
+                  <th class="col-purchased-detail">進件日</th>
+                  <th class="col-purchased-detail">權威</th>
+                  <th class="col-purchased-detail">賣出價</th>
+                  <th class="col-purchased-detail">備註</th>
+                  <th class="col-purchased-detail">整理項目</th>
+                  <th class="col-purchased-detail">獎金</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -1391,6 +1546,7 @@
           </div>
         </section>
 
+        <!-- 已售出 (保持完整所有欄位，無展開/收起詳細按鈕) -->
         <section class="records-section sold-section" id="soldSection" aria-labelledby="soldTitle">
           <header class="section-title">
             <div>
@@ -1430,50 +1586,11 @@
               <span>在已買入清單按下已售出後會移到這裡。</span>
             </div>
           </div>
-
-          <!-- 數據報告：年度買進台數 -->
-          <div style="padding: 20px 28px; border-top: 1px solid var(--line); background: var(--surface-soft);">
-            <div class="report-wrapper">
-              <div class="report-header">
-                <div class="report-title">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="20" x2="18" y2="10"></line>
-                    <line x1="12" y1="20" x2="12" y2="4"></line>
-                    <line x1="6" y1="20" x2="6" y2="14"></line>
-                  </svg>
-                  數據報告 — 年度買進台數
-                </div>
-                <div class="report-controls">
-                  <select id="reportYearSelect" class="report-select" title="選擇統計年份">
-                    <!-- JS 動態生成年份 -->
-                  </select>
-                </div>
-              </div>
-
-              <div class="report-stats-grid">
-                <div class="stat-card primary">
-                  <span class="stat-label">年度總買進台數</span>
-                  <div class="stat-value"><span id="annualTotalPurchased">0</span> <span style="font-size:15px; font-weight:700;">台</span></div>
-                </div>
-                <div class="stat-card" id="purchasedStatCard">
-                  <span class="stat-label">包含已買入 (在庫)</span>
-                  <div class="stat-value"><span id="annualPurchasedCount">0</span> <span style="font-size:15px; font-weight:700;">台</span></div>
-                </div>
-                <div class="stat-card" id="soldStatCard">
-                  <span class="stat-label">包含已售出</span>
-                  <div class="stat-value"><span id="annualSoldCount">0</span> <span style="font-size:15px; font-weight:700;">台</span></div>
-                </div>
-              </div>
-
-              <div class="year-breakdown-wrap" id="yearBreakdownList">
-                <!-- JS 動態渲染各年份快速切換標籤 -->
-              </div>
-            </div>
-          </div>
         </section>
       </section>
     </main>
 
+    <!-- 估價資料彈窗 (新增/編輯) -->
     <dialog id="valuationDialog">
       <form id="valuationForm" autocomplete="off">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 4px;">
@@ -1594,6 +1711,7 @@
       </form>
     </dialog>
 
+    <!-- 預約時間彈窗 -->
     <dialog id="bookingDialog">
       <form id="bookingForm" autocomplete="off">
         <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px;">
@@ -1623,6 +1741,7 @@
       </form>
     </dialog>
 
+    <!-- 月曆視圖彈窗 -->
     <dialog id="calendarViewDialog">
       <div class="modal-content-wrap">
         <div class="calendar-header">
@@ -1660,6 +1779,63 @@
       </div>
     </dialog>
 
+    <!-- 數據報告彈窗 -->
+    <dialog id="reportDialog">
+      <div class="modal-content-wrap">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px;">
+          <div class="report-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            數據報告 — 年度買進台數
+          </div>
+          <button class="secondary" type="button" id="closeReportDialogBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
+        </div>
+
+        <div class="report-wrapper">
+          <div class="report-header">
+            <div class="report-controls">
+              <select id="reportYearSelect" class="report-select" title="選擇統計年份">
+                <!-- JS 動態生成年份 -->
+              </select>
+            </div>
+          </div>
+
+          <div class="report-stats-grid">
+            <div class="stat-card primary">
+              <span class="stat-label">年度總買進台數</span>
+              <div class="stat-value"><span id="annualTotalPurchased">0</span> <span style="font-size:15px; font-weight:700;">台</span></div>
+            </div>
+            <div class="stat-card" id="purchasedStatCard">
+              <span class="stat-label">包含已買入 (在庫)</span>
+              <div class="stat-value"><span id="annualPurchasedCount">0</span> <span style="font-size:15px; font-weight:700;">台</span></div>
+            </div>
+            <div class="stat-card" id="soldStatCard">
+              <span class="stat-label">包含已售出</span>
+              <div class="stat-value"><span id="annualSoldCount">0</span> <span style="font-size:15px; font-weight:700;">台</span></div>
+            </div>
+          </div>
+
+          <div class="year-breakdown-wrap" id="yearBreakdownList">
+            <!-- JS 動態渲染各年份快速切換標籤 -->
+          </div>
+
+          <div class="channel-breakdown-wrap" id="channelBreakdownWrap">
+            <div class="channel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+              進件來源管道占比 (Channel Breakdown)
+            </div>
+            <div class="channel-grid" id="channelGridList">
+              <!-- JS 動態生成管道占比資料 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- 確認買入彈窗 -->
     <dialog id="buyDialog">
       <form id="buyForm" method="dialog">
         <h2>已買入資料</h2>
@@ -1679,6 +1855,7 @@
       </form>
     </dialog>
 
+    <!-- 確認售出彈窗 -->
     <dialog id="sellDialog">
       <form id="sellForm" method="dialog">
         <h2>已售出資料</h2>
@@ -1694,6 +1871,7 @@
       </form>
     </dialog>
 
+    <!-- 確認刪除彈窗 -->
     <dialog id="deleteConfirmDialog">
       <form id="deleteConfirmForm" method="dialog">
         <h2>確認刪除</h2>
@@ -1762,6 +1940,9 @@
       const switchCountPurchased = document.querySelector("#switchCountPurchased");
       const switchCountSold = document.querySelector("#switchCountSold");
 
+      const toggleOngoingDetailBtn = document.querySelector("#toggleOngoingDetailBtn");
+      const togglePurchasedDetailBtn = document.querySelector("#togglePurchasedDetailBtn");
+
       const openCalendarViewBtn = document.querySelector("#openCalendarViewBtn");
       const calendarViewDialog = document.querySelector("#calendarViewDialog");
       const closeCalendarViewBtn = document.querySelector("#closeCalendarViewBtn");
@@ -1770,6 +1951,10 @@
       const nextMonthBtn = document.querySelector("#nextMonthBtn");
       const calendarMonthTitle = document.querySelector("#calendarMonthTitle");
       const calendarGrid = document.querySelector("#calendarGrid");
+
+      const openReportModalBtn = document.querySelector("#openReportModalBtn");
+      const reportDialog = document.querySelector("#reportDialog");
+      const closeReportDialogBtn = document.querySelector("#closeReportDialogBtn");
 
       const bookingDialog = document.querySelector("#bookingDialog");
       const bookingForm = document.querySelector("#bookingForm");
@@ -1804,6 +1989,8 @@
       const annualPurchasedCount = document.querySelector("#annualPurchasedCount");
       const annualSoldCount = document.querySelector("#annualSoldCount");
       const yearBreakdownList = document.querySelector("#yearBreakdownList");
+      const channelBreakdownWrap = document.querySelector("#channelBreakdownWrap");
+      const channelGridList = document.querySelector("#channelGridList");
 
       const soldDateSortHeader = document.querySelector("#soldDateSortHeader");
       const soldBonusSortHeader = document.querySelector("#soldBonusSortHeader");
@@ -1815,6 +2002,25 @@
       let calendarCurrentDate = new Date();
       let calendarFilterType = "all";
       let selectedCalendarDateISO = "";
+
+      let ongoingDetailExpanded = false;
+      let purchasedDetailExpanded = false;
+
+      // 透過 CSS 搭配 JavaScript MutationObserver 自動偵測彈窗開啟狀態並鎖定背景防滑動
+      function updateBodyScrollLock() {
+        const openModal = document.querySelector("dialog[open]");
+        document.body.classList.toggle("modal-open", openModal !== null);
+      }
+
+      const modalObserver = new MutationObserver(() => {
+        updateBodyScrollLock();
+      });
+
+      modalObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ["open"],
+        subtree: true
+      });
 
       function timeToMinutes(timeStr) {
         if (!timeStr) return 9999;
@@ -2141,6 +2347,57 @@
           }
         }
 
+        if (channelBreakdownWrap && channelGridList) {
+          if (selectedYear === "2025") {
+            channelBreakdownWrap.classList.add("is-hidden");
+          } else {
+            channelBreakdownWrap.classList.remove("is-hidden");
+
+            const yearRecords = records.filter((r) => {
+              if (selectedYear === "all") return true;
+              return getRecordPurchaseYear(r) === selectedYear;
+            });
+
+            const counts = { "來店": 0, "網站": 0, "自買": 0, "自行輸入": 0 };
+            let total = 0;
+
+            yearRecords.forEach((r) => {
+              const src = r.sourceType || "來店";
+              if (counts.hasOwnProperty(src)) {
+                counts[src]++;
+              } else {
+                counts["自行輸入"]++;
+              }
+              total++;
+            });
+
+            channelGridList.innerHTML = "";
+            const channels = ["來店", "網站", "自買", "自行輸入"];
+
+            channels.forEach((ch) => {
+              const count = counts[ch] || 0;
+
+              if (ch === "自行輸入" && count === 0) return;
+
+              const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+
+              const card = document.createElement("div");
+              card.className = "channel-card";
+              card.innerHTML = `
+                <div class="channel-card-header">
+                  <span>${ch}</span>
+                  <span style="color:#64748b;">${pct}%</span>
+                </div>
+                <div class="channel-card-val">${count} <span style="font-size:13px; font-weight:700;">台</span></div>
+                <div class="channel-progress-bg">
+                  <div class="channel-progress-fill" style="width: ${pct}%;"></div>
+                </div>
+              `;
+              channelGridList.appendChild(card);
+            });
+          }
+        }
+
         if (yearBreakdownList) {
           yearBreakdownList.innerHTML = "";
           sortedYears.forEach((yr) => {
@@ -2168,17 +2425,108 @@
         return cell;
       }
 
-      function createRecordRow(record) {
+      // 1. 估價進行中資料列（主要資訊優先：來源、進件日、年份、車型、里程、顏色、車況、版本、報價、報價(金額)、賣家）
+      function createOngoingRow(record) {
         const row = document.createElement("tr");
 
-        row.append(createCell(getSourceLabel(record)));
-        row.append(createCell(formatMMDD(record.receivedDate)));
+        row.append(
+          createCell(getSourceLabel(record)),
+          createCell(formatMMDD(record.receivedDate)),
+          createCell(record.year),
+          createCell(record.model, "model-cell"),
+          createCell(record.km),
+          createCell(record.color),
+          createCell(record.condition), 
+          createCell(record.version),
+          createCell(record.quote), 
+          createCell(record.purchasePrice),
+          createCell(record.seller),
+          // 詳細欄位（權威、買進價、賣出價、備註、整理項目、獎金）
+          createCell(record.authority, "col-ongoing-detail"),
+          createCell(record.actualDealPrice, "col-ongoing-detail"),
+          createCell(record.salePrice, "col-ongoing-detail"),
+          createCell(record.remarks, "note-cell col-ongoing-detail"),
+          createCell(record.repairItems, "wide-cell col-ongoing-detail"),
+          createCell(record.bonus, "col-ongoing-detail")
+        );
 
-        if (record.isPurchased || record.isSold) {
-          row.append(createCell(formatMMDD(record.boughtDate)));
-        }
+        const actionCell = document.createElement("td");
+        actionCell.innerHTML = `
+          <div class="row-actions">
+            <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="action-blue" type="button" data-action="toggle-purchased" data-id="${record.id}">已買</button>
+            <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>`;
+        row.append(actionCell);
+        return row;
+      }
+
+      // 2. 已買入資料列（主要資訊優先：來源、買進日、年份、車型、里程、顏色、車況、版本、報價、報價(金額)、買進價、賣家）
+      function createPurchasedRow(record) {
+        const row = document.createElement("tr");
 
         row.append(
+          createCell(getSourceLabel(record)),
+          createCell(formatMMDD(record.boughtDate)),
+          createCell(record.year),
+          createCell(record.model, "model-cell"),
+          createCell(record.km),
+          createCell(record.color),
+          createCell(record.condition), 
+          createCell(record.version),
+          createCell(record.quote), 
+          createCell(record.purchasePrice),
+          createCell(record.actualDealPrice),
+          createCell(record.seller),
+          // 詳細欄位（進件日、權威、賣出價、備註、整理項目、獎金）
+          createCell(formatMMDD(record.receivedDate), "col-purchased-detail"),
+          createCell(record.authority, "col-purchased-detail"),
+          createCell(record.salePrice, "col-purchased-detail"),
+          createCell(record.remarks, "note-cell col-purchased-detail"),
+          createCell(record.repairItems, "wide-cell col-purchased-detail"),
+          createCell(record.bonus, "col-purchased-detail")
+        );
+
+        const actionCell = document.createElement("td");
+        actionCell.innerHTML = `
+          <div class="row-actions">
+            <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="action-green" type="button" data-action="sell" data-id="${record.id}">已售出</button>
+            <button class="secondary" type="button" data-action="toggle-purchased" data-id="${record.id}">取消買</button>
+            <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>`;
+        row.append(actionCell);
+        return row;
+      }
+
+      // 3. 已售出資料列（保持原標準所有欄位排列）
+      function createSoldRow(record) {
+        const row = document.createElement("tr");
+
+        row.append(
+          createCell(getSourceLabel(record)),
+          createCell(formatMMDD(record.receivedDate)),
+          createCell(formatMMDD(record.boughtDate)),
           createCell(record.year),
           createCell(record.model, "model-cell"),
           createCell(record.km),
@@ -2197,32 +2545,116 @@
         );
 
         const actionCell = document.createElement("td");
-        let actionHTML = '';
+        actionCell.innerHTML = `
+          <div class="row-actions">
+            <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="secondary" type="button" data-action="toggle-sold" data-id="${record.id}">取消成交</button>
+            <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>`;
+        row.append(actionCell);
+        return row;
+      }
 
-        if (record.isSold) {
-          actionHTML = `
-            <div class="row-actions">
-              <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
-              <button class="secondary" type="button" data-action="toggle-sold" data-id="${record.id}">取消成交</button>
-              <button class="danger" type="button" data-action="delete" data-id="${record.id}">刪除</button>
-            </div>`;
-        } else if (record.isPurchased) {
-          actionHTML = `
-            <div class="row-actions">
-              <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
-              <button class="action-green" type="button" data-action="sell" data-id="${record.id}">已售出</button>
-              <button class="secondary" type="button" data-action="toggle-purchased" data-id="${record.id}">取消買入</button>
-              <button class="danger" type="button" data-action="delete" data-id="${record.id}">刪除</button>
-            </div>`;
-        } else {
-          actionHTML = `
-            <div class="row-actions">
-              <button class="secondary" type="button" data-action="edit" data-id="${record.id}">編輯</button>
-              <button class="action-blue" type="button" data-action="toggle-purchased" data-id="${record.id}">已買入</button>
-              <button class="danger" type="button" data-action="delete" data-id="${record.id}">刪除</button>
-            </div>`;
-        }
-        actionCell.innerHTML = actionHTML;
+      // 2. 已買入資料列（主要資訊優先：來源、買進日、年份、車型、里程、顏色、車況、版本、報價、報價(金額)、買進價、賣家）
+      function createPurchasedRow(record) {
+        const row = document.createElement("tr");
+
+        row.append(
+          createCell(getSourceLabel(record)),
+          createCell(formatMMDD(record.boughtDate)),
+          createCell(record.year),
+          createCell(record.model, "model-cell"),
+          createCell(record.km),
+          createCell(record.color),
+          createCell(record.condition), 
+          createCell(record.version),
+          createCell(record.quote), 
+          createCell(record.purchasePrice),
+          createCell(record.actualDealPrice),
+          createCell(record.seller),
+          // 詳細欄位（進件日、權威、賣出價、備註、整理項目、獎金）
+          createCell(formatMMDD(record.receivedDate), "col-purchased-detail"),
+          createCell(record.authority, "col-purchased-detail"),
+          createCell(record.salePrice, "col-purchased-detail"),
+          createCell(record.remarks, "note-cell col-purchased-detail"),
+          createCell(record.repairItems, "wide-cell col-purchased-detail"),
+          createCell(record.bonus, "col-purchased-detail")
+        );
+
+        const actionCell = document.createElement("td");
+        actionCell.innerHTML = `
+          <div class="row-actions">
+            <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="action-green" type="button" data-action="sell" data-id="${record.id}">已售出</button>
+            <button class="secondary" type="button" data-action="toggle-purchased" data-id="${record.id}">取消買入</button>
+            <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>`;
+        row.append(actionCell);
+        return row;
+      }
+
+      // 3. 已售出資料列（保持原標準所有欄位排列）
+      function createSoldRow(record) {
+        const row = document.createElement("tr");
+
+        row.append(
+          createCell(getSourceLabel(record)),
+          createCell(formatMMDD(record.receivedDate)),
+          createCell(formatMMDD(record.boughtDate)),
+          createCell(record.year),
+          createCell(record.model, "model-cell"),
+          createCell(record.km),
+          createCell(record.color),
+          createCell(record.condition), 
+          createCell(record.version),
+          createCell(record.authority),
+          createCell(record.quote), 
+          createCell(record.purchasePrice),
+          createCell(record.actualDealPrice),
+          createCell(record.salePrice),
+          createCell(record.remarks, "note-cell"),
+          createCell(record.repairItems, "wide-cell"),
+          createCell(record.seller),
+          createCell(record.bonus)
+        );
+
+        const actionCell = document.createElement("td");
+        actionCell.innerHTML = `
+          <div class="row-actions">
+            <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="secondary" type="button" data-action="toggle-sold" data-id="${record.id}">取消成交</button>
+            <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>`;
         row.append(actionCell);
         return row;
       }
@@ -2258,13 +2690,13 @@
         const soldRecords = filteredRecords.filter((record) => record.isSold);
 
         ongoingBody.innerHTML = "";
-        for (const record of sortRecords(ongoingRecords)) ongoingBody.append(createRecordRow(record));
+        for (const record of sortRecords(ongoingRecords)) ongoingBody.append(createOngoingRow(record));
         
         purchasedBody.innerHTML = "";
-        for (const record of sortRecords(purchasedRecords)) purchasedBody.append(createRecordRow(record));
+        for (const record of sortRecords(purchasedRecords)) purchasedBody.append(createPurchasedRow(record));
         
         soldBody.innerHTML = "";
-        for (const record of sortSoldRecords(soldRecords)) soldBody.append(createRecordRow(record));
+        for (const record of sortSoldRecords(soldRecords)) soldBody.append(createSoldRow(record));
 
         ongoingCount.textContent = `${ongoingRecords.length} 筆`;
         purchasedCount.textContent = `${purchasedRecords.length} 筆`;
@@ -2610,6 +3042,21 @@
         }
       }
 
+      // 箭頭展開/收起詳細欄位事件處理
+      toggleOngoingDetailBtn?.addEventListener("click", () => {
+        ongoingDetailExpanded = !ongoingDetailExpanded;
+        ongoingSection.classList.toggle("hide-ongoing-details", !ongoingDetailExpanded);
+        toggleOngoingDetailBtn.innerHTML = ongoingDetailExpanded ? "▲ 收起詳細" : "▼ 展開詳細";
+        toggleOngoingDetailBtn.setAttribute("aria-expanded", ongoingDetailExpanded);
+      });
+
+      togglePurchasedDetailBtn?.addEventListener("click", () => {
+        purchasedDetailExpanded = !purchasedDetailExpanded;
+        purchasedSection.classList.toggle("hide-purchased-details", !purchasedDetailExpanded);
+        togglePurchasedDetailBtn.innerHTML = purchasedDetailExpanded ? "▲ 收起詳細" : "▼ 展開詳細";
+        togglePurchasedDetailBtn.setAttribute("aria-expanded", purchasedDetailExpanded);
+      });
+
       modalVehicleSelect?.addEventListener("change", (e) => {
         const selectedId = e.target.value;
         bookingTargetRecordId.value = selectedId;
@@ -2796,6 +3243,18 @@
       searchInput.addEventListener("input", render);
       reportYearSelect?.addEventListener("change", updateReportSection);
 
+      openReportModalBtn?.addEventListener("click", () => {
+        updateReportSection();
+        reportDialog.showModal();
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+      });
+
+      closeReportDialogBtn?.addEventListener("click", () => {
+        reportDialog.close();
+      });
+
       document.querySelectorAll(".switch-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
           currentStatusFilter = btn.dataset.status;
@@ -2866,7 +3325,10 @@
         }
       });
 
-      resetForm(); updateSoldHeadersUI(); render(); syncFromCloud();
+      resetForm(); 
+      updateSoldHeadersUI(); 
+      render(); 
+      syncFromCloud();
     </script>
   </body>
 </html>
