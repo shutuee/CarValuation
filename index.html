@@ -2375,7 +2375,7 @@
         let totalInYear = purchasedInYear + soldInYear;
 
         if (selectedYear === "2025") {
-          totalInYear = Math.max(42, filteredDeals.length);
+          totalInYear = 42;
         }
 
         if (annualTotalPurchased) annualTotalPurchased.textContent = totalInYear;
@@ -2453,7 +2453,7 @@
             let countNum = yrDeals.length;
             if (yr === currentYearStr) {
               countNum = allInStockCount + yrDeals.filter((r) => r.isSold).length;
-            } else if (yr === "2025" && countNum === 0) {
+            } else if (yr === "2025") {
               countNum = 42;
             }
 
