@@ -2307,8 +2307,22 @@
       function getRecordPurchaseYear(record) {
         if (!record.isPurchased && !record.isSold) return null;
         const dateStr = record.boughtDate || record.receivedDate || "";
-        const match = dateStr.match(/^(\d{4})/);
-        return match ? match[1] : null;
+        const match = dateStr.match(/(\d{4})/);
+        if (match) {
+          const yr = parseInt(match[1], 10);
+          if (yr >= 2000 && yr <= 2100) return String(yr);
+        }
+        const minguoMatch = dateStr.match(/^(\d{3})[^\d]/);
+        if (minguoMatch) {
+          const mYr = parseInt(minguoMatch[1], 10);
+          if (mYr >= 90 && mYr <= 150) return String(mYr + 1911);
+        }
+        const createdMatch = (record.createdAt || "").match(/(\d{4})/);
+        if (createdMatch) {
+          const cYr = parseInt(createdMatch[1], 10);
+          if (cYr >= 2000 && cYr <= 2100) return String(cYr);
+        }
+        return String(new Date().getFullYear());
       }
 
       function updateReportSection() {
@@ -2348,14 +2362,20 @@
           return getRecordPurchaseYear(r) === selectedYear;
         });
 
+        // 在庫（已買入未售出）直接同步全系統 active 在庫數量
+        const allInStockCount = records.filter((r) => r.isPurchased && !r.isSold).length;
         let purchasedInYear = filteredDeals.filter((r) => r.isPurchased && !r.isSold).length;
+        
+        // 若選擇當前年份或全部年份，在庫台數直接與外部「已買入」清單（allInStockCount）完全同步
+        if (selectedYear === "all" || selectedYear === currentYearStr) {
+          purchasedInYear = allInStockCount;
+        }
+
         let soldInYear = filteredDeals.filter((r) => r.isSold).length;
-        let totalInYear = filteredDeals.length;
+        let totalInYear = purchasedInYear + soldInYear;
 
         if (selectedYear === "2025") {
-          totalInYear = 42;
-        } else if (selectedYear === "2026" && totalInYear === 0) {
-          totalInYear = 31;
+          totalInYear = Math.max(42, filteredDeals.length);
         }
 
         if (annualTotalPurchased) annualTotalPurchased.textContent = totalInYear;
@@ -2431,8 +2451,11 @@
           sortedYears.forEach((yr) => {
             const yrDeals = dealRecords.filter((r) => getRecordPurchaseYear(r) === yr);
             let countNum = yrDeals.length;
-            if (yr === "2025") countNum = 42;
-            if (yr === "2026") countNum = 31;
+            if (yr === currentYearStr) {
+              countNum = allInStockCount + yrDeals.filter((r) => r.isSold).length;
+            } else if (yr === "2025" && countNum === 0) {
+              countNum = 42;
+            }
 
             const tag = document.createElement("div");
             tag.className = "year-stat-tag" + (yr === selectedYear ? " is-active" : "");
