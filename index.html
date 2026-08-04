@@ -758,8 +758,10 @@
       .col-remarks   { width: 180px; min-width: 180px; }
       .col-repair    { width: 220px; min-width: 220px; }
       .col-bonus     { width: 90px;  min-width: 90px; }
-      .col-actions   { width: 210px; min-width: 210px; }
-      .ongoing-section .col-actions { width: 160px; min-width: 160px; }
+      
+      /* 統一操作欄位寬度為 180px */
+      .col-actions   { width: 180px; min-width: 180px; }
+      .ongoing-section .col-actions { width: 180px; min-width: 180px; }
 
       /* 固定欄高與良好閱讀性規格 */
       th, td {
@@ -913,6 +915,189 @@
       dialog#reportDialog {
         width: min(640px, calc(100% - 32px));
         border-radius: 16px;
+      }
+
+      /* 車型版本查詢彈窗專屬樣式 (加大為 960px) */
+      dialog#specDialog {
+        width: min(960px, calc(100vw - 32px));
+        max-height: 90vh;
+        border-radius: 16px;
+        overflow-y: auto;
+      }
+
+      .spec-container {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .spec-input-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .spec-input-row input {
+        flex: 1;
+        font-size: 16px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+      }
+
+      .spec-output-box {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        min-height: 240px;
+        max-height: 540px;
+        overflow-y: auto;
+        font-size: 15px;
+        line-height: 1.6;
+        color: #1e293b;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+      }
+
+      /* 專屬重點版本卡片與條列排版優化 */
+      .spec-version-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #16a34a;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin: 12px 0;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+      }
+
+      .spec-version-header {
+        font-size: 16px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 10px;
+        padding-bottom: 6px;
+        border-bottom: 1px dashed #cbd5e1;
+      }
+
+      .spec-bullet-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 8px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #334155;
+      }
+
+      .spec-bullet-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #2563eb;
+        margin-top: 8px;
+        flex-shrink: 0;
+      }
+
+      .spec-phase-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 14px;
+      }
+      .spec-phase-badge.phase-1 { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+      .spec-phase-badge.phase-2 { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+      .spec-phase-badge.phase-3 { background: #fffbeb; color: #d97706; border: 1px solid #fef08a; }
+
+      .spec-output-box table {
+        width: 100%;
+        margin: 12px 0;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        table-layout: auto;
+      }
+
+      .spec-output-box th {
+        background: #f1f5f9;
+        color: #0f172a;
+        font-weight: 800;
+        padding: 8px 12px;
+        border-bottom: 2px solid #cbd5e1;
+        position: static;
+        box-shadow: none;
+      }
+
+      .spec-output-box td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 14px;
+      }
+
+      .spec-output-box tr:nth-child(even) td {
+        background: #f8fafc;
+      }
+
+      .spec-quick-btns {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px dashed #cbd5e1;
+        background: #f8fafc;
+        padding: 12px;
+        border-radius: 10px;
+      }
+
+      .spec-chip-btn {
+        min-height: 38px;
+        height: 38px;
+        padding: 0 16px;
+        border-radius: 20px;
+        border: 1px solid #2563eb;
+        background: #ffffff;
+        color: #2563eb;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08);
+      }
+
+      .spec-chip-btn:hover {
+        background: #2563eb;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+      }
+
+      /* 階段二網址連結按鈕：灰色邊框白底樣式 */
+      .spec-chip-btn-gray {
+        min-height: 38px;
+        height: 38px;
+        padding: 0 16px;
+        border-radius: 20px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        color: #475569;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+      }
+
+      .spec-chip-btn-gray:hover {
+        background: #f1f5f9;
+        border-color: #0f172a;
+        color: #0f172a;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(15, 23, 42, 0.1);
       }
 
       dialog form, .modal-content-wrap {
@@ -1439,6 +1624,18 @@
                 預約
               </button>
 
+              <!-- 新增 版本 按鈕 -->
+              <button type="button" class="btn-calendar-view" id="openSpecModalBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                版本
+              </button>
+
               <button type="button" class="btn-calendar-view" id="openReportModalBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -1550,7 +1747,7 @@
                   <th class="col-color">顏色</th>
                   <th class="col-cond">車況</th>
                   <th class="col-ver">版本</th>
-                  <th class="col-auth col-purchased-detail">權威</th>
+                  <th class="col-auth">權威</th>
                   <th class="col-quote">報價</th>
                   <th class="col-price">報價(金額)</th>
                   <th class="col-buy-price">買進價</th>
@@ -1615,6 +1812,28 @@
         </section>
       </section>
     </main>
+
+    <!-- 車型版本查詢彈窗 (加大至 960px) -->
+    <dialog id="specDialog">
+      <div class="modal-content-wrap">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px;">
+          <h2 style="margin:0; font-weight:800;" id="specDialogTitle">車型版本查詢</h2>
+          <button class="secondary" type="button" id="closeSpecDialogBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
+        </div>
+
+        <div class="spec-container">
+          <!-- 無提示文字，乾淨空白輸入框 -->
+          <div class="spec-input-row">
+            <input type="text" id="specQueryInput" autocomplete="off" style="min-height:46px;" />
+            <button type="button" class="action-blue" id="submitSpecBtn" style="min-height:46px; border-radius:8px; padding:0 20px; white-space:nowrap;">查詢</button>
+            <button type="button" class="secondary" id="clearSpecBtn" style="min-height:46px; border-radius:8px; padding:0 16px; white-space:nowrap;">清除</button>
+          </div>
+
+          <!-- SKILL 規範動態回應顯示區域 -->
+          <div class="spec-output-box" id="specOutputBox"></div>
+        </div>
+      </div>
+    </dialog>
 
     <!-- 估價資料彈窗 (新增/編輯) -->
     <dialog id="valuationDialog">
@@ -1772,7 +1991,7 @@
       <div class="modal-content-wrap">
         <div class="calendar-header">
           <div class="calendar-header-row1">
-            <h2 id="calendarMonthTitle" style="margin:0; font-size:20px; font-weight:800; color:var(--text-main);">2026年 7月</h2>
+            <h2 id="calendarMonthTitle" style="margin:0; font-size:20px; font-weight:800; color:var(--text-main);">2026年 8月</h2>
             <div class="month-nav">
               <button type="button" class="month-nav-btn" id="prevMonthBtn" title="上個月">＜</button>
               <button type="button" class="month-nav-btn today-btn" id="todayMonthBtn">今天</button>
@@ -1984,6 +2203,15 @@
       const reportDialog = document.querySelector("#reportDialog");
       const closeReportDialogBtn = document.querySelector("#closeReportDialogBtn");
 
+      /* 車型版本彈窗元素綁定 */
+      const openSpecModalBtn = document.querySelector("#openSpecModalBtn");
+      const specDialog = document.querySelector("#specDialog");
+      const closeSpecDialogBtn = document.querySelector("#closeSpecDialogBtn");
+      const specQueryInput = document.querySelector("#specQueryInput");
+      const submitSpecBtn = document.querySelector("#submitSpecBtn");
+      const clearSpecBtn = document.querySelector("#clearSpecBtn");
+      const specOutputBox = document.querySelector("#specOutputBox");
+
       const bookingDialog = document.querySelector("#bookingDialog");
       const bookingForm = document.querySelector("#bookingForm");
       const formAddBookingBtn = document.querySelector("#formAddBookingBtn");
@@ -2033,6 +2261,10 @@
 
       let ongoingDetailExpanded = false;
       let purchasedDetailExpanded = false;
+
+      /* SKILL car-spec-difference 流程狀態紀錄 */
+      let specCurrentCarModel = ""; // 當前查詢車型
+      let specHistoryText = "";
 
       // 透過 MutationObserver 自動偵測彈窗開啟狀態並鎖定背景防滑動
       function updateBodyScrollLock() {
@@ -2280,6 +2512,16 @@
         });
       }
 
+      /* 已買入預設依照「買進日」降冪排序 */
+      function sortPurchasedRecords(items) {
+        return [...items].sort((a, b) => {
+          const dateA = dateValueToNumber(a.boughtDate || a.receivedDate) || 0;
+          const dateB = dateValueToNumber(b.boughtDate || b.receivedDate) || 0;
+          if (dateA !== dateB) return dateB - dateA;
+          return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
+        });
+      }
+
       function sortSoldRecords(items) {
         return [...items].sort((a, b) => {
           if (soldSortField === "bonus") {
@@ -2476,7 +2718,7 @@
         return cell;
       }
 
-      // 1. 估價進行中資料列（套用特定欄位 class 進行寬度對齊）
+      // 1. 估價進行中資料列（來源、進件日、年份、車型、里程、顏色、車況、版本、報價、報價(金額)、賣家 + 詳細）
       function createOngoingRow(record) {
         const row = document.createElement("tr");
 
@@ -2520,7 +2762,7 @@
         return row;
       }
 
-      // 2. 已買入資料列
+      // 2. 已買入資料列（來源、買進日、進件日(詳細)、年份、車型、里程、顏色、車況、版本、權威、報價、報價(金額)、買進價、賣家...）
       function createPurchasedRow(record) {
         const row = document.createElement("tr");
 
@@ -2534,7 +2776,7 @@
           createCell(record.color, "col-color"),
           createCell(record.condition, "col-cond"), 
           createCell(record.version, "col-ver"),
-          createCell(record.authority, "col-auth col-purchased-detail"),
+          createCell(record.authority, "col-auth"),
           createCell(record.quote, "col-quote"), 
           createCell(record.purchasePrice, "col-price"),
           createCell(record.actualDealPrice, "col-buy-price"),
@@ -2556,7 +2798,7 @@
               </svg>
             </button>
             <button class="action-green" type="button" data-action="sell" data-id="${record.id}">已售</button>
-            <button class="secondary" type="button" data-action="toggle-purchased" data-id="${record.id}">取消</button>
+            <button class="secondary" type="button" data-action="toggle-purchased" data-id="${record.id}">取消買</button>
             <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"></polyline>
@@ -2648,7 +2890,8 @@
         for (const record of sortRecords(ongoingRecords)) ongoingBody.append(createOngoingRow(record));
         
         purchasedBody.innerHTML = "";
-        for (const record of sortRecords(purchasedRecords)) purchasedBody.append(createPurchasedRow(record));
+        /* 已買入預設依照買進日（boughtDate）排序 */
+        for (const record of sortPurchasedRecords(purchasedRecords)) purchasedBody.append(createPurchasedRow(record));
         
         soldBody.innerHTML = "";
         for (const record of sortSoldRecords(soldRecords)) soldBody.append(createSoldRow(record));
@@ -2669,6 +2912,291 @@
         updateStatusFilterUI();
         updateReportSection();
       }
+
+      /* 核心功能：執行 Gemini AI car-spec-difference SKILL 三階段查詢 */
+      async function handleSpecQuery(queryText) {
+        if (!queryText) return;
+        const input = queryText.trim();
+        if (!input) return;
+
+        submitSpecBtn.disabled = true;
+        submitSpecBtn.textContent = "查詢中...";
+        specOutputBox.innerHTML = `
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:50px 0; color:#2563eb; font-weight:700;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 10 10"></path></svg>
+            <span>正在即時檢索 Yahoo 汽車與 8891 進行台灣市場規格比對...</span>
+          </div>
+          <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+        `;
+
+        const systemPrompt = `你是一個嚴格遵循 car-spec-difference SKILL 規範的台灣汽車配備與版本專家。
+請務必嚴格依照以下三階段流程執行，不可跳階、不可混合：
+
+【任務說明】
+名稱: car-spec-difference
+描述: 查詢指定年份、品牌與車型的台灣市場版本，先列出版本讓使用者選擇，再比較指定版本差異；比較後必須讓使用者選擇一個版本，第三階段只輸出該指定版本的配備參考來源網址，不再輸出完整配備表。
+
+【階段 1：列出版本】
+當使用者輸入為車型名稱時（如: 2023 Toyota Yaris），查詢台灣市場版本與新車定價。
+第一階段輸出格式：
+Markdown 表格：| 編號 | 版本 | 新車定價 |
+結尾必須精準附上提示：請回覆要比較的版本編號，例如：23 表示比較 2 和 3。
+（注意：第一階段不要輸出網址連結）
+
+【階段 2：比較指定版本】
+當使用者輸入為版本編號（如: 12 或 23）時：
+只比較使用者指定的版本之價格、馬力、扭力、排氣量、驅動方式、變速箱、鋁圈尺寸、頭燈、免鑰匙、電動尾門、天窗、前後雷達、電動椅、通風座椅、恆溫空調、車道維持/偏離、環景/倒車顯影、CarPlay、TCS。
+比較後必須標註 **專屬重點** (請務必使用『專屬重點』作為標題)：
+請以極具條理、易於閱讀的結構呈現每個比較版本的亮點，切勿將所有配備塞在同一整段長文內。
+每一版本的呈現格式要求如下：
+- **【編號 X】版本名稱（價格與價差）**
+  - **動力/基礎**：...
+  - **外觀升級**：...
+  - **內裝/科技**：...
+  - **安全防護**：...
+（請使用點狀列表 \`-\` 分項條列說明，並將重點關鍵配備如 **15 吋鋁合金輪圈**、**透氣皮質座椅**、**7 具 SRS 氣囊** 用 **黑體粗體字** 呈現）
+結尾必須精準附上提示：請回覆要看的參考來源版本：1 或 2。
+
+【階段 3：只輸出指定版本參考網址】
+當使用者輸入為單一數字（如: 2）時：
+僅輸出該指定版本的名稱與專屬配備參考來源網址（Yahoo 汽車 / 8891 / 原廠規配表）。
+絕對不顯示完整配備表或價格細節。
+輸出格式：
+指定版本：版本名稱
+配備參考來源：
+- [Yahoo 汽車 版本名稱 規格配備](網址)
+- [8891 版本名稱 規格配備](網址)`;
+
+        const userQuery = specHistoryText ? `【前情脈絡】:\n${specHistoryText}\n\n【使用者最新輸入】: ${input}` : `【查詢車型】: ${input}`;
+
+        try {
+          const apiKey = ""; // Canvas 運行環境會自動帶入 API Key
+          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+          const payload = {
+            contents: [{ parts: [{ text: userQuery }] }],
+            tools: [{ "google_search": {} }],
+            systemInstruction: { parts: [{ text: systemPrompt }] }
+          };
+
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const result = await response.json();
+          const candidate = result.candidates?.[0];
+          const responseText = candidate?.content?.parts?.[0]?.text;
+
+          if (responseText) {
+            // 紀錄歷史
+            specHistoryText += `\nUser: ${input}\nModel: ${responseText}\n`;
+            if (!specCurrentCarModel && !/^\d+$/.test(input)) {
+              specCurrentCarModel = input;
+            }
+
+            let phaseBadgeHtml = "";
+            let chipBtnsHtml = "";
+            let isPhase1 = false;
+            let isPhase2 = false;
+
+            if (responseText.includes("請回覆要比較的版本編號")) {
+              isPhase1 = true;
+              phaseBadgeHtml = `<div class="spec-phase-badge phase-1">📌 階段一：車系版本與定價清單</div>`;
+            } else if (responseText.includes("請回覆要看的參考來源版本")) {
+              isPhase2 = true;
+              phaseBadgeHtml = `<div class="spec-phase-badge phase-2">📊 階段二：指定版本規格比較</div>`;
+              
+              // 擷取階段二的所有版本編號與名稱，有幾個編號就建立幾個對應按鈕
+              const versionMatches = [...responseText.matchAll(/(?:【編號|\(編號|編號)\s*(\d+)[】\)]?/g)];
+              const foundNums = [...new Set(versionMatches.map(m => m[1]))];
+
+              let buttonsHtml = "";
+              if (foundNums.length > 0) {
+                foundNums.forEach(num => {
+                  // 嘗試提取對應版本名稱
+                  const lineMatch = responseText.match(new RegExp(`(?:【編號|\\(編號|編號)\\s*${num}[】\\)]?\\s*([^\\n\\*\\:]+)`));
+                  let labelText = lineMatch ? lineMatch[1].replace(/^[\:\s]+/, '').trim() : `版本 ${num}`;
+                  buttonsHtml += `<button type="button" class="spec-chip-btn-gray" onclick="quickQuery('${num}')">${labelText} 網址</button>`;
+                });
+              } else {
+                buttonsHtml = `
+                  <button type="button" class="spec-chip-btn-gray" onclick="quickQuery('1')">版本 1 網址</button>
+                  <button type="button" class="spec-chip-btn-gray" onclick="quickQuery('2')">版本 2 網址</button>
+                `;
+              }
+
+              chipBtnsHtml = `
+                <div class="spec-quick-btns">
+                  <span style="font-size:13px; font-weight:800; color:#475569; width:100%; margin-bottom:4px;">⚡ 點擊獲取專屬參考網址：</span>
+                  ${buttonsHtml}
+                </div>
+              `;
+            } else {
+              phaseBadgeHtml = `<div class="spec-phase-badge phase-3">🔗 階段三：專屬參考來源網址</div>`;
+            }
+
+            // 排版優化：轉換 Markdown 為 HTML 結構
+            let formattedBody = responseText
+              .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+              .replace(/###\s*升級專屬重點/g, '### 專屬重點')
+              .replace(/###\s*專屬重點/g, '<h3 style="margin:16px 0 10px 0; font-size:18px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">✨ 專屬重點 (配備升級差異)</h3>')
+              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+              .replace(/\[(.*?)\]\((https?:\/\/.*?)\)/g, '<a href="$2" target="_blank" style="color:#2563eb; text-decoration:underline; font-weight:700;">$1</a>');
+
+            // 處理 Markdown 表格與卡片化列表
+            const lines = formattedBody.split('\n');
+            let htmlLines = [];
+            let inTable = false;
+            let tableRowIndex = 0;
+            let inCard = false;
+
+            lines.forEach((line) => {
+              const trimmed = line.trim();
+              if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+                if (inCard) { htmlLines.push('</div>'); inCard = false; }
+                if (!inTable) {
+                  inTable = true;
+                  htmlLines.push('<table>');
+                }
+                const cells = trimmed.split('|').slice(1, -1).map(c => c.trim());
+                if (trimmed.includes('---')) return; // 忽略分隔線
+
+                if (htmlLines[htmlLines.length - 1] === '<table>') {
+                  // 表頭新增選取欄位
+                  const headerCells = isPhase1 ? ['選取', ...cells] : cells;
+                  htmlLines.push('<thead><tr>' + headerCells.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>');
+                } else {
+                  // 資料列新增勾選框
+                  tableRowIndex++;
+                  const firstCellNum = cells[0]?.replace(/<[^>]*>/g, '').trim() || String(tableRowIndex);
+                  const numVal = parseInt(firstCellNum, 10) || tableRowIndex;
+                  const rowCells = isPhase1 ? [`<input type="checkbox" class="spec-version-checkbox" value="${numVal}" style="width:18px; height:18px; cursor:pointer;" />`, ...cells] : cells;
+                  htmlLines.push('<tr>' + rowCells.map(c => `<td>${c}</td>`).join('') + '</tr>');
+                }
+              } else {
+                if (inTable) {
+                  inTable = false;
+                  htmlLines.push('</tbody></table>');
+                  if (isPhase1) {
+                    htmlLines.push(`
+                      <div style="margin: 12px 0 16px 0; display: flex; align-items: center; gap: 10px;">
+                        <button type="button" class="action-blue" id="submitCheckedVersionsBtn" style="min-height:40px; padding:0 22px; font-weight:800; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+                          送出
+                        </button>
+                        <span style="font-size:13px; color:#64748b; font-weight:700;">請勾選上方表格欲比較的版本並點擊送出</span>
+                      </div>
+                    `);
+                  }
+                }
+
+                if (trimmed) {
+                  // 判斷是否為版本大項標頭，例如 **【編號 1】...**
+                  const versionHeaderMatch = trimmed.match(/^(?:-\s*)?<strong>【編號\s*(\d+)】(.*?)<\/strong>(.*)/);
+                  if (versionHeaderMatch) {
+                    if (inCard) { htmlLines.push('</div>'); }
+                    inCard = true;
+                    htmlLines.push(`
+                      <div class="spec-version-card">
+                        <div class="spec-version-header">【編號 ${versionHeaderMatch[1]}】${versionHeaderMatch[2]}${versionHeaderMatch[3]}</div>
+                    `);
+                  } else if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
+                    const bulletContent = line.replace(/^\s*[-•]\s*/, '');
+                    htmlLines.push(`
+                      <div class="spec-bullet-item">
+                        <span class="spec-bullet-dot"></span>
+                        <div>${bulletContent}</div>
+                      </div>
+                    `);
+                  } else {
+                    htmlLines.push(`<div style="margin-bottom:6px;">${line}</div>`);
+                  }
+                }
+              }
+            });
+
+            if (inCard) { htmlLines.push('</div>'); }
+
+            if (inTable) {
+              htmlLines.push('</tbody></table>');
+              if (isPhase1) {
+                htmlLines.push(`
+                  <div style="margin: 12px 0 16px 0; display: flex; align-items: center; gap: 10px;">
+                    <button type="button" class="action-blue" id="submitCheckedVersionsBtn" style="min-height:40px; padding:0 22px; font-weight:800; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+                      送出
+                    </button>
+                    <span style="font-size:13px; color:#64748b; font-weight:700;">請勾選上方表格欲比較的版本並點擊送出</span>
+                  </div>
+                `);
+              }
+            }
+
+            specOutputBox.innerHTML = `
+              ${phaseBadgeHtml}
+              <div style="font-size:15px; line-height:1.7;">${htmlLines.join('')}</div>
+              ${chipBtnsHtml}
+            `;
+
+            // 綁定階段一「送出」藍色按鈕事件
+            const submitCheckedBtn = document.querySelector("#submitCheckedVersionsBtn");
+            if (submitCheckedBtn) {
+              submitCheckedBtn.addEventListener("click", () => {
+                const checkedBoxes = document.querySelectorAll(".spec-version-checkbox:checked");
+                const selectedNums = Array.from(checkedBoxes).map(cb => cb.value);
+                if (selectedNums.length === 0) {
+                  alert("請先勾選至少一個要比較的版本編號！");
+                  return;
+                }
+                quickQuery(selectedNums.join(""));
+              });
+            }
+
+            specQueryInput.value = "";
+          } else {
+            specOutputBox.innerHTML = `<div style="color:#ef4444; text-align:center; padding:20px;">無法取得資料，請重新嘗試查詢。</div>`;
+          }
+        } catch (err) {
+          specOutputBox.innerHTML = `<div style="color:#ef4444; text-align:center; padding:20px;">查詢發生錯誤，請稍後再試。</div>`;
+        } finally {
+          submitSpecBtn.disabled = false;
+          submitSpecBtn.textContent = "查詢";
+        }
+      }
+
+      window.quickQuery = function(val) {
+        specQueryInput.value = val;
+        handleSpecQuery(val);
+      };
+
+      openSpecModalBtn?.addEventListener("click", () => {
+        specDialog.showModal();
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+      });
+
+      closeSpecDialogBtn?.addEventListener("click", () => {
+        specDialog.close();
+      });
+
+      submitSpecBtn?.addEventListener("click", () => {
+        handleSpecQuery(specQueryInput.value);
+      });
+
+      specQueryInput?.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleSpecQuery(specQueryInput.value);
+        }
+      });
+
+      clearSpecBtn?.addEventListener("click", () => {
+        specQueryInput.value = "";
+        specCurrentCarModel = "";
+        specHistoryText = "";
+        specOutputBox.innerHTML = "";
+      });
 
       function updateSourceCustomVisibility() {
         const shouldShow = fields.sourceType.value === CUSTOM_SOURCE;
