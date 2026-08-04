@@ -1861,16 +1861,13 @@
       <div class="modal-content-wrap">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px;">
           <h2 style="margin:0; font-weight:800;" id="specDialogTitle">車型版本查詢</h2>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <button class="secondary" type="button" id="configApiKeyBtn" style="min-height:36px; padding:0 12px; border-radius:8px; font-size:13px;" title="設定 Gemini API Key">⚙️ Key</button>
-            <button class="secondary" type="button" id="closeSpecDialogBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
-          </div>
+          <button class="secondary" type="button" id="closeSpecDialogBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
         </div>
 
         <div class="spec-container">
           <!-- 無提示文字，乾淨空白輸入框 -->
           <div class="spec-input-row">
-            <input type="text" id="specQueryInput" autocomplete="off" style="min-height:46px;" placeholder="輸入年份與車型 (例: 2023 Toyota Yaris)" />
+            <input type="text" id="specQueryInput" autocomplete="off" style="min-height:46px;" />
             <button type="button" class="action-blue" id="submitSpecBtn" style="min-height:46px; border-radius:8px; padding:0 20px; white-space:nowrap;">查詢</button>
             <button type="button" class="secondary" id="clearSpecBtn" style="min-height:46px; border-radius:8px; padding:0 16px; white-space:nowrap;">清除</button>
           </div>
@@ -2253,7 +2250,6 @@
       const openSpecModalBtn = document.querySelector("#openSpecModalBtn");
       const specDialog = document.querySelector("#specDialog");
       const closeSpecDialogBtn = document.querySelector("#closeSpecDialogBtn");
-      const configApiKeyBtn = document.querySelector("#configApiKeyBtn");
       const specQueryInput = document.querySelector("#specQueryInput");
       const submitSpecBtn = document.querySelector("#submitSpecBtn");
       const clearSpecBtn = document.querySelector("#clearSpecBtn");
@@ -2960,54 +2956,18 @@
         updateReportSection();
       }
 
-      /* Gemini API Key 設定與取得 */
-      function getGeminiApiKey() {
-        return localStorage.getItem("gemini_api_key") || "";
-      }
-
-      function promptSetApiKey() {
-        const currentKey = getGeminiApiKey();
-        const inputKey = prompt("請輸入您的 Gemini API Key：\n（如無 Key 可前往 Google AI Studio 免費申請）", currentKey);
-        if (inputKey !== null) {
-          localStorage.setItem("gemini_api_key", inputKey.trim());
-          alert(inputKey.trim() ? "API Key 已成功儲存！" : "已清除 API Key。");
-        }
-      }
-
-      window.resetApiKey = function() {
-        promptSetApiKey();
-      };
-
-      configApiKeyBtn?.addEventListener("click", promptSetApiKey);
-
       /* 核心功能：執行 Gemini AI car-spec-difference SKILL 三階段查詢 */
       async function handleSpecQuery(queryText) {
         if (!queryText) return;
         const input = queryText.trim();
         if (!input) return;
 
-        let apiKey = getGeminiApiKey();
-        if (!apiKey) {
-          const userKey = prompt("尚未設定 Gemini API Key。\n請輸入您的 Gemini API Key 以開啟查詢功能：");
-          if (userKey && userKey.trim()) {
-            apiKey = userKey.trim();
-            localStorage.setItem("gemini_api_key", apiKey);
-          } else {
-            specOutputBox.innerHTML = `
-              <div style="color:#ef4444; text-align:center; padding:20px;">
-                <strong>未設定 API Key</strong><br>
-                <span style="font-size:13px; color:#64748b;">請點擊右上角「⚙️ Key」按鈕設定您的免費 Gemini API Key 即可開啟車型版本查詢功能。</span>
-              </div>`;
-            return;
-          }
-        }
-
         submitSpecBtn.disabled = true;
         submitSpecBtn.textContent = "查詢中...";
         specOutputBox.innerHTML = `
           <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:50px 0; color:#2563eb; font-weight:700;">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 10 10"></path></svg>
-            <span>正在即時檢索台灣市場規格比對...</span>
+            <span>正在即時檢索 Yahoo 汽車與 8891 進行台灣市場規格比對...</span>
           </div>
           <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
         `;
@@ -3053,7 +3013,8 @@ Markdown 表格：| 編號 | 版本 | 新車定價 |
         const userQuery = specHistoryText ? `【前情脈絡】:\n${specHistoryText}\n\n【使用者最新輸入】: ${input}` : `【查詢車型】: ${input}`;
 
         try {
-          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+          const apiKey = ""; // Canvas 運行環境會自動帶入 API Key
+          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
           const payload = {
             contents: [{ parts: [{ text: userQuery }] }],
@@ -3068,17 +3029,6 @@ Markdown 表格：| 編號 | 版本 | 新車定價 |
           });
 
           const result = await response.json();
-
-          if (result.error) {
-            specOutputBox.innerHTML = `
-              <div style="color:#ef4444; text-align:center; padding:20px;">
-                <strong>API 呼叫失敗 (${result.error.code || 'Error'})</strong><br>
-                <span style="font-size:13px; color:#64748b;">${result.error.message || '請確認 API Key 是否正確。'}</span><br><br>
-                <button type="button" class="secondary" style="min-height:36px; padding:0 16px;" onclick="resetApiKey()">重新設定 API Key</button>
-              </div>`;
-            return;
-          }
-
           const candidate = result.candidates?.[0];
           const responseText = candidate?.content?.parts?.[0]?.text;
 
@@ -3250,7 +3200,7 @@ Markdown 表格：| 編號 | 版本 | 新車定價 |
             specOutputBox.innerHTML = `<div style="color:#ef4444; text-align:center; padding:20px;">無法取得資料，請重新嘗試查詢。</div>`;
           }
         } catch (err) {
-          specOutputBox.innerHTML = `<div style="color:#ef4444; text-align:center; padding:20px;">查詢發生錯誤 (${err.message || '連線錯誤'})，請稍後再試。</div>`;
+          specOutputBox.innerHTML = `<div style="color:#ef4444; text-align:center; padding:20px;">查詢發生錯誤，請稍後再試。</div>`;
         } finally {
           submitSpecBtn.disabled = false;
           submitSpecBtn.textContent = "查詢";
