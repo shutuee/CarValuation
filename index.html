@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>中古車估價與預約管理系統</title>
+    <title>估價與預約管理系統</title>
     <style>
       :root {
         color-scheme: light;
@@ -1578,32 +1578,43 @@
       }
 
       @media (max-width: 620px) {
+        .list-tools {
+          padding: 12px 14px;
+        }
+        .search-tools-group { 
+          display: flex;
+          width: 100%;
+        }
         .form-grid { grid-template-columns: 1fr; }
         .wide, .full-row { grid-column: auto; }
         .search-row { 
           flex-direction: column; 
           align-items: stretch;
           gap: 10px;
+          width: 100%;
         }
         .action-buttons-group {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
           gap: 6px;
           width: 100%;
+          box-sizing: border-box;
         }
         .action-buttons-group button {
           width: 100%;
           min-width: 0;
-          padding: 0 4px !important;
+          padding: 0 2px !important;
           font-size: 13px !important;
           justify-content: center;
-          gap: 4px !important;
+          gap: 3px !important;
+          box-sizing: border-box;
         }
         .action-buttons-group button svg {
           width: 15px !important;
           height: 15px !important;
+          flex-shrink: 0;
         }
-        .quick-switch-wrap { flex-direction: column; align-items: flex-start; gap: 8px; }
+        .quick-switch-wrap { flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; }
         .switch-btn-group { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         .switch-btn { justify-content: center; width: 100%; padding: 8px 10px; }
       }
