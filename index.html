@@ -1861,13 +1861,16 @@
       <div class="modal-content-wrap">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px;">
           <h2 style="margin:0; font-weight:800;" id="specDialogTitle">車型版本查詢</h2>
-          <button class="secondary" type="button" id="closeSpecDialogBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="secondary" type="button" id="configApiKeyBtn" style="min-height:36px; padding:0 12px; border-radius:8px; font-size:13px;" title="設定 Gemini API Key">⚙️ Key</button>
+            <button class="secondary" type="button" id="closeSpecDialogBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
+          </div>
         </div>
 
         <div class="spec-container">
           <!-- 無提示文字，乾淨空白輸入框 -->
           <div class="spec-input-row">
-            <input type="text" id="specQueryInput" autocomplete="off" style="min-height:46px;" />
+            <input type="text" id="specQueryInput" autocomplete="off" style="min-height:46px;" placeholder="輸入年份與車型 (例: 2023 Toyota Yaris)" />
             <button type="button" class="action-blue" id="submitSpecBtn" style="min-height:46px; border-radius:8px; padding:0 20px; white-space:nowrap;">查詢</button>
             <button type="button" class="secondary" id="clearSpecBtn" style="min-height:46px; border-radius:8px; padding:0 16px; white-space:nowrap;">清除</button>
           </div>
@@ -2250,6 +2253,7 @@
       const openSpecModalBtn = document.querySelector("#openSpecModalBtn");
       const specDialog = document.querySelector("#specDialog");
       const closeSpecDialogBtn = document.querySelector("#closeSpecDialogBtn");
+      const configApiKeyBtn = document.querySelector("#configApiKeyBtn");
       const specQueryInput = document.querySelector("#specQueryInput");
       const submitSpecBtn = document.querySelector("#submitSpecBtn");
       const clearSpecBtn = document.querySelector("#clearSpecBtn");
@@ -2956,18 +2960,54 @@
         updateReportSection();
       }
 
+      /* Gemini API Key 設定與取得 */
+      function getGeminiApiKey() {
+        return localStorage.getItem("gemini_api_key") || "";
+      }
+
+      function promptSetApiKey() {
+        const currentKey = getGeminiApiKey();
+        const inputKey = prompt("請輸入您的 Gemini API Key：\n（如無 Key 可前往 Google AI Studio 免費申請）", currentKey);
+        if (inputKey !== null) {
+          localStorage.setItem("gemini_api_key", inputKey.trim());
+          alert(inputKey.trim() ? "API Key 已成功儲存！" : "已清除 API Key。");
+        }
+      }
+
+      window.resetApiKey = function() {
+        promptSetApiKey();
+      };
+
+      configApiKeyBtn?.addEventListener("click", promptSetApiKey);
+
       /* 核心功能：執行 Gemini AI car-spec-difference SKILL 三階段查詢 */
       async function handleSpecQuery(queryText) {
         if (!queryText) return;
         const input = queryText.trim();
         if (!input) return;
 
+        let apiKey = getGeminiApiKey();
+        if (!apiKey) {
+          const userKey = prompt("尚未設定 Gemini API Key。\n請輸入您的 Gemini API Key 以開啟查詢功能：");
+          if (userKey && userKey.trim()) {
+            apiKey = userKey.trim();
+            localStorage.setItem("gemini_api_key", apiKey);
+          } else {
+            specOutputBox.innerHTML = `
+              <div style="color:#ef4444; text-align:center; padding:20px;">
+                <strong>未設定 API Key</strong><br>
+                <span style="font-size:13px; color:#64748b;">請點擊右上角「⚙️ Key」按鈕設定您的免費 Gemini API Key 即可開啟車型版本查詢功能。</span>
+              </div>`;
+            return;
+          }
+        }
+
         submitSpecBtn.disabled = true;
         submitSpecBtn.textContent = "查詢中...";
         specOutputBox.innerHTML = `
           <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:50px 0; color:#2563eb; font-weight:700;">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 10 10"></path></svg>
-            <span>正在即時檢索 Yahoo 汽車與 8891 進行台灣市場規格比對...</span>
+            <span>正在即時檢索台灣市場規格比對...</span>
           </div>
           <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
         `;
@@ -3013,194 +3053,246 @@ Markdown 表格：| 編號 | 版本 | 新車定價 |
         const userQuery = specHistoryText ? `【前情脈絡】:\n${specHistoryText}\n\n【使用者最新輸入】: ${input}` : `【查詢車型】: ${input}`;
 
         try {
-          const apiKey = ""; // Canvas 運行環境會自動帶入 API Key
-          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+          let result = null;
+          let lastError = null;
 
-          const payload = {
-            contents: [{ parts: [{ text: userQuery }] }],
-            tools: [{ "google_search": {} }],
-            systemInstruction: { parts: [{ text: systemPrompt }] }
-          };
+          const models = ["gemini-2.0-flash", "gemini-1.5-flash"];
 
-          const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-
-          const result = await response.json();
-          const candidate = result.candidates?.[0];
-          const responseText = candidate?.content?.parts?.[0]?.text;
-
-          if (responseText) {
-            // 紀錄歷史
-            specHistoryText += `\nUser: ${input}\nModel: ${responseText}\n`;
-            if (!specCurrentCarModel && !/^\d+$/.test(input)) {
-              specCurrentCarModel = input;
-            }
-
-            let phaseBadgeHtml = "";
-            let chipBtnsHtml = "";
-            let isPhase1 = false;
-            let isPhase2 = false;
-
-            if (responseText.includes("請回覆要比較的版本編號")) {
-              isPhase1 = true;
-              phaseBadgeHtml = `<div class="spec-phase-badge phase-1">📌 階段一：車系版本與定價清單</div>`;
-            } else if (responseText.includes("請回覆要看的參考來源版本")) {
-              isPhase2 = true;
-              phaseBadgeHtml = `<div class="spec-phase-badge phase-2">📊 階段二：指定版本規格比較</div>`;
-              
-              // 擷取階段二的所有版本編號與名稱，有幾個編號就建立幾個對應按鈕
-              const versionMatches = [...responseText.matchAll(/(?:【編號|\(編號|編號)\s*(\d+)[】\)]?/g)];
-              const foundNums = [...new Set(versionMatches.map(m => m[1]))];
-
-              let buttonsHtml = "";
-              if (foundNums.length > 0) {
-                foundNums.forEach(num => {
-                  // 嘗試提取對應版本名稱
-                  const lineMatch = responseText.match(new RegExp(`(?:【編號|\\(編號|編號)\\s*${num}[】\\)]?\\s*([^\\n\\*\\:]+)`));
-                  let labelText = lineMatch ? lineMatch[1].replace(/^[\:\s]+/, '').trim() : `版本 ${num}`;
-                  buttonsHtml += `<button type="button" class="spec-chip-btn-gray" onclick="quickQuery('${num}')">${labelText} 網址</button>`;
-                });
-              } else {
-                buttonsHtml = `
-                  <button type="button" class="spec-chip-btn-gray" onclick="quickQuery('1')">版本 1 網址</button>
-                  <button type="button" class="spec-chip-btn-gray" onclick="quickQuery('2')">版本 2 網址</button>
-                `;
-              }
-
-              chipBtnsHtml = `
-                <div class="spec-quick-btns">
-                  <span style="font-size:13px; font-weight:800; color:#475569; width:100%; margin-bottom:4px;">⚡ 點擊獲取專屬參考網址：</span>
-                  ${buttonsHtml}
-                </div>
-              `;
-            } else {
-              phaseBadgeHtml = `<div class="spec-phase-badge phase-3">🔗 階段三：專屬參考來源網址</div>`;
-            }
-
-            // 排版優化：轉換 Markdown 為 HTML 結構
-            let formattedBody = responseText
-              .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-              .replace(/###\s*升級專屬重點/g, '### 專屬重點')
-              .replace(/###\s*專屬重點/g, '<h3 style="margin:16px 0 10px 0; font-size:18px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">✨ 專屬重點 (配備升級差異)</h3>')
-              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-              .replace(/\[(.*?)\]\((https?:\/\/.*?)\)/g, '<a href="$2" target="_blank" style="color:#2563eb; text-decoration:underline; font-weight:700;">$1</a>');
-
-            // 處理 Markdown 表格與卡片化列表
-            const lines = formattedBody.split('\n');
-            let htmlLines = [];
-            let inTable = false;
-            let tableRowIndex = 0;
-            let inCard = false;
-
-            lines.forEach((line) => {
-              const trimmed = line.trim();
-              if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
-                if (inCard) { htmlLines.push('</div>'); inCard = false; }
-                if (!inTable) {
-                  inTable = true;
-                  htmlLines.push('<table>');
-                }
-                const cells = trimmed.split('|').slice(1, -1).map(c => c.trim());
-                if (trimmed.includes('---')) return; // 忽略分隔線
-
-                if (htmlLines[htmlLines.length - 1] === '<table>') {
-                  // 表頭新增選取欄位
-                  const headerCells = isPhase1 ? ['選取', ...cells] : cells;
-                  htmlLines.push('<thead><tr>' + headerCells.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>');
-                } else {
-                  // 資料列新增勾選框
-                  tableRowIndex++;
-                  const firstCellNum = cells[0]?.replace(/<[^>]*>/g, '').trim() || String(tableRowIndex);
-                  const numVal = parseInt(firstCellNum, 10) || tableRowIndex;
-                  const rowCells = isPhase1 ? [`<input type="checkbox" class="spec-version-checkbox" value="${numVal}" style="width:18px; height:18px; cursor:pointer;" />`, ...cells] : cells;
-                  htmlLines.push('<tr>' + rowCells.map(c => `<td>${c}</td>`).join('') + '</tr>');
-                }
-              } else {
-                if (inTable) {
-                  inTable = false;
-                  htmlLines.push('</tbody></table>');
-                  if (isPhase1) {
-                    htmlLines.push(`
-                      <div style="margin: 12px 0 16px 0; display: flex; align-items: center; gap: 10px;">
-                        <button type="button" class="action-blue" id="submitCheckedVersionsBtn" style="min-height:40px; padding:0 22px; font-weight:800; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
-                          送出
-                        </button>
-                        <span style="font-size:13px; color:#64748b; font-weight:700;">請勾選上方表格欲比較的版本並點擊送出</span>
-                      </div>
-                    `);
-                  }
-                }
-
-                if (trimmed) {
-                  // 判斷是否為版本大項標頭，例如 **【編號 1】...**
-                  const versionHeaderMatch = trimmed.match(/^(?:-\s*)?<strong>【編號\s*(\d+)】(.*?)<\/strong>(.*)/);
-                  if (versionHeaderMatch) {
-                    if (inCard) { htmlLines.push('</div>'); }
-                    inCard = true;
-                    htmlLines.push(`
-                      <div class="spec-version-card">
-                        <div class="spec-version-header">【編號 ${versionHeaderMatch[1]}】${versionHeaderMatch[2]}${versionHeaderMatch[3]}</div>
-                    `);
-                  } else if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
-                    const bulletContent = line.replace(/^\s*[-•]\s*/, '');
-                    htmlLines.push(`
-                      <div class="spec-bullet-item">
-                        <span class="spec-bullet-dot"></span>
-                        <div>${bulletContent}</div>
-                      </div>
-                    `);
-                  } else {
-                    htmlLines.push(`<div style="margin-bottom:6px;">${line}</div>`);
-                  }
-                }
-              }
-            });
-
-            if (inCard) { htmlLines.push('</div>'); }
-
-            if (inTable) {
-              htmlLines.push('</tbody></table>');
-              if (isPhase1) {
-                htmlLines.push(`
-                  <div style="margin: 12px 0 16px 0; display: flex; align-items: center; gap: 10px;">
-                    <button type="button" class="action-blue" id="submitCheckedVersionsBtn" style="min-height:40px; padding:0 22px; font-weight:800; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
-                      送出
-                    </button>
-                    <span style="font-size:13px; color:#64748b; font-weight:700;">請勾選上方表格欲比較的版本並點擊送出</span>
-                  </div>
-                `);
-              }
-            }
-
-            specOutputBox.innerHTML = `
-              ${phaseBadgeHtml}
-              <div style="font-size:15px; line-height:1.7;">${htmlLines.join('')}</div>
-              ${chipBtnsHtml}
-            `;
-
-            // 綁定階段一「送出」藍色按鈕事件
-            const submitCheckedBtn = document.querySelector("#submitCheckedVersionsBtn");
-            if (submitCheckedBtn) {
-              submitCheckedBtn.addEventListener("click", () => {
-                const checkedBoxes = document.querySelectorAll(".spec-version-checkbox:checked");
-                const selectedNums = Array.from(checkedBoxes).map(cb => cb.value);
-                if (selectedNums.length === 0) {
-                  alert("請先勾選至少一個要比較的版本編號！");
-                  return;
-                }
-                quickQuery(selectedNums.join(""));
+          // 階段 1: 優先嘗試含 Google Search Grounding (適用於有啟用 Grounding 的 Key)
+          for (const model of models) {
+            try {
+              const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+              const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                tools: [{ "google_search": {} }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+              };
+              const res = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
               });
+              const data = await res.json();
+              if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                result = data;
+                break;
+              } else if (data.error) {
+                lastError = data.error;
+              }
+            } catch (err) {
+              lastError = err;
             }
+          }
 
-            specQueryInput.value = "";
+          // 階段 2: 若免費版 API Key 的 Google Search 額度被限制 (limit: 0 / 429)，自動切換為純 AI 模型知識庫查詢
+          if (!result) {
+            for (const model of models) {
+              try {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                const payloadNoSearch = {
+                  contents: [{ parts: [{ text: userQuery }] }],
+                  systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+                const res = await fetch(apiUrl, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payloadNoSearch)
+                });
+                const data = await res.json();
+                if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                  result = data;
+                  break;
+                } else if (data.error) {
+                  lastError = data.error;
+                }
+              } catch (err) {
+                lastError = err;
+              }
+            }
+          }
+
+          if (result) {
+            const candidate = result.candidates?.[0];
+            const responseText = candidate?.content?.parts?.[0]?.text;
+
+            if (responseText) {
+              // 紀錄歷史
+              specHistoryText += `\nUser: ${input}\nModel: ${responseText}\n`;
+              if (!specCurrentCarModel && !/^\d+$/.test(input)) {
+                specCurrentCarModel = input;
+              }
+
+              let phaseBadgeHtml = "";
+              let chipBtnsHtml = "";
+              let isPhase1 = false;
+              let isPhase2 = false;
+
+              if (responseText.includes("請回覆要比較的版本編號")) {
+                isPhase1 = true;
+                phaseBadgeHtml = `<div class="spec-phase-badge phase-1">📌 階段一：車系版本與定價清單</div>`;
+              } else if (responseText.includes("請回覆要看的參考來源版本")) {
+                isPhase2 = true;
+                phaseBadgeHtml = `<div class="spec-phase-badge phase-2">📊 階段二：指定版本規格比較</div>`;
+                
+                // 擷取階段二的所有版本編號與名稱，有幾個編號就建立幾個對應按鈕
+                const versionMatches = [...responseText.matchAll(/(?:【編號|\(編號|編號)\s*(\d+)[】\)]?/g)];
+                const foundNums = [...new Set(versionMatches.map(m => m[1]))];
+
+                let buttonsHtml = "";
+                if (foundNums.length > 0) {
+                  foundNums.forEach(num => {
+                    // 嘗試提取對應版本名稱
+                    const lineMatch = responseText.match(new RegExp(`(?:【編號|\\(編號|編號)\\s*${num}[】\\)]?\\s*([^\\n\\*\\:]+)`));
+                    let labelText = lineMatch ? lineMatch[1].replace(/^[\:\s]+/, '').trim() : `版本 ${num}`;
+                    buttonsHtml += `<button type="button" class="spec-chip-btn-gray" onclick="quickQuery('${num}')">${labelText} 網址</button>`;
+                  });
+                } else {
+                  buttonsHtml = `
+                    <button type="button" class="spec-chip-btn-gray" onclick="quickQuery('1')">版本 1 網址</button>
+                    <button type="button" class="spec-chip-btn-gray" onclick="quickQuery('2')">版本 2 網址</button>
+                  `;
+                }
+
+                chipBtnsHtml = `
+                  <div class="spec-quick-btns">
+                    <span style="font-size:13px; font-weight:800; color:#475569; width:100%; margin-bottom:4px;">⚡ 點擊獲取專屬參考網址：</span>
+                    ${buttonsHtml}
+                  </div>
+                `;
+              } else {
+                phaseBadgeHtml = `<div class="spec-phase-badge phase-3">🔗 階段三：專屬參考來源網址</div>`;
+              }
+
+              // 排版優化：轉換 Markdown 為 HTML 結構
+              let formattedBody = responseText
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/###\s*升級專屬重點/g, '### 專屬重點')
+                .replace(/###\s*專屬重點/g, '<h3 style="margin:16px 0 10px 0; font-size:18px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">✨ 專屬重點 (配備升級差異)</h3>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\[(.*?)\]\((https?:\/\/.*?)\)/g, '<a href="$2" target="_blank" style="color:#2563eb; text-decoration:underline; font-weight:700;">$1</a>');
+
+              // 處理 Markdown 表格與卡片化列表
+              const lines = formattedBody.split('\n');
+              let htmlLines = [];
+              let inTable = false;
+              let tableRowIndex = 0;
+              let inCard = false;
+
+              lines.forEach((line) => {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+                  if (inCard) { htmlLines.push('</div>'); inCard = false; }
+                  if (!inTable) {
+                    inTable = true;
+                    htmlLines.push('<table>');
+                  }
+                  const cells = trimmed.split('|').slice(1, -1).map(c => c.trim());
+                  if (trimmed.includes('---')) return; // 忽略分隔線
+
+                  if (htmlLines[htmlLines.length - 1] === '<table>') {
+                    // 表頭新增選取欄位
+                    const headerCells = isPhase1 ? ['選取', ...cells] : cells;
+                    htmlLines.push('<thead><tr>' + headerCells.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>');
+                  } else {
+                    // 資料列新增勾選框
+                    tableRowIndex++;
+                    const firstCellNum = cells[0]?.replace(/<[^>]*>/g, '').trim() || String(tableRowIndex);
+                    const numVal = parseInt(firstCellNum, 10) || tableRowIndex;
+                    const rowCells = isPhase1 ? [`<input type="checkbox" class="spec-version-checkbox" value="${numVal}" style="width:18px; height:18px; cursor:pointer;" />`, ...cells] : cells;
+                    htmlLines.push('<tr>' + rowCells.map(c => `<td>${c}</td>`).join('') + '</tr>');
+                  }
+                } else {
+                  if (inTable) {
+                    inTable = false;
+                    htmlLines.push('</tbody></table>');
+                    if (isPhase1) {
+                      htmlLines.push(`
+                        <div style="margin: 12px 0 16px 0; display: flex; align-items: center; gap: 10px;">
+                          <button type="button" class="action-blue" id="submitCheckedVersionsBtn" style="min-height:40px; padding:0 22px; font-weight:800; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+                            送出
+                          </button>
+                          <span style="font-size:13px; color:#64748b; font-weight:700;">請勾選上方表格欲比較的版本並點擊送出</span>
+                        </div>
+                      `);
+                    }
+                  }
+
+                  if (trimmed) {
+                    // 判斷是否為版本大項標頭，例如 **【編號 1】...**
+                    const versionHeaderMatch = trimmed.match(/^(?:-\s*)?<strong>【編號\s*(\d+)】(.*?)<\/strong>(.*)/);
+                    if (versionHeaderMatch) {
+                      if (inCard) { htmlLines.push('</div>'); }
+                      inCard = true;
+                      htmlLines.push(`
+                        <div class="spec-version-card">
+                          <div class="spec-version-header">【編號 ${versionHeaderMatch[1]}】${versionHeaderMatch[2]}${versionHeaderMatch[3]}</div>
+                      `);
+                    } else if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
+                      const bulletContent = line.replace(/^\s*[-•]\s*/, '');
+                      htmlLines.push(`
+                        <div class="spec-bullet-item">
+                          <span class="spec-bullet-dot"></span>
+                          <div>${bulletContent}</div>
+                        </div>
+                      `);
+                    } else {
+                      htmlLines.push(`<div style="margin-bottom:6px;">${line}</div>`);
+                    }
+                  }
+                }
+              });
+
+              if (inCard) { htmlLines.push('</div>'); }
+
+              if (inTable) {
+                htmlLines.push('</tbody></table>');
+                if (isPhase1) {
+                  htmlLines.push(`
+                    <div style="margin: 12px 0 16px 0; display: flex; align-items: center; gap: 10px;">
+                      <button type="button" class="action-blue" id="submitCheckedVersionsBtn" style="min-height:40px; padding:0 22px; font-weight:800; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+                        送出
+                      </button>
+                      <span style="font-size:13px; color:#64748b; font-weight:700;">請勾選上方表格欲比較的版本並點擊送出</span>
+                    </div>
+                  `);
+                }
+              }
+
+              specOutputBox.innerHTML = `
+                ${phaseBadgeHtml}
+                <div style="font-size:15px; line-height:1.7;">${htmlLines.join('')}</div>
+                ${chipBtnsHtml}
+              `;
+
+              // 綁定階段一「送出」藍色按鈕事件
+              const submitCheckedBtn = document.querySelector("#submitCheckedVersionsBtn");
+              if (submitCheckedBtn) {
+                submitCheckedBtn.addEventListener("click", () => {
+                  const checkedBoxes = document.querySelectorAll(".spec-version-checkbox:checked");
+                  const selectedNums = Array.from(checkedBoxes).map(cb => cb.value);
+                  if (selectedNums.length === 0) {
+                    alert("請先勾選至少一個要比較的版本編號！");
+                    return;
+                  }
+                  quickQuery(selectedNums.join(""));
+                });
+              }
+
+              specQueryInput.value = "";
+            } else {
+              specOutputBox.innerHTML = `<div style="color:#ef4444; text-align:center; padding:20px;">無法取得資料，請重新嘗試查詢。</div>`;
+            }
           } else {
-            specOutputBox.innerHTML = `<div style="color:#ef4444; text-align:center; padding:20px;">無法取得資料，請重新嘗試查詢。</div>`;
+            const errDetail = lastError?.message || (lastError ? JSON.stringify(lastError) : "連線或權限錯誤");
+            specOutputBox.innerHTML = `
+              <div style="color:#ef4444; text-align:center; padding:20px;">
+                <strong>API 呼叫失敗</strong><br>
+                <span style="font-size:13px; color:#64748b;">${errDetail}</span><br>
+                <button type="button" class="secondary" onclick="resetApiKey()" style="margin-top:12px; font-size:13px; min-height:32px; padding:0 12px; border-radius:6px;">重新設定 API Key</button>
+              </div>`;
           }
         } catch (err) {
-          specOutputBox.innerHTML = `<div style="color:#ef4444; text-align:center; padding:20px;">查詢發生錯誤，請稍後再試。</div>`;
+          specOutputBox.innerHTML = `<div style="color:#ef4444; text-align:center; padding:20px;">查詢發生錯誤 (${err.message || '連線錯誤'})，請稍後再試。</div>`;
         } finally {
           submitSpecBtn.disabled = false;
           submitSpecBtn.textContent = "查詢";
