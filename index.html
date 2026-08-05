@@ -165,14 +165,19 @@
         background: #f1f5f9;
       }
 
-      button.danger {
-        border-color: #f3c5c0;
-        background: #fff;
-        color: var(--danger);
+      /* 紅底白字按鈕 (用於確認刪除與主要紅色按鈕) */
+      button.danger,
+      button.btn-danger-red {
+        border-color: #dc2626;
+        background-color: #dc2626;
+        color: #ffffff;
+        font-weight: 700;
       }
 
-      button.danger:hover {
-        background: #fff1f0;
+      button.danger:hover,
+      button.btn-danger-red:hover {
+        background-color: #b91c1c;
+        border-color: #b91c1c;
       }
 
       button.action-blue {
@@ -324,7 +329,6 @@
         transform: translateY(0);
       }
 
-      /* 詳細欄位展開/收起按鈕樣式 */
       .btn-toggle-detail {
         min-height: 36px;
         height: 36px;
@@ -770,6 +774,7 @@
       .col-actions   { width: 230px; min-width: 230px; }
       .ongoing-section .col-actions { width: 230px; min-width: 230px; }
 
+      /* 獎金 N 按鈕樣式：預設灰底、選取時藍底白字 */
       .btn-bonus-n {
         min-height: 38px;
         height: 38px;
@@ -795,14 +800,16 @@
       }
 
       .btn-bonus-n.is-active {
-        background-color: #eff6ff;
+        background-color: #2563eb;
         border-color: #2563eb;
-        color: #2563eb;
+        color: #ffffff;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
       }
 
       .btn-bonus-n.is-active:hover {
-        background-color: #dbeafe;
+        background-color: #1d4ed8;
         border-color: #1d4ed8;
+        color: #ffffff;
       }
 
       /* 固定欄高與良好閱讀性規格 */
@@ -2012,7 +2019,7 @@
         <input type="hidden" id="deleteTargetId" />
         <div class="dialog-actions">
           <button class="secondary" type="button" id="cancelDeleteButton">取消</button>
-          <button type="submit" class="danger">確認刪除</button>
+          <button type="submit" class="danger btn-danger-red">確認刪除</button>
         </div>
       </form>
     </dialog>
@@ -2604,7 +2611,7 @@
         return cell;
       }
 
-      // 1. 估價進行中資料列（已移除獎金欄位）
+      // 1. 估價進行中資料列（已移除進行中獎金欄位）
       function createOngoingRow(record) {
         const row = document.createElement("tr");
 
