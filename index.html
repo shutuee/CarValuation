@@ -2831,7 +2831,23 @@
           else fields[name].value = record[name] || "";
         }
         updateSourceCustomVisibility();
-        if (valuationDialogTitle) valuationDialogTitle.textContent = "編輯估價資料";
+        if (valuationDialogTitle) valuationDialogTitle.textContent = "編輯資料";
+        
+        if (record.isPurchased) {
+          // 已買入紀錄：顯示綠色儲存按鈕
+          if (submitValuationBtn) submitValuationBtn.classList.add("is-hidden");
+          if (submitPurchasedBtn) {
+            submitPurchasedBtn.classList.remove("is-hidden");
+            submitPurchasedBtn.textContent = "儲存";
+          }
+        } else {
+          // 估價進行中紀錄：顯示藍色儲存按鈕
+          if (submitValuationBtn) {
+            submitValuationBtn.classList.remove("is-hidden");
+            submitValuationBtn.textContent = "儲存";
+          }
+          if (submitPurchasedBtn) submitPurchasedBtn.classList.add("is-hidden");
+        }
 
         valuationDialog.showModal();
       }
@@ -2840,6 +2856,14 @@
         form.reset();
         fields.recordId.value = "";
         if (valuationDialogTitle) valuationDialogTitle.textContent = "新增估價資料";
+        if (submitValuationBtn) {
+          submitValuationBtn.classList.remove("is-hidden");
+          submitValuationBtn.textContent = "新增估價";
+        }
+        if (submitPurchasedBtn) {
+          submitPurchasedBtn.classList.remove("is-hidden");
+          submitPurchasedBtn.textContent = "新增買進";
+        }
         updateSourceCustomVisibility();
       }
 
@@ -3251,7 +3275,7 @@
           records[existingIndex] = await persistUpdate(normalizeRecord({
             ...records[existingIndex],
             ...data,
-            isPurchased: asPurchased
+            isPurchased: records[existingIndex].isPurchased
           }));
         } else {
           records.push(await persistCreate(normalizeRecord({
