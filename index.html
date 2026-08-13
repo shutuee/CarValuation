@@ -276,28 +276,6 @@
         color: #0f172a;
       }
 
-      .btn-add-booking.type-valuation {
-        border-color: #2563eb;
-        background-color: #eff6ff;
-        color: #2563eb;
-      }
-
-      .btn-add-booking.type-valuation:hover {
-        background-color: #dbeafe;
-        border-color: #1d4ed8;
-      }
-
-      .btn-add-booking.type-delivery {
-        border-color: #16a34a;
-        background-color: #f0fdf4;
-        color: #16a34a;
-      }
-
-      .btn-add-booking.type-delivery:hover {
-        background-color: #dcfce7;
-        border-color: #15803d;
-      }
-
       .btn-black {
         height: 36px;
         min-height: 36px;
@@ -1530,7 +1508,7 @@
                 </button>
 
                 <button type="button" class="btn-calendar-view" id="openReportModalBtn">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="20" x2="18" y2="10"></line>
                     <line x1="12" y1="20" x2="12" y2="4"></line>
                     <line x1="6" y1="20" x2="6" y2="14"></line>
@@ -1815,7 +1793,7 @@
             <span>獎金</span>
             <input id="bonus" type="text" />
           </label>
-          <!-- 新增預約日期與時間輸入欄位 -->
+          <!-- 預約日期與時間選擇欄位 -->
           <label>
             <span>預約日期</span>
             <input id="bookingDate" type="date" />
@@ -2047,7 +2025,7 @@
       ];
 
       const sheetHeaders = [
-        "id", "source", "receivedDate", "boughtDate", "bookingDate", "bookingTime", "year", "model",
+        "id", "source", "receivedDate", "boughtDate", "bookingDate", "bookingTime", "bookingType", "year", "model",
         "km", "color", "condition", "version", "authority", "quote",
         "purchasePrice", "actualDealPrice", "salePrice", "remarks",
         "repairItems", "seller", "bonus", "isPurchased", "state",
@@ -2158,7 +2136,6 @@
       let ongoingDetailExpanded = false;
       let purchasedDetailExpanded = false;
 
-      // 透過 MutationObserver 自動偵測彈窗開啟狀態並鎖定背景防滑動
       function updateBodyScrollLock() {
         const openModal = document.querySelector("dialog[open]");
         document.body.classList.toggle("modal-open", openModal !== null);
@@ -2232,6 +2209,14 @@
 
         const rawState = cleanSheetText(record.state || "").toUpperCase();
         const isSold = (rawState === "Y");
+        const isPurchased = normalizeBoolean(record.isPurchased);
+
+        // 預約類型 (valuation: 估價預約, delivery: 交車預約)
+        // 若沒有 explicitly 帶入，且有預約資訊，預設依當時建立階段設定
+        let bookingType = cleanSheetText(record.bookingType || "");
+        if (!bookingType && (record.bookingDate || record.bookingTime)) {
+          bookingType = isPurchased ? "delivery" : "valuation";
+        }
 
         return {
           id: cleanSheetText(record.id) || createId(),
@@ -2241,6 +2226,7 @@
           boughtDate: normalizeDateText(cleanSheetText(record.boughtDate || "")),
           bookingDate: normalizeDateText(cleanSheetText(record.bookingDate || "")),
           bookingTime: cleanSheetText(record.bookingTime || ""),
+          bookingType,
           year: cleanSheetText(record.year),
           model: cleanSheetText(record.model),
           km: normalizeKm(cleanSheetText(record.km || record.mileage || "")),
@@ -2256,8 +2242,8 @@
           repairItems: cleanSheetText(record.repairItems),
           seller: cleanSheetText(record.seller || record.location || [record.sellerName, record.sellerPhone].filter(Boolean).join(" ")),
           bonus: cleanSheetText(record.bonus),
-          isPurchased: normalizeBoolean(record.isPurchased),
-          isSold: isSold,
+          isPurchased,
+          isSold,
           state: isSold ? "Y" : "N",
           createdAt: record.createdAt || new Date().toISOString(),
           updatedAt: record.updatedAt || new Date().toISOString(),
@@ -2407,7 +2393,6 @@
         });
       }
 
-      /* 已買入預設依照「買進日」降冪排序 */
       function sortPurchasedRecords(items) {
         return [...items].sort((a, b) => {
           const dateA = dateValueToNumber(a.boughtDate || a.receivedDate) || 0;
@@ -2831,17 +2816,18 @@
           else fields[name].value = record[name] || "";
         }
         updateSourceCustomVisibility();
-        if (valuationDialogTitle) valuationDialogTitle.textContent = "編輯資料";
         
+        if (valuationDialogTitle) valuationDialogTitle.textContent = "編輯資料";
+
         if (record.isPurchased) {
-          // 已買入紀錄：顯示綠色儲存按鈕
+          // 編輯「已買入」資料：顯示綠色「儲存」按鈕，隱藏藍色按鈕
           if (submitValuationBtn) submitValuationBtn.classList.add("is-hidden");
           if (submitPurchasedBtn) {
             submitPurchasedBtn.classList.remove("is-hidden");
             submitPurchasedBtn.textContent = "儲存";
           }
         } else {
-          // 估價進行中紀錄：顯示藍色儲存按鈕
+          // 編輯「估價進行中」資料：顯示藍色「儲存」按鈕，隱藏綠色按鈕
           if (submitValuationBtn) {
             submitValuationBtn.classList.remove("is-hidden");
             submitValuationBtn.textContent = "儲存";
@@ -2918,9 +2904,9 @@
 
           let dayBookings = records.filter((r) => r.bookingDate === dateISO);
           if (calendarFilterType === "valuation") {
-            dayBookings = dayBookings.filter((r) => !r.isPurchased);
+            dayBookings = dayBookings.filter((r) => r.bookingType === "valuation" || (!r.bookingType && !r.isPurchased));
           } else if (calendarFilterType === "delivery") {
-            dayBookings = dayBookings.filter((r) => r.isPurchased);
+            dayBookings = dayBookings.filter((r) => r.bookingType === "delivery" || (!r.bookingType && r.isPurchased));
           }
 
           dayBookings.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
@@ -2928,15 +2914,17 @@
           if (dayBookings.length > 0) {
             if (dayBookings.length <= 2) {
               dayBookings.forEach((b) => {
+                const isDeliveryBadge = b.bookingType === "delivery" || (!b.bookingType && b.isPurchased);
                 const badge = document.createElement("div");
-                badge.className = "calendar-badge" + (b.isPurchased ? " is-purchased" : "");
+                badge.className = "calendar-badge" + (isDeliveryBadge ? " is-purchased" : "");
                 badge.textContent = b.bookingTime || '預約';
                 cell.appendChild(badge);
               });
             } else {
               dayBookings.slice(0, 1).forEach((b) => {
+                const isDeliveryBadge = b.bookingType === "delivery" || (!b.bookingType && b.isPurchased);
                 const badge = document.createElement("div");
-                badge.className = "calendar-badge" + (b.isPurchased ? " is-purchased" : "");
+                badge.className = "calendar-badge" + (isDeliveryBadge ? " is-purchased" : "");
                 badge.textContent = b.bookingTime || '預約';
                 cell.appendChild(badge);
               });
@@ -3014,9 +3002,9 @@
 
         let dayBookings = records.filter((r) => r.bookingDate === dateISO);
         if (calendarFilterType === "valuation") {
-          dayBookings = dayBookings.filter((r) => !r.isPurchased);
+          dayBookings = dayBookings.filter((r) => r.bookingType === "valuation" || (!r.bookingType && !r.isPurchased));
         } else if (calendarFilterType === "delivery") {
-          dayBookings = dayBookings.filter((r) => r.isPurchased);
+          dayBookings = dayBookings.filter((r) => r.bookingType === "delivery" || (!r.bookingType && r.isPurchased));
         }
 
         dayBookings.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
@@ -3026,7 +3014,7 @@
         if (dayBookings.length > 0) {
           dayBookings.forEach((b) => {
             const item = document.createElement("div");
-            const isDeliv = b.isPurchased;
+            const isDeliv = b.bookingType === "delivery" || (!b.bookingType && b.isPurchased);
             item.className = "agenda-item " + (isDeliv ? "type-delivery-card" : "type-valuation-card");
 
             const badgeLabel = isDeliv ? "交車" : "估價";
@@ -3077,6 +3065,7 @@
                   ...records[idx],
                   bookingDate: "",
                   bookingTime: "",
+                  bookingType: "",
                   updatedAt: new Date().toISOString()
                 }));
                 saveLocalRecords();
@@ -3108,6 +3097,17 @@
         modalVehicleSelect.innerHTML = '<option value="">請選擇車輛 (選填)</option>';
 
         const availableRecords = records.filter((r) => !r.isSold || r.id === selectedId);
+
+        // 排序方式：[估價] 車輛排在上面 (!isPurchased)，[已買入] 車輛排在下面 (isPurchased)
+        availableRecords.sort((a, b) => {
+          if (!a.isPurchased && b.isPurchased) return -1;
+          if (a.isPurchased && !b.isPurchased) return 1;
+          
+          // 同類別內部依日期排序 (最新在最上方)
+          const dateA = dateValueToNumber(a.boughtDate || a.receivedDate) || 0;
+          const dateB = dateValueToNumber(b.boughtDate || b.receivedDate) || 0;
+          return dateB - dateA;
+        });
 
         availableRecords.forEach((r) => {
           const opt = document.createElement("option");
@@ -3230,10 +3230,13 @@
 
         const idx = records.findIndex((r) => r.id === targetId);
         if (idx >= 0) {
+          const rec = records[idx];
+          const bType = rec.isPurchased ? "delivery" : "valuation";
           records[idx] = await persistUpdate(normalizeRecord({
-            ...records[idx],
+            ...rec,
             bookingDate: bDate,
             bookingTime: bTime,
+            bookingType: bType,
             updatedAt: new Date().toISOString()
           }));
         }
@@ -3272,14 +3275,26 @@
 
         const existingIndex = records.findIndex((r) => r.id === data.id);
         if (existingIndex >= 0) {
+          const oldRec = records[existingIndex];
+          // 如果原有預約，維持原本預約類型，否則依照新階段設定
+          let bType = oldRec.bookingType || "";
+          if ((data.bookingDate || data.bookingTime) && !bType) {
+            bType = asPurchased ? "delivery" : "valuation";
+          }
           records[existingIndex] = await persistUpdate(normalizeRecord({
-            ...records[existingIndex],
+            ...oldRec,
             ...data,
-            isPurchased: records[existingIndex].isPurchased
+            bookingType: bType,
+            isPurchased: asPurchased ? true : oldRec.isPurchased
           }));
         } else {
+          let bType = "";
+          if (data.bookingDate || data.bookingTime) {
+            bType = asPurchased ? "delivery" : "valuation";
+          }
           records.push(await persistCreate(normalizeRecord({
             ...data,
+            bookingType: bType,
             isPurchased: asPurchased,
             isSold: false,
             state: "N",
@@ -3301,7 +3316,8 @@
 
       form.addEventListener("submit", (e) => {
         e.preventDefault();
-        saveValuationForm(false);
+        const isEditingPurchased = records.some(r => r.id === fields.recordId.value && r.isPurchased);
+        saveValuationForm(isEditingPurchased);
       });
 
       buyForm.addEventListener("submit", async (event) => {
@@ -3309,8 +3325,11 @@
         const index = records.findIndex((i) => i.id === buyRecordId.value);
         if (index >= 0) {
           records[index] = await persistUpdate(normalizeRecord({
-            ...records[index], boughtDate: buyDate.value.trim(), actualDealPrice: buyActualDealPrice.value.trim(),
-            isPurchased: true, updatedAt: new Date().toISOString()
+            ...records[index],
+            boughtDate: buyDate.value.trim(),
+            actualDealPrice: buyActualDealPrice.value.trim(),
+            isPurchased: true,
+            updatedAt: new Date().toISOString()
           }));
           saveLocalRecords(); render();
         }
@@ -3335,7 +3354,12 @@
           }
 
           records[index] = await persistUpdate(normalizeRecord({
-            ...records[index], salePrice: sellPriceInput.value.trim(), bonus: newBonus, isSold: true, state: "Y", updatedAt: new Date().toISOString()
+            ...records[index],
+            salePrice: sellPriceInput.value.trim(),
+            bonus: newBonus,
+            isSold: true,
+            state: "Y",
+            updatedAt: new Date().toISOString()
           }));
           saveLocalRecords(); render();
         }
