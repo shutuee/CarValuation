@@ -165,19 +165,14 @@
         background: #f1f5f9;
       }
 
-      /* 紅底白字按鈕 (用於確認刪除與主要紅色按鈕) */
-      button.danger,
-      button.btn-danger-red {
-        border-color: #dc2626;
-        background-color: #dc2626;
-        color: #ffffff;
-        font-weight: 700;
+      button.danger {
+        border-color: #f3c5c0;
+        background: #fff;
+        color: var(--danger);
       }
 
-      button.danger:hover,
-      button.btn-danger-red:hover {
-        background-color: #b91c1c;
-        border-color: #b91c1c;
+      button.danger:hover {
+        background: #fff1f0;
       }
 
       button.action-blue {
@@ -303,10 +298,7 @@
         box-shadow: 0 4px 8px rgba(15, 23, 42, 0.15);
       }
 
-      .btn-black:active {
-        transform: translateY(0);
-      }
-
+      /* 詳細欄位展開/收起按鈕樣式 */
       .btn-toggle-detail {
         min-height: 36px;
         height: 36px;
@@ -705,17 +697,15 @@
       .table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
       .table-wrap::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-      /* 表格基礎佈局與寬度鎖定 */
       table {
         width: 100%;
         min-width: 100%;
         border-collapse: separate;
         border-spacing: 0;
         border: none;
-        table-layout: fixed; /* 固定欄寬演算法 */
+        table-layout: fixed;
       }
 
-      /* 展開詳細時，表格轉為 width: max-content 延伸出順暢滾動條 */
       .ongoing-section:not(.hide-ongoing-details) table,
       .purchased-section:not(.hide-purchased-details) table,
       .sold-section table {
@@ -723,13 +713,11 @@
         min-width: 100%;
       }
 
-      /* 隱藏詳細欄位控制項 */
       .ongoing-section.hide-ongoing-details .col-ongoing-detail,
       .purchased-section.hide-purchased-details .col-purchased-detail {
         display: none !important;
       }
 
-      /* 強制統一欄寬規範，防止收起與展開間視差跳動 */
       .col-src       { width: 80px;  min-width: 80px; }
       .col-date      { width: 85px;  min-width: 85px; }
       .col-year      { width: 75px;  min-width: 75px; }
@@ -748,49 +736,9 @@
       .col-repair    { width: 220px; min-width: 220px; }
       .col-bonus     { width: 90px;  min-width: 90px; }
       
-      /* 統一操作欄位寬度為 230px，確保底色完整包覆所有按鈕與垃圾桶圖示 */
       .col-actions   { width: 230px; min-width: 230px; }
       .ongoing-section .col-actions { width: 230px; min-width: 230px; }
 
-      /* 獎金 N 按鈕樣式：預設灰底、選取時藍底白字 */
-      .btn-bonus-n {
-        min-height: 38px;
-        height: 38px;
-        width: 38px;
-        padding: 0;
-        border-radius: 8px;
-        border: 2px solid #e2e8f0;
-        background-color: #f8fafc;
-        color: #94a3b8;
-        font-weight: 800;
-        font-size: 16px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        cursor: pointer;
-      }
-
-      .btn-bonus-n:hover {
-        background-color: #f1f5f9;
-        border-color: #cbd5e1;
-        color: #64748b;
-      }
-
-      .btn-bonus-n.is-active {
-        background-color: #2563eb;
-        border-color: #2563eb;
-        color: #ffffff;
-        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
-      }
-
-      .btn-bonus-n.is-active:hover {
-        background-color: #1d4ed8;
-        border-color: #1d4ed8;
-        color: #ffffff;
-      }
-
-      /* 固定欄高與良好閱讀性規格 */
       th, td {
         border: none;
         border-bottom: 1px solid #737373;
@@ -843,7 +791,7 @@
         display: flex;
         flex-wrap: nowrap;
         gap: 6px;
-        min-width: 120px;
+        min-width: 180px;
         align-items: center;
       }
 
@@ -1332,6 +1280,30 @@
         background-color: #fef2f2;
       }
 
+      .bonus-n-btn {
+        min-height: 38px;
+        height: 38px;
+        padding: 0 16px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background-color: #f1f5f9;
+        color: #64748b;
+        font-weight: 800;
+        font-size: 15px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.18s ease;
+      }
+
+      .bonus-n-btn.is-active {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      }
+
       @media (max-width: 768px) {
         .btn-calendar-view {
           height: 36px;
@@ -1427,33 +1399,27 @@
         .search-row { 
           flex-direction: row; 
           align-items: center;
-          gap: 8px;
+          gap: 10px;
           width: 100%;
         }
         .action-buttons-group {
           display: flex;
           align-items: center;
           gap: 6px;
-          flex-shrink: 0;
+          box-sizing: border-box;
         }
         .action-buttons-group button {
           min-width: 0;
-          padding: 0 8px !important;
-          font-size: 13px !important;
+          padding: 0 10px !important;
+          font-size: 14px !important;
           justify-content: center;
-          gap: 3px !important;
+          gap: 4px !important;
           box-sizing: border-box;
-          height: 40px;
-          min-height: 40px;
         }
         .action-buttons-group button svg {
-          width: 15px !important;
-          height: 15px !important;
+          width: 16px !important;
+          height: 16px !important;
           flex-shrink: 0;
-        }
-        .search-box {
-          flex: 1;
-          min-width: 0;
         }
         .quick-switch-wrap { flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; }
         .switch-btn-group { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -1489,11 +1455,10 @@
   <body>
     <main class="app-shell">
       <section class="workspace">
-        <!-- 資料工具列 (新增估價按鈕與搜尋欄位) -->
+        <!-- 資料工具列 -->
         <section class="list-tools" aria-label="資料工具列">
           <div class="search-tools-group">
             <div class="search-row">
-              <!-- 按鈕群組與搜尋欄位同列 -->
               <div class="action-buttons-group">
                 <button type="button" class="btn-add-valuation" id="openValuationBtn">+新增估價</button>
 
@@ -1508,7 +1473,7 @@
                 </button>
 
                 <button type="button" class="btn-calendar-view" id="openReportModalBtn">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="20" x2="18" y2="10"></line>
                     <line x1="12" y1="20" x2="12" y2="4"></line>
                     <line x1="6" y1="20" x2="6" y2="14"></line>
@@ -1550,7 +1515,7 @@
           </div>
         </section>
 
-        <!-- 估價進行中 (預設折疊詳細欄位) -->
+        <!-- 估價進行中 -->
         <section class="records-section ongoing-section hide-ongoing-details" id="ongoingSection" aria-labelledby="ongoingTitle">
           <header class="section-title">
             <div>
@@ -1576,7 +1541,6 @@
                   <th class="col-quote">報價</th>
                   <th class="col-price">報價(金額)</th>
                   <th class="col-seller">賣家</th>
-                  <!-- 詳細欄位 -->
                   <th class="col-auth col-ongoing-detail">權威</th>
                   <th class="col-remarks col-ongoing-detail">備註</th>
                   <th class="col-repair col-ongoing-detail">整理項目</th>
@@ -1592,7 +1556,7 @@
           </div>
         </section>
 
-        <!-- 已買入 (預設折疊詳細欄位) -->
+        <!-- 已買入 -->
         <section class="records-section purchased-section hide-purchased-details" id="purchasedSection" aria-labelledby="purchasedTitle">
           <header class="section-title">
             <div>
@@ -1620,7 +1584,6 @@
                   <th class="col-price">報價(金額)</th>
                   <th class="col-buy-price">買進價</th>
                   <th class="col-seller">賣家</th>
-                  <!-- 詳細欄位 -->
                   <th class="col-auth col-purchased-detail">權威</th>
                   <th class="col-remarks col-purchased-detail">備註</th>
                   <th class="col-repair col-purchased-detail">整理項目</th>
@@ -1681,14 +1644,12 @@
       </section>
     </main>
 
-    <!-- 估價資料彈窗 (新增/編輯) -->
+    <!-- 估價資料彈窗 -->
     <dialog id="valuationDialog">
       <form id="valuationForm" autocomplete="off">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 4px;">
           <h2 style="margin:0;" id="valuationDialogTitle">新增估價資料</h2>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <button class="secondary" type="button" id="closeValuationDialogBtn" style="min-height:36px; padding:0 12px;">✕</button>
-          </div>
+          <button class="secondary" type="button" id="closeValuationDialogBtn" style="min-height:36px; padding:0 12px;">✕</button>
         </div>
         <input type="hidden" id="recordId" />
         <div class="form-grid">
@@ -1793,7 +1754,6 @@
             <span>獎金</span>
             <input id="bonus" type="text" />
           </label>
-          <!-- 預約日期與時間選擇欄位 -->
           <label>
             <span>預約日期</span>
             <input id="bookingDate" type="date" />
@@ -1807,8 +1767,8 @@
         </div>
         <div class="form-actions">
           <button class="secondary" type="button" id="resetButton">清除</button>
-          <button type="button" class="action-blue" id="submitValuationBtn">新增估價</button>
-          <button type="button" class="action-green" id="submitPurchasedBtn">新增買進</button>
+          <button type="submit" class="action-blue" id="submitValuationBtn">新增估價</button>
+          <button type="submit" class="action-green" id="submitPurchasedBtn">新增買進</button>
         </div>
       </form>
     </dialog>
@@ -1903,19 +1863,7 @@
                 <!-- JS 動態生成年份 -->
               </select>
               <select id="reportMonthSelect" class="report-select" title="選擇統計月份">
-                <option value="all">全部月份</option>
-                <option value="01">1 月</option>
-                <option value="02">2 月</option>
-                <option value="03">3 月</option>
-                <option value="04">4 月</option>
-                <option value="05">5 月</option>
-                <option value="06">6 月</option>
-                <option value="07">7 月</option>
-                <option value="08">8 月</option>
-                <option value="09">9 月</option>
-                <option value="10">10 月</option>
-                <option value="11">11 月</option>
-                <option value="12">12 月</option>
+                <!-- JS 動態生成月份 -->
               </select>
             </div>
           </div>
@@ -1979,18 +1927,27 @@
       <form id="sellForm" method="dialog">
         <h2>已售出資料</h2>
         <input type="hidden" id="sellRecordId" />
+        
         <label>
           <span>買進價</span>
-          <div id="sellDisplayBuyPrice" style="font-size: 16px; font-weight: 700; padding: 10px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; color: #334155; min-height: 44px; display: flex; align-items: center;">無紀錄</div>
+          <input id="sellBuyPriceDisplay" type="text" readonly style="background-color: #f1f5f9; color: #475569; font-weight: 700;" />
         </label>
+
+        <label>
+          <span>獎金標註</span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button type="button" class="bonus-n-btn" id="sellBonusNBtn">
+              <span>獎金 N</span>
+            </button>
+            <span style="font-size: 13px; color: #64748b;">點擊切換是否標註 N</span>
+          </div>
+        </label>
+
         <label>
           <span>賣出價</span>
           <input id="sellPriceInput" type="text" />
         </label>
-        <div style="display: flex; align-items: center; gap: 12px; margin-top: 4px;">
-          <span style="color: var(--muted); font-size: 14px; font-weight: 700;">獎金</span>
-          <button type="button" id="sellBonusNBtn" class="btn-bonus-n">N</button>
-        </div>
+        
         <div class="dialog-actions">
           <button class="secondary" type="button" id="cancelSellButton">取消</button>
           <button type="submit" class="action-green">確認售出</button>
@@ -2006,7 +1963,7 @@
         <input type="hidden" id="deleteTargetId" />
         <div class="dialog-actions">
           <button class="secondary" type="button" id="cancelDeleteButton">取消</button>
-          <button type="submit" class="danger btn-danger-red">確認刪除</button>
+          <button type="submit" class="action-red" style="background-color: #dc2626; border-color: #dc2626; color: #ffffff;">確認刪除</button>
         </div>
       </form>
     </dialog>
@@ -2018,17 +1975,17 @@
       const FIXED_SOURCES = ["來店", "網站", "自買"];
 
       const fieldNames = [
-        "sourceType", "sourceCustom", "receivedDate", "boughtDate", "year", "model",
+        "sourceType", "sourceCustom", "receivedDate", "boughtDate", "bookingDate", "bookingTime", "year", "model",
         "km", "color", "condition", "version", "authority", "quote",
         "purchasePrice", "actualDealPrice", "salePrice", "remarks",
-        "repairItems", "seller", "bonus", "bookingDate", "bookingTime",
+        "repairItems", "seller", "bonus",
       ];
 
       const sheetHeaders = [
-        "id", "source", "receivedDate", "boughtDate", "bookingDate", "bookingTime", "bookingType", "year", "model",
+        "id", "source", "receivedDate", "boughtDate", "bookingDate", "bookingTime", "year", "model",
         "km", "color", "condition", "version", "authority", "quote",
         "purchasePrice", "actualDealPrice", "salePrice", "remarks",
-        "repairItems", "seller", "bonus", "isPurchased", "state",
+        "repairItems", "seller", "bonus", "isPurchased", "bookingType", "state",
         "createdAt", "updatedAt",
       ];
 
@@ -2102,10 +2059,10 @@
       const sellDialog = document.querySelector("#sellDialog"); 
       const sellForm = document.querySelector("#sellForm");
       const sellRecordId = document.querySelector("#sellRecordId");
+      const sellBuyPriceDisplay = document.querySelector("#sellBuyPriceDisplay");
+      const sellBonusNBtn = document.querySelector("#sellBonusNBtn");
       const sellPriceInput = document.querySelector("#sellPriceInput");
       const cancelSellButton = document.querySelector("#cancelSellButton");
-      const sellDisplayBuyPrice = document.querySelector("#sellDisplayBuyPrice");
-      const sellBonusNBtn = document.querySelector("#sellBonusNBtn");
 
       const deleteConfirmDialog = document.querySelector("#deleteConfirmDialog");
       const deleteConfirmForm = document.querySelector("#deleteConfirmForm");
@@ -2136,6 +2093,9 @@
       let ongoingDetailExpanded = false;
       let purchasedDetailExpanded = false;
 
+      let currentSubmitAction = "valuation"; // "valuation" or "purchased"
+      let sellBonusStateN = false; // 已售出彈窗中的 N 按鈕狀態
+
       function updateBodyScrollLock() {
         const openModal = document.querySelector("dialog[open]");
         document.body.classList.toggle("modal-open", openModal !== null);
@@ -2153,7 +2113,8 @@
 
       function timeToMinutes(timeStr) {
         if (!timeStr) return 9999;
-        const parts = String(timeStr).split(":");
+        const cleanTime = String(timeStr).replace(/.*T/, "").replace(/\..*/, "");
+        const parts = cleanTime.split(":");
         if (parts.length < 2) return 9999;
         const h = parseInt(parts[0], 10);
         const m = parseInt(parts[1], 10);
@@ -2183,11 +2144,23 @@
         initTimePickerOptions(fields.bookingTime);
       }
 
+      function initMonthSelectOptions() {
+        if (!reportMonthSelect) return;
+        reportMonthSelect.innerHTML = '<option value="all">全部月份</option>';
+        for (let m = 1; m <= 12; m++) {
+          const opt = document.createElement("option");
+          opt.value = String(m).padStart(2, "0");
+          opt.textContent = `${m} 月`;
+          reportMonthSelect.appendChild(opt);
+        }
+      }
+      initMonthSelectOptions();
+
       function loadLocalRecords() {
         try {
           const savedRecords = JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
           return savedRecords.map(normalizeRecord);
-        } catch {
+        } catch (error) {
           return [];
         }
       }
@@ -2201,6 +2174,23 @@
         return String(value).replace(/^'/, "");
       }
 
+      /**
+       * 預約時間格式化：
+       * 不論試算表回傳 1899-12-30T14:30:00.000Z 還是標準時間字串，均自動處理為 HH:MM 格式。
+       */
+      function normalizeBookingTime(value) {
+        if (!value) return "";
+        const text = String(value).trim();
+        const match = text.match(/(?:T|\b)(\d{1,2}:\d{2})(?::\d{2})?/);
+        if (match) {
+          const parts = match[1].split(":");
+          const h = parts[0].padStart(2, "0");
+          const m = parts[1].padStart(2, "0");
+          return `${h}:${m}`;
+        }
+        return text;
+      }
+
       function normalizeRecord(record) {
         const rawSource = cleanSheetText(record.source || "");
         const normalizedSource = rawSource === "估價網站" ? "網站" : rawSource;
@@ -2211,10 +2201,8 @@
         const isSold = (rawState === "Y");
         const isPurchased = normalizeBoolean(record.isPurchased);
 
-        // 預約類型 (valuation: 估價預約, delivery: 交車預約)
-        // 若沒有 explicitly 帶入，且有預約資訊，預設依當時建立階段設定
-        let bookingType = cleanSheetText(record.bookingType || "");
-        if (!bookingType && (record.bookingDate || record.bookingTime)) {
+        let bookingType = cleanSheetText(record.bookingType);
+        if (!bookingType) {
           bookingType = isPurchased ? "delivery" : "valuation";
         }
 
@@ -2225,8 +2213,8 @@
           receivedDate: normalizeDateText(cleanSheetText(record.receivedDate || record.date || "")),
           boughtDate: normalizeDateText(cleanSheetText(record.boughtDate || "")),
           bookingDate: normalizeDateText(cleanSheetText(record.bookingDate || "")),
-          bookingTime: cleanSheetText(record.bookingTime || ""),
-          bookingType,
+          bookingTime: normalizeBookingTime(cleanSheetText(record.bookingTime || "")),
+          bookingType: bookingType,
           year: cleanSheetText(record.year),
           model: cleanSheetText(record.model),
           km: normalizeKm(cleanSheetText(record.km || record.mileage || "")),
@@ -2242,8 +2230,8 @@
           repairItems: cleanSheetText(record.repairItems),
           seller: cleanSheetText(record.seller || record.location || [record.sellerName, record.sellerPhone].filter(Boolean).join(" ")),
           bonus: cleanSheetText(record.bonus),
-          isPurchased,
-          isSold,
+          isPurchased: isPurchased,
+          isSold: isSold,
           state: isSold ? "Y" : "N",
           createdAt: record.createdAt || new Date().toISOString(),
           updatedAt: record.updatedAt || new Date().toISOString(),
@@ -2287,6 +2275,14 @@
         const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
         if (isoDate) return `${isoDate[2]}/${isoDate[3]}`;
         return text;
+      }
+
+      function getRecordMonth(value) {
+        if (!value) return "";
+        const text = String(value).trim();
+        const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (isoDate) return isoDate[2];
+        return "";
       }
 
       function dateValueToNumber(value) {
@@ -2355,14 +2351,14 @@
         try {
           const result = await apiPost("create", { record: toSheetRecord(record) });
           return normalizeRecord(result.record || record);
-        } catch { return record; }
+        } catch (error) { return record; }
       }
 
       async function persistUpdate(record) {
         try {
           const result = await apiPost("update", { record: toSheetRecord(record) });
           return normalizeRecord(result.record || record);
-        } catch { return record; }
+        } catch (error) { return record; }
       }
 
       async function persistDelete(id) {
@@ -2447,18 +2443,8 @@
         return String(new Date().getFullYear());
       }
 
-      function getRecordPurchaseMonth(record) {
-        if (!record.isPurchased && !record.isSold) return null;
-        const dateStr = record.boughtDate || record.receivedDate || "";
-        const match = dateStr.match(/^\d{4}[-/](\d{1,2})[-/]/);
-        if (match) {
-          return String(match[1]).padStart(2, "0");
-        }
-        return null;
-      }
-
       function updateReportSection() {
-        if (!reportYearSelect) return;
+        if (!reportYearSelect || !reportMonthSelect) return;
 
         const dealRecords = records.filter((r) => r.isPurchased || r.isSold);
         const yearsSet = new Set();
@@ -2489,12 +2475,15 @@
         }
 
         const selectedYear = reportYearSelect.value;
-        const selectedMonth = reportMonthSelect ? reportMonthSelect.value : "all";
+        const selectedMonth = reportMonthSelect.value;
 
         const filteredDeals = dealRecords.filter((r) => {
-          const yearMatch = selectedYear === "all" || getRecordPurchaseYear(r) === selectedYear;
-          const monthMatch = selectedMonth === "all" || getRecordPurchaseMonth(r) === selectedMonth;
-          return yearMatch && monthMatch;
+          if (selectedYear !== "all" && getRecordPurchaseYear(r) !== selectedYear) return false;
+          if (selectedMonth !== "all") {
+            const m = getRecordMonth(r.boughtDate || r.receivedDate);
+            if (m !== selectedMonth) return false;
+          }
+          return true;
         });
 
         const allInStockCount = records.filter((r) => r.isPurchased && !r.isSold).length;
@@ -2535,9 +2524,12 @@
             channelBreakdownWrap.classList.remove("is-hidden");
 
             const yearRecords = records.filter((r) => {
-              const yearMatch = selectedYear === "all" || getRecordPurchaseYear(r) === selectedYear;
-              const monthMatch = selectedMonth === "all" || getRecordPurchaseMonth(r) === selectedMonth;
-              return yearMatch && monthMatch;
+              if (selectedYear !== "all" && getRecordPurchaseYear(r) !== selectedYear) return false;
+              if (selectedMonth !== "all") {
+                const m = getRecordMonth(r.boughtDate || r.receivedDate);
+                if (m !== selectedMonth) return false;
+              }
+              return true;
             });
 
             const counts = { "來店": 0, "網站": 0, "自買": 0, "自行輸入": 0 };
@@ -2559,6 +2551,7 @@
             channels.forEach((ch) => {
               const count = counts[ch] || 0;
               if (ch === "自行輸入" && count === 0) return;
+
               const pct = total > 0 ? Math.round((count / total) * 100) : 0;
 
               const card = document.createElement("div");
@@ -2581,11 +2574,19 @@
         if (yearBreakdownList) {
           yearBreakdownList.innerHTML = "";
           sortedYears.forEach((yr) => {
-            const yrDeals = dealRecords.filter((r) => getRecordPurchaseYear(r) === yr);
+            const yrDeals = dealRecords.filter((r) => {
+              if (getRecordPurchaseYear(r) !== yr) return false;
+              if (selectedMonth !== "all") {
+                const m = getRecordMonth(r.boughtDate || r.receivedDate);
+                if (m !== selectedMonth) return false;
+              }
+              return true;
+            });
+
             let countNum = yrDeals.length;
-            if (yr === currentYearStr) {
+            if (yr === currentYearStr && selectedMonth === "all") {
               countNum = allInStockCount + yrDeals.filter((r) => r.isSold).length;
-            } else if (yr === "2025") {
+            } else if (yr === "2025" && selectedMonth === "all") {
               countNum = 42;
             }
 
@@ -2608,7 +2609,6 @@
         return cell;
       }
 
-      // 1. 估價進行中資料列
       function createOngoingRow(record) {
         const row = document.createElement("tr");
 
@@ -2624,7 +2624,6 @@
           createCell(record.quote, "col-quote"), 
           createCell(record.purchasePrice, "col-price"),
           createCell(record.seller, "col-seller"),
-          // 詳細欄位（權威、備註、整理項目）
           createCell(record.authority, "col-auth col-ongoing-detail"),
           createCell(record.remarks, "note-cell col-remarks col-ongoing-detail"),
           createCell(record.repairItems, "wide-cell col-repair col-ongoing-detail")
@@ -2651,7 +2650,6 @@
         return row;
       }
 
-      // 2. 已買入資料列
       function createPurchasedRow(record) {
         const row = document.createElement("tr");
 
@@ -2669,7 +2667,6 @@
           createCell(record.purchasePrice, "col-price"),
           createCell(record.actualDealPrice, "col-buy-price"),
           createCell(record.seller, "col-seller"),
-          // 詳細欄位 (權威移至此處)
           createCell(record.authority, "col-auth col-purchased-detail"),
           createCell(record.remarks, "note-cell col-remarks col-purchased-detail"),
           createCell(record.repairItems, "wide-cell col-repair col-purchased-detail"),
@@ -2698,7 +2695,6 @@
         return row;
       }
 
-      // 3. 已售出資料列
       function createSoldRow(record) {
         const row = document.createElement("tr");
 
@@ -2813,6 +2809,7 @@
           if (!fields[name]) continue;
           if (name === "km") fields[name].value = normalizeKm(record[name]);
           else if (name === "receivedDate" || name === "boughtDate" || name === "bookingDate") fields[name].value = toDateInputValue(record[name]);
+          else if (name === "bookingTime") fields[name].value = normalizeBookingTime(record[name]);
           else fields[name].value = record[name] || "";
         }
         updateSourceCustomVisibility();
@@ -2820,19 +2817,13 @@
         if (valuationDialogTitle) valuationDialogTitle.textContent = "編輯資料";
 
         if (record.isPurchased) {
-          // 編輯「已買入」資料：顯示綠色「儲存」按鈕，隱藏藍色按鈕
-          if (submitValuationBtn) submitValuationBtn.classList.add("is-hidden");
-          if (submitPurchasedBtn) {
-            submitPurchasedBtn.classList.remove("is-hidden");
-            submitPurchasedBtn.textContent = "儲存";
-          }
+          submitValuationBtn.classList.add("is-hidden");
+          submitPurchasedBtn.classList.remove("is-hidden");
+          submitPurchasedBtn.textContent = "儲存";
         } else {
-          // 編輯「估價進行中」資料：顯示藍色「儲存」按鈕，隱藏綠色按鈕
-          if (submitValuationBtn) {
-            submitValuationBtn.classList.remove("is-hidden");
-            submitValuationBtn.textContent = "儲存";
-          }
-          if (submitPurchasedBtn) submitPurchasedBtn.classList.add("is-hidden");
+          submitValuationBtn.classList.remove("is-hidden");
+          submitValuationBtn.textContent = "儲存";
+          submitPurchasedBtn.classList.add("is-hidden");
         }
 
         valuationDialog.showModal();
@@ -2842,14 +2833,12 @@
         form.reset();
         fields.recordId.value = "";
         if (valuationDialogTitle) valuationDialogTitle.textContent = "新增估價資料";
-        if (submitValuationBtn) {
-          submitValuationBtn.classList.remove("is-hidden");
-          submitValuationBtn.textContent = "新增估價";
-        }
-        if (submitPurchasedBtn) {
-          submitPurchasedBtn.classList.remove("is-hidden");
-          submitPurchasedBtn.textContent = "新增買進";
-        }
+        
+        submitValuationBtn.classList.remove("is-hidden");
+        submitValuationBtn.textContent = "新增估價";
+        submitPurchasedBtn.classList.remove("is-hidden");
+        submitPurchasedBtn.textContent = "新增買進";
+
         updateSourceCustomVisibility();
       }
 
@@ -2904,9 +2893,9 @@
 
           let dayBookings = records.filter((r) => r.bookingDate === dateISO);
           if (calendarFilterType === "valuation") {
-            dayBookings = dayBookings.filter((r) => r.bookingType === "valuation" || (!r.bookingType && !r.isPurchased));
+            dayBookings = dayBookings.filter((r) => r.bookingType === "valuation");
           } else if (calendarFilterType === "delivery") {
-            dayBookings = dayBookings.filter((r) => r.bookingType === "delivery" || (!r.bookingType && r.isPurchased));
+            dayBookings = dayBookings.filter((r) => r.bookingType === "delivery");
           }
 
           dayBookings.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
@@ -2914,18 +2903,18 @@
           if (dayBookings.length > 0) {
             if (dayBookings.length <= 2) {
               dayBookings.forEach((b) => {
-                const isDeliveryBadge = b.bookingType === "delivery" || (!b.bookingType && b.isPurchased);
                 const badge = document.createElement("div");
+                const isDeliveryBadge = (b.bookingType === "delivery");
                 badge.className = "calendar-badge" + (isDeliveryBadge ? " is-purchased" : "");
-                badge.textContent = b.bookingTime || '預約';
+                badge.textContent = normalizeBookingTime(b.bookingTime) || '預約';
                 cell.appendChild(badge);
               });
             } else {
               dayBookings.slice(0, 1).forEach((b) => {
-                const isDeliveryBadge = b.bookingType === "delivery" || (!b.bookingType && b.isPurchased);
                 const badge = document.createElement("div");
+                const isDeliveryBadge = (b.bookingType === "delivery");
                 badge.className = "calendar-badge" + (isDeliveryBadge ? " is-purchased" : "");
-                badge.textContent = b.bookingTime || '預約';
+                badge.textContent = normalizeBookingTime(b.bookingTime) || '預約';
                 cell.appendChild(badge);
               });
               const moreBadge = document.createElement("div");
@@ -3002,9 +2991,9 @@
 
         let dayBookings = records.filter((r) => r.bookingDate === dateISO);
         if (calendarFilterType === "valuation") {
-          dayBookings = dayBookings.filter((r) => r.bookingType === "valuation" || (!r.bookingType && !r.isPurchased));
+          dayBookings = dayBookings.filter((r) => r.bookingType === "valuation");
         } else if (calendarFilterType === "delivery") {
-          dayBookings = dayBookings.filter((r) => r.bookingType === "delivery" || (!r.bookingType && r.isPurchased));
+          dayBookings = dayBookings.filter((r) => r.bookingType === "delivery");
         }
 
         dayBookings.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
@@ -3014,11 +3003,11 @@
         if (dayBookings.length > 0) {
           dayBookings.forEach((b) => {
             const item = document.createElement("div");
-            const isDeliv = b.bookingType === "delivery" || (!b.bookingType && b.isPurchased);
-            item.className = "agenda-item " + (isDeliv ? "type-delivery-card" : "type-valuation-card");
+            const isDeliveryAgenda = (b.bookingType === "delivery");
+            item.className = "agenda-item " + (isDeliveryAgenda ? "type-delivery-card" : "type-valuation-card");
 
-            const badgeLabel = isDeliv ? "交車" : "估價";
-            const badgeClass = isDeliv ? "type-delivery" : "type-valuation";
+            const badgeLabel = isDeliveryAgenda ? "交車" : "估價";
+            const badgeClass = isDeliveryAgenda ? "type-delivery" : "type-valuation";
 
             const vehicleStr = [b.year, b.model].filter(Boolean).join(" ");
             const infoParts = [];
@@ -3032,7 +3021,7 @@
               <div class="agenda-item-left">
                 <span class="agenda-type-badge ${badgeClass}">${badgeLabel}</span>
                 <div class="agenda-info">
-                  <span class="agenda-time">⏰ ${b.bookingTime || '未定時間'}</span>
+                  <span class="agenda-time">⏰ ${normalizeBookingTime(b.bookingTime) || '未定時間'}</span>
                   <span class="agenda-detail" title="${infoText}">${infoText}</span>
                 </div>
               </div>
@@ -3065,7 +3054,6 @@
                   ...records[idx],
                   bookingDate: "",
                   bookingTime: "",
-                  bookingType: "",
                   updatedAt: new Date().toISOString()
                 }));
                 saveLocalRecords();
@@ -3098,15 +3086,11 @@
 
         const availableRecords = records.filter((r) => !r.isSold || r.id === selectedId);
 
-        // 排序方式：[估價] 車輛排在上面 (!isPurchased)，[已買入] 車輛排在下面 (isPurchased)
         availableRecords.sort((a, b) => {
-          if (!a.isPurchased && b.isPurchased) return -1;
-          if (a.isPurchased && !b.isPurchased) return 1;
-          
-          // 同類別內部依日期排序 (最新在最上方)
-          const dateA = dateValueToNumber(a.boughtDate || a.receivedDate) || 0;
-          const dateB = dateValueToNumber(b.boughtDate || b.receivedDate) || 0;
-          return dateB - dateA;
+          const typeA = a.isPurchased ? 1 : 0;
+          const typeB = b.isPurchased ? 1 : 0;
+          if (typeA !== typeB) return typeA - typeB;
+          return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
         });
 
         availableRecords.forEach((r) => {
@@ -3145,7 +3129,6 @@
         }
       }
 
-      // 展開/收起詳細欄位事件處理
       toggleOngoingDetailBtn?.addEventListener("click", () => {
         ongoingDetailExpanded = !ongoingDetailExpanded;
         ongoingSection.classList.toggle("hide-ongoing-details", !ongoingDetailExpanded);
@@ -3212,7 +3195,7 @@
         const targetRec = records.find((r) => r.id === recId);
         const todayStr = new Date().toISOString().split("T")[0];
         modalBookingDate.value = targetRec?.bookingDate || todayStr;
-        modalBookingTime.value = targetRec?.bookingTime || "09:00";
+        modalBookingTime.value = normalizeBookingTime(targetRec?.bookingTime) || "09:00";
         openBookingModal();
       }
 
@@ -3231,7 +3214,7 @@
         const idx = records.findIndex((r) => r.id === targetId);
         if (idx >= 0) {
           const rec = records[idx];
-          const bType = rec.isPurchased ? "delivery" : "valuation";
+          const bType = rec.bookingType || (rec.isPurchased ? "delivery" : "valuation");
           records[idx] = await persistUpdate(normalizeRecord({
             ...rec,
             bookingDate: bDate,
@@ -3256,9 +3239,18 @@
         valuationDialog.close();
       });
 
-      async function saveValuationForm(asPurchased) {
-        if (submitValuationBtn) submitValuationBtn.disabled = true;
-        if (submitPurchasedBtn) submitPurchasedBtn.disabled = true;
+      submitValuationBtn?.addEventListener("click", () => {
+        currentSubmitAction = "valuation";
+      });
+
+      submitPurchasedBtn?.addEventListener("click", () => {
+        currentSubmitAction = "purchased";
+      });
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        submitValuationBtn.disabled = true;
+        submitPurchasedBtn.disabled = true;
 
         const data = { id: fields.recordId.value || createId(), updatedAt: new Date().toISOString() };
         for (const name of fieldNames) {
@@ -3269,33 +3261,39 @@
         if (data.sourceType !== CUSTOM_SOURCE) data.sourceCustom = "";
         data.km = normalizeKm(data.km);
 
-        if (asPurchased && !data.boughtDate) {
-          data.boughtDate = new Date().toISOString().split("T")[0];
-        }
-
         const existingIndex = records.findIndex((r) => r.id === data.id);
+        const todayStr = new Date().toISOString().split("T")[0];
+
         if (existingIndex >= 0) {
-          const oldRec = records[existingIndex];
-          // 如果原有預約，維持原本預約類型，否則依照新階段設定
-          let bType = oldRec.bookingType || "";
-          if ((data.bookingDate || data.bookingTime) && !bType) {
-            bType = asPurchased ? "delivery" : "valuation";
-          }
+          const existingRec = records[existingIndex];
+          const isPurchased = existingRec.isPurchased;
+          const bookingDate = data.bookingDate || existingRec.bookingDate || "";
+          const bookingTime = data.bookingTime || existingRec.bookingTime || "";
+          const bookingType = existingRec.bookingType || (isPurchased ? "delivery" : "valuation");
+
           records[existingIndex] = await persistUpdate(normalizeRecord({
-            ...oldRec,
+            ...existingRec,
             ...data,
-            bookingType: bType,
-            isPurchased: asPurchased ? true : oldRec.isPurchased
+            bookingDate,
+            bookingTime,
+            bookingType,
+            isPurchased
           }));
         } else {
-          let bType = "";
-          if (data.bookingDate || data.bookingTime) {
-            bType = asPurchased ? "delivery" : "valuation";
+          const isPurchased = (currentSubmitAction === "purchased");
+          if (isPurchased && !data.boughtDate) {
+            data.boughtDate = todayStr;
           }
+          const bookingDate = data.bookingDate || "";
+          const bookingTime = data.bookingTime || "";
+          const bookingType = isPurchased ? "delivery" : "valuation";
+
           records.push(await persistCreate(normalizeRecord({
             ...data,
-            bookingType: bType,
-            isPurchased: asPurchased,
+            bookingDate,
+            bookingTime,
+            bookingType,
+            isPurchased: isPurchased,
             isSold: false,
             state: "N",
             createdAt: new Date().toISOString()
@@ -3305,19 +3303,15 @@
         saveLocalRecords();
         resetForm();
         render();
-        renderCalendarView();
+        if (calendarViewDialog.open) renderCalendarView();
         valuationDialog.close();
-        if (submitValuationBtn) submitValuationBtn.disabled = false;
-        if (submitPurchasedBtn) submitPurchasedBtn.disabled = false;
-      }
+        submitValuationBtn.disabled = false;
+        submitPurchasedBtn.disabled = false;
+      });
 
-      submitValuationBtn?.addEventListener("click", () => saveValuationForm(false));
-      submitPurchasedBtn?.addEventListener("click", () => saveValuationForm(true));
-
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const isEditingPurchased = records.some(r => r.id === fields.recordId.value && r.isPurchased);
-        saveValuationForm(isEditingPurchased);
+      sellBonusNBtn?.addEventListener("click", () => {
+        sellBonusStateN = !sellBonusStateN;
+        sellBonusNBtn.classList.toggle("is-active", sellBonusStateN);
       });
 
       buyForm.addEventListener("submit", async (event) => {
@@ -3336,27 +3330,15 @@
         buyDialog.close(); buyForm.reset();
       });
 
-      sellBonusNBtn?.addEventListener("click", () => {
-        sellBonusNBtn.classList.toggle("is-active");
-      });
-
       sellForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const index = records.findIndex((i) => i.id === sellRecordId.value);
         if (index >= 0) {
-          const isBonusN = sellBonusNBtn.classList.contains("is-active");
-          let newBonus = records[index].bonus;
-          
-          if (isBonusN) {
-            newBonus = "N";
-          } else if (newBonus === "N" || newBonus === "n") {
-            newBonus = "";
-          }
-
+          const updatedBonus = sellBonusStateN ? "N" : (records[index].bonus === "N" ? "" : records[index].bonus);
           records[index] = await persistUpdate(normalizeRecord({
             ...records[index],
             salePrice: sellPriceInput.value.trim(),
-            bonus: newBonus,
+            bonus: updatedBonus,
             isSold: true,
             state: "Y",
             updatedAt: new Date().toISOString()
@@ -3456,18 +3438,12 @@
             buyDialog.showModal(); buyDate.focus();
           }
         } else if (button.dataset.action === "sell") {
-          sellRecordId.value = record.id; 
+          sellRecordId.value = record.id;
+          sellBuyPriceDisplay.value = record.actualDealPrice || "未填寫";
           sellPriceInput.value = record.salePrice || "";
-          sellDisplayBuyPrice.textContent = record.actualDealPrice || "無紀錄";
-          
-          if (record.bonus === "N" || record.bonus === "n") {
-            sellBonusNBtn.classList.add("is-active");
-          } else {
-            sellBonusNBtn.classList.remove("is-active");
-          }
-          
-          sellDialog.showModal(); 
-          sellPriceInput.focus();
+          sellBonusStateN = (record.bonus === "N");
+          sellBonusNBtn.classList.toggle("is-active", sellBonusStateN);
+          sellDialog.showModal(); sellPriceInput.focus();
         } else if (button.dataset.action === "toggle-sold") {
           records[index] = await persistUpdate(normalizeRecord({ ...record, isSold: false, state: "N", updatedAt: new Date().toISOString() }));
           saveLocalRecords(); render();
