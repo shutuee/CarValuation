@@ -2088,7 +2088,7 @@
       let currentStatusFilter = "all";
       let calendarCurrentDate = new Date();
       let calendarFilterType = "all";
-      let selectedCalendarDateISO = "";
+      let selectedCalendarDateISO = new Date().toISOString().split("T")[0];
 
       let ongoingDetailExpanded = false;
       let purchasedDetailExpanded = false;
@@ -3073,7 +3073,8 @@
             bookingTargetRecordId.value = "";
             populateVehicleSelect("");
             updateBookingDialogTitle("");
-            modalBookingDate.value = dateISO;
+            const defaultDate = dateISO || selectedCalendarDateISO || new Date().toISOString().split("T")[0];
+            modalBookingDate.value = defaultDate;
             modalBookingTime.value = "08:30";
             openBookingModal();
           };
@@ -3160,7 +3161,10 @@
 
       openCalendarViewBtn?.addEventListener("click", () => {
         calendarCurrentDate = new Date();
-        selectedCalendarDateISO = "";
+        const todayStr = new Date().toISOString().split("T")[0];
+        if (!selectedCalendarDateISO) {
+          selectedCalendarDateISO = todayStr;
+        }
         renderCalendarView();
         calendarViewDialog.showModal();
         if (document.activeElement) {
@@ -3179,6 +3183,7 @@
 
       todayMonthBtn?.addEventListener("click", () => {
         calendarCurrentDate = new Date();
+        selectedCalendarDateISO = new Date().toISOString().split("T")[0];
         renderCalendarView();
       });
 
@@ -3194,7 +3199,7 @@
 
         const targetRec = records.find((r) => r.id === recId);
         const todayStr = new Date().toISOString().split("T")[0];
-        modalBookingDate.value = targetRec?.bookingDate || todayStr;
+        modalBookingDate.value = targetRec?.bookingDate || selectedCalendarDateISO || todayStr;
         modalBookingTime.value = normalizeBookingTime(targetRec?.bookingTime) || "09:00";
         openBookingModal();
       }
@@ -3205,29 +3210,69 @@
 
       bookingForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const targetId = modalVehicleSelect.value || bookingTargetRecordId.value;
-        const bDate = modalBookingDate.value;
-        const bTime = modalBookingTime.value;
+        const saveBtn = bookingForm.querySelector("button[type='submit']");
+        if (saveBtn) saveBtn.disabled = true;
 
-        if (!targetId) return;
+        try {
+          const targetId = modalVehicleSelect.value || bookingTargetRecordId.value;
+          const bDate = modalBookingDate.value;
+          const bTime = modalBookingTime.value;
 
-        const idx = records.findIndex((r) => r.id === targetId);
-        if (idx >= 0) {
-          const rec = records[idx];
-          const bType = rec.bookingType || (rec.isPurchased ? "delivery" : "valuation");
-          records[idx] = await persistUpdate(normalizeRecord({
-            ...rec,
-            bookingDate: bDate,
-            bookingTime: bTime,
-            bookingType: bType,
-            updatedAt: new Date().toISOString()
-          }));
+          if (!bDate) {
+            if (saveBtn) saveBtn.disabled = false;
+            return;
+          }
+
+          if (targetId) {
+            const idx = records.findIndex((r) => r.id === targetId);
+            if (idx >= 0) {
+              const rec = records[idx];
+              const bType = rec.bookingType || (rec.isPurchased ? "delivery" : "valuation");
+              records[idx] = await persistUpdate(normalizeRecord({
+                ...rec,
+                bookingDate: bDate,
+                bookingTime: bTime,
+                bookingType: bType,
+                updatedAt: new Date().toISOString()
+              }));
+            }
+          } else {
+            // 車輛為選填：若未選擇車輛，自動建立一筆新的預約紀錄
+            const newRec = normalizeRecord({
+              id: createId(),
+              model: "預約估價",
+              bookingDate: bDate,
+              bookingTime: bTime,
+              bookingType: "valuation",
+              isPurchased: false,
+              isSold: false,
+              state: "N",
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            });
+            records.push(await persistCreate(newRec));
+          }
+
+          // 同步選取日期與月曆視圖，防止畫面跳動或跑掉
+          if (bDate) {
+            selectedCalendarDateISO = bDate;
+            const parts = bDate.split("-").map(Number);
+            if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+              calendarCurrentDate = new Date(parts[0], parts[1] - 1, 1);
+            }
+          }
+
+          saveLocalRecords();
+          render();
+          if (calendarViewDialog.open) {
+            renderCalendarView();
+          }
+          bookingDialog.close();
+        } catch (error) {
+          console.error("Booking save error:", error);
+        } finally {
+          if (saveBtn) saveBtn.disabled = false;
         }
-
-        saveLocalRecords();
-        render();
-        renderCalendarView();
-        bookingDialog.close();
       });
 
       openValuationBtn?.addEventListener("click", () => {
@@ -3298,6 +3343,14 @@
             state: "N",
             createdAt: new Date().toISOString()
           })));
+        }
+
+        if (data.bookingDate) {
+          selectedCalendarDateISO = data.bookingDate;
+          const parts = data.bookingDate.split("-").map(Number);
+          if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+            calendarCurrentDate = new Date(parts[0], parts[1] - 1, 1);
+          }
         }
 
         saveLocalRecords();
