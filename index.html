@@ -1974,223 +1974,217 @@
       const CUSTOM_SOURCE = "自行輸入";
       const FIXED_SOURCES = ["來店", "網站", "自買"];
 
+      // 核心 DOM 元素宣告
+      const form = document.getElementById("valuationForm");
+      const searchInput = document.getElementById("searchInput");
+      const ongoingSection = document.getElementById("ongoingSection");
+      const ongoingCount = document.getElementById("ongoingCount");
+      const ongoingBody = document.getElementById("ongoingBody");
+      const ongoingEmpty = document.getElementById("ongoingEmpty");
+      const toggleOngoingDetailBtn = document.getElementById("toggleOngoingDetailBtn");
+
+      const purchasedSection = document.getElementById("purchasedSection");
+      const purchasedCount = document.getElementById("purchasedCount");
+      const purchasedBody = document.getElementById("purchasedBody");
+      const purchasedEmpty = document.getElementById("purchasedEmpty");
+      const togglePurchasedDetailBtn = document.getElementById("togglePurchasedDetailBtn");
+
+      const soldSection = document.getElementById("soldSection");
+      const soldCount = document.getElementById("soldCount");
+      const soldBody = document.getElementById("soldBody");
+      const soldEmpty = document.getElementById("soldEmpty");
+      const soldDateSortHeader = document.getElementById("soldDateSortHeader");
+      const soldBonusSortHeader = document.getElementById("soldBonusSortHeader");
+
+      const valuationDialog = document.getElementById("valuationDialog");
+      const valuationDialogTitle = document.getElementById("valuationDialogTitle");
+      const closeValuationDialogBtn = document.getElementById("closeValuationDialogBtn");
+      const sourceCustomWrap = document.getElementById("sourceCustomWrap");
+      const resetButton = document.getElementById("resetButton");
+      const submitValuationBtn = document.getElementById("submitValuationBtn");
+      const submitPurchasedBtn = document.getElementById("submitPurchasedBtn");
+
+      const bookingDialog = document.getElementById("bookingDialog");
+      const bookingForm = document.getElementById("bookingForm");
+      const bookingDialogTitle = document.getElementById("bookingDialogTitle");
+      const bookingTargetRecordId = document.getElementById("bookingTargetRecordId");
+      const modalVehicleSelect = document.getElementById("modalVehicleSelect");
+      const modalVehicleSelectWrap = document.getElementById("modalVehicleSelectWrap");
+      const modalBookingDate = document.getElementById("modalBookingDate");
+      const modalBookingTime = document.getElementById("modalBookingTime");
+      const cancelBookingBtn = document.getElementById("cancelBookingBtn");
+
+      const calendarViewDialog = document.getElementById("calendarViewDialog");
+      const calendarMonthTitle = document.getElementById("calendarMonthTitle");
+      const prevMonthBtn = document.getElementById("prevMonthBtn");
+      const todayMonthBtn = document.getElementById("todayMonthBtn");
+      const nextMonthBtn = document.getElementById("nextMonthBtn");
+      const closeCalendarViewBtn = document.getElementById("closeCalendarViewBtn");
+      const calendarGrid = document.getElementById("calendarGrid");
+      const dailyAgendaPanel = document.getElementById("dailyAgendaPanel");
+      const agendaDateTitle = document.getElementById("agendaDateTitle");
+      const agendaList = document.getElementById("agendaList");
+      const agendaAddBookingBtn = document.getElementById("agendaAddBookingBtn");
+
+      const reportDialog = document.getElementById("reportDialog");
+      const closeReportDialogBtn = document.getElementById("closeReportDialogBtn");
+      const reportYearSelect = document.getElementById("reportYearSelect");
+      const reportMonthSelect = document.getElementById("reportMonthSelect");
+      const annualTotalPurchased = document.getElementById("annualTotalPurchased");
+      const annualPurchasedCount = document.getElementById("annualPurchasedCount");
+      const annualSoldCount = document.getElementById("annualSoldCount");
+      const yearBreakdownList = document.getElementById("yearBreakdownList");
+      const channelBreakdownWrap = document.getElementById("channelBreakdownWrap");
+      const channelGridList = document.getElementById("channelGridList");
+
+      const buyDialog = document.getElementById("buyDialog");
+      const buyForm = document.getElementById("buyForm");
+      const buyRecordId = document.getElementById("buyRecordId");
+      const buyDate = document.getElementById("buyDate");
+      const buyActualDealPrice = document.getElementById("buyActualDealPrice");
+      const cancelBuyButton = document.getElementById("cancelBuyButton");
+
+      const sellDialog = document.getElementById("sellDialog");
+      const sellForm = document.getElementById("sellForm");
+      const sellRecordId = document.getElementById("sellRecordId");
+      const sellBuyPriceDisplay = document.getElementById("sellBuyPriceDisplay");
+      const sellBonusNBtn = document.getElementById("sellBonusNBtn");
+      const sellPriceInput = document.getElementById("sellPriceInput");
+      const cancelSellButton = document.getElementById("cancelSellButton");
+
+      const deleteConfirmDialog = document.getElementById("deleteConfirmDialog");
+      const deleteConfirmForm = document.getElementById("deleteConfirmForm");
+      const deleteConfirmText = document.getElementById("deleteConfirmText");
+      const deleteTargetId = document.getElementById("deleteTargetId");
+      const cancelDeleteButton = document.getElementById("cancelDeleteButton");
+
+      const openValuationBtn = document.getElementById("openValuationBtn");
+      const openCalendarViewBtn = document.getElementById("openCalendarViewBtn");
+      const openReportModalBtn = document.getElementById("openReportModalBtn");
+
+      const switchCountAll = document.getElementById("switchCountAll");
+      const switchCountOngoing = document.getElementById("switchCountOngoing");
+      const switchCountPurchased = document.getElementById("switchCountPurchased");
+      const switchCountSold = document.getElementById("switchCountSold");
+
+      // 欄位名與表單元素表映射
       const fieldNames = [
-        "sourceType", "sourceCustom", "receivedDate", "boughtDate", "bookingDate", "bookingTime", "year", "model",
-        "km", "color", "condition", "version", "authority", "quote",
-        "purchasePrice", "actualDealPrice", "salePrice", "remarks",
-        "repairItems", "seller", "bonus",
+        "receivedDate",
+        "boughtDate",
+        "sourceType",
+        "sourceCustom",
+        "year",
+        "model",
+        "km",
+        "color",
+        "condition",
+        "version",
+        "authority",
+        "quote",
+        "purchasePrice",
+        "actualDealPrice",
+        "salePrice",
+        "remarks",
+        "repairItems",
+        "seller",
+        "bonus",
+        "bookingDate",
+        "bookingTime"
       ];
 
       const sheetHeaders = [
-        "id", "source", "receivedDate", "boughtDate", "bookingDate", "bookingTime", "year", "model",
-        "km", "color", "condition", "version", "authority", "quote",
-        "purchasePrice", "actualDealPrice", "salePrice", "remarks",
-        "repairItems", "seller", "bonus", "isPurchased", "bookingType", "state",
-        "createdAt", "updatedAt",
+        "id", "source", "sourceType", "sourceCustom", "receivedDate", "boughtDate",
+        "bookingDate", "bookingTime", "bookingType", "year", "model", "km", "color",
+        "condition", "version", "authority", "quote", "purchasePrice", "actualDealPrice",
+        "salePrice", "remarks", "repairItems", "seller", "bonus", "isPurchased", "state",
+        "createdAt", "updatedAt"
       ];
 
-      const fields = Object.fromEntries(fieldNames.map((name) => [name, document.querySelector(`#${name}`)]));
-      fields.recordId = document.querySelector("#recordId");
+      const fields = {
+        recordId: document.getElementById("recordId")
+      };
+      fieldNames.forEach((name) => {
+        fields[name] = document.getElementById(name);
+      });
 
-      const valuationDialog = document.querySelector("#valuationDialog");
-      const valuationDialogTitle = document.querySelector("#valuationDialogTitle");
-      const openValuationBtn = document.querySelector("#openValuationBtn");
-      const closeValuationDialogBtn = document.querySelector("#closeValuationDialogBtn");
-
-      const form = document.querySelector("#valuationForm");
-      const submitValuationBtn = document.querySelector("#submitValuationBtn");
-      const submitPurchasedBtn = document.querySelector("#submitPurchasedBtn");
-      const resetButton = document.querySelector("#resetButton");
-      const searchInput = document.querySelector("#searchInput");
-      const sourceCustomWrap = document.querySelector("#sourceCustomWrap");
-      
-      const ongoingSection = document.querySelector("#ongoingSection");
-      const purchasedSection = document.querySelector("#purchasedSection");
-      const soldSection = document.querySelector("#soldSection");
-
-      const ongoingBody = document.querySelector("#ongoingBody");
-      const purchasedBody = document.querySelector("#purchasedBody");
-      const soldBody = document.querySelector("#soldBody"); 
-      
-      const ongoingEmpty = document.querySelector("#ongoingEmpty");
-      const purchasedEmpty = document.querySelector("#purchasedEmpty");
-      const soldEmpty = document.querySelector("#soldEmpty"); 
-      
-      const ongoingCount = document.querySelector("#ongoingCount");
-      const purchasedCount = document.querySelector("#purchasedCount");
-      const soldCount = document.querySelector("#soldCount"); 
-
-      const switchCountAll = document.querySelector("#switchCountAll");
-      const switchCountOngoing = document.querySelector("#switchCountOngoing");
-      const switchCountPurchased = document.querySelector("#switchCountPurchased");
-      const switchCountSold = document.querySelector("#switchCountSold");
-
-      const toggleOngoingDetailBtn = document.querySelector("#toggleOngoingDetailBtn");
-      const togglePurchasedDetailBtn = document.querySelector("#togglePurchasedDetailBtn");
-
-      const openCalendarViewBtn = document.querySelector("#openCalendarViewBtn");
-      const calendarViewDialog = document.querySelector("#calendarViewDialog");
-      const closeCalendarViewBtn = document.querySelector("#closeCalendarViewBtn");
-      const prevMonthBtn = document.querySelector("#prevMonthBtn");
-      const todayMonthBtn = document.querySelector("#todayMonthBtn");
-      const nextMonthBtn = document.querySelector("#nextMonthBtn");
-      const calendarMonthTitle = document.querySelector("#calendarMonthTitle");
-      const calendarGrid = document.querySelector("#calendarGrid");
-
-      const openReportModalBtn = document.querySelector("#openReportModalBtn");
-      const reportDialog = document.querySelector("#reportDialog");
-      const closeReportDialogBtn = document.querySelector("#closeReportDialogBtn");
-
-      const bookingDialog = document.querySelector("#bookingDialog");
-      const bookingForm = document.querySelector("#bookingForm");
-      const cancelBookingBtn = document.querySelector("#cancelBookingBtn");
-      const modalVehicleSelect = document.querySelector("#modalVehicleSelect");
-      const modalBookingDate = document.querySelector("#modalBookingDate");
-      const modalBookingTime = document.querySelector("#modalBookingTime");
-      const bookingTargetRecordId = document.querySelector("#bookingTargetRecordId");
-      
-      const buyDialog = document.querySelector("#buyDialog");
-      const buyForm = document.querySelector("#buyForm");
-      const buyRecordId = document.querySelector("#buyRecordId");
-      const buyDate = document.querySelector("#buyDate");
-      const buyActualDealPrice = document.querySelector("#buyActualDealPrice");
-      const cancelBuyButton = document.querySelector("#cancelBuyButton");
-      
-      const sellDialog = document.querySelector("#sellDialog"); 
-      const sellForm = document.querySelector("#sellForm");
-      const sellRecordId = document.querySelector("#sellRecordId");
-      const sellBuyPriceDisplay = document.querySelector("#sellBuyPriceDisplay");
-      const sellBonusNBtn = document.querySelector("#sellBonusNBtn");
-      const sellPriceInput = document.querySelector("#sellPriceInput");
-      const cancelSellButton = document.querySelector("#cancelSellButton");
-
-      const deleteConfirmDialog = document.querySelector("#deleteConfirmDialog");
-      const deleteConfirmForm = document.querySelector("#deleteConfirmForm");
-      const deleteTargetId = document.querySelector("#deleteTargetId");
-      const deleteConfirmText = document.querySelector("#deleteConfirmText");
-      const cancelDeleteButton = document.querySelector("#cancelDeleteButton");
-
-      const reportYearSelect = document.querySelector("#reportYearSelect");
-      const reportMonthSelect = document.querySelector("#reportMonthSelect");
-      const annualTotalPurchased = document.querySelector("#annualTotalPurchased");
-      const annualPurchasedCount = document.querySelector("#annualPurchasedCount");
-      const annualSoldCount = document.querySelector("#annualSoldCount");
-      const yearBreakdownList = document.querySelector("#yearBreakdownList");
-      const channelBreakdownWrap = document.querySelector("#channelBreakdownWrap");
-      const channelGridList = document.querySelector("#channelGridList");
-
-      const soldDateSortHeader = document.querySelector("#soldDateSortHeader");
-      const soldBonusSortHeader = document.querySelector("#soldBonusSortHeader");
-      
-      let records = loadLocalRecords();
-      let soldSortField = "receivedDate";
-      let soldSortDesc = true;
+      // 狀態變數定義
+      let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
       let currentStatusFilter = "all";
-      let calendarCurrentDate = new Date();
-      let calendarFilterType = "all";
-      let selectedCalendarDateISO = new Date().toISOString().split("T")[0];
-
       let ongoingDetailExpanded = false;
       let purchasedDetailExpanded = false;
+      let soldSortField = "receivedDate";
+      let soldSortDesc = true;
+      let sellBonusStateN = false;
+      let currentSubmitAction = "valuation";
 
-      let currentSubmitAction = "valuation"; // "valuation" or "purchased"
-      let sellBonusStateN = false; // 已售出彈窗中的 N 按鈕狀態
+      let calendarCurrentDate = new Date();
+      let selectedCalendarDateISO = "";
+      let calendarFilterType = "all";
 
-      function updateBodyScrollLock() {
-        const openModal = document.querySelector("dialog[open]");
-        document.body.classList.toggle("modal-open", openModal !== null);
+      function cleanSheetText(val) {
+        if (val === null || val === undefined) return "";
+        return String(val).trim();
       }
 
-      const modalObserver = new MutationObserver(() => {
-        updateBodyScrollLock();
-      });
-
-      modalObserver.observe(document.body, {
-        attributes: true,
-        attributeFilter: ["open"],
-        subtree: true
-      });
+      function normalizeBoolean(val) {
+        if (typeof val === "boolean") return val;
+        if (typeof val === "string") {
+          const s = val.trim().toLowerCase();
+          return s === "true" || s === "1" || s === "y" || s === "yes";
+        }
+        return Boolean(val);
+      }
 
       function timeToMinutes(timeStr) {
         if (!timeStr) return 9999;
-        const cleanTime = String(timeStr).replace(/.*T/, "").replace(/\..*/, "");
-        const parts = cleanTime.split(":");
-        if (parts.length < 2) return 9999;
-        const h = parseInt(parts[0], 10);
-        const m = parseInt(parts[1], 10);
-        if (isNaN(h) || isNaN(m)) return 9999;
-        return h * 60 + m;
+        const normalized = normalizeBookingTime(timeStr);
+        const parts = normalized.split(":");
+        if (parts.length >= 2) {
+          const h = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10);
+          if (!isNaN(h) && !isNaN(m)) return h * 60 + m;
+        }
+        return 9999;
       }
 
-      function initTimePickerOptions(selectElem) {
-        if (!selectElem) return;
-        selectElem.innerHTML = '<option value="">請選擇時間</option>';
-        for (let hour = 8; hour <= 20; hour++) {
-          for (let min = 0; min < 60; min += 30) {
-            if (hour === 20 && min > 0) break;
-            const hStr = String(hour).padStart(2, "0");
-            const mStr = String(min).padStart(2, "0");
-            const timeVal = `${hStr}:${mStr}`;
-            const opt = document.createElement("option");
-            opt.value = timeVal;
-            opt.textContent = timeVal;
-            selectElem.appendChild(opt);
+      function initTimeSelects() {
+        const times = [];
+        for (let h = 8; h <= 21; h++) {
+          for (let m of [0, 30]) {
+            if (h === 21 && m === 30) continue;
+            const hh = String(h).padStart(2, "0");
+            const mm = String(m).padStart(2, "0");
+            times.push(`${hh}:${mm}`);
           }
         }
+        [fields.bookingTime, modalBookingTime].forEach((sel) => {
+          if (!sel) return;
+          sel.innerHTML = '<option value="">請選擇時間</option>';
+          times.forEach((t) => {
+            const opt = document.createElement("option");
+            opt.value = t;
+            opt.textContent = t;
+            sel.appendChild(opt);
+          });
+        });
       }
 
-      initTimePickerOptions(modalBookingTime);
-      if (fields.bookingTime) {
-        initTimePickerOptions(fields.bookingTime);
-      }
-
-      function initMonthSelectOptions() {
+      function initReportMonthSelect() {
         if (!reportMonthSelect) return;
         reportMonthSelect.innerHTML = '<option value="all">全部月份</option>';
         for (let m = 1; m <= 12; m++) {
           const opt = document.createElement("option");
-          opt.value = String(m).padStart(2, "0");
+          const mStr = String(m).padStart(2, "0");
+          opt.value = mStr;
           opt.textContent = `${m} 月`;
           reportMonthSelect.appendChild(opt);
         }
       }
-      initMonthSelectOptions();
 
-      function loadLocalRecords() {
-        try {
-          const savedRecords = JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
-          return savedRecords.map(normalizeRecord);
-        } catch (error) {
-          return [];
-        }
-      }
-
-      function normalizeBoolean(value) {
-        return value === true || String(value).toLowerCase() === "true" || value === "是";
-      }
-
-      function cleanSheetText(value) {
-        if (value === "" || value === null || value === undefined) return "";
-        return String(value).replace(/^'/, "");
-      }
-
-      /**
-       * 預約時間與日期格式化：
-       * 解決 Google Sheets / Apps Script 回傳 UTC ISO 時間字串（如 1899-12-30T01:00:00.000Z 或 2026-08-27T16:00:00.000Z）
-       * 時，未經 GMT+8 時區校正導致日期與時間跑掉（少 8 小時）的問題。
-       */
       function normalizeBookingTime(value) {
         if (!value) return "";
         const text = String(value).trim();
-        if (text.includes("T")) {
-          const d = new Date(text);
-          if (!isNaN(d.getTime())) {
-            const h = String(d.getHours()).padStart(2, "0");
-            const m = String(d.getMinutes()).padStart(2, "0");
-            return `${h}:${m}`;
-          }
-        }
-        const match = text.match(/(?:^|\b)(\d{1,2}):(\d{2})(?::\d{2})?/);
+        const match = text.match(/(?:^|T|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
         if (match) {
           const h = match[1].padStart(2, "0");
           const m = match[2].padStart(2, "0");
@@ -2202,15 +2196,6 @@
       function normalizeDateText(value) {
         if (!value) return "";
         const text = String(value).trim();
-        if (text.includes("T")) {
-          const d = new Date(text);
-          if (!isNaN(d.getTime())) {
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, "0");
-            const day = String(d.getDate()).padStart(2, "0");
-            return `${y}-${m}-${day}`;
-          }
-        }
         const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
         if (isoMatch) {
           const y = isoMatch[1];
@@ -2281,14 +2266,6 @@
         const number = Number(value);
         if (!Number.isFinite(number)) return String(value);
         return number > 1000 ? String(Math.round((number / 10000) * 10) / 10) : String(number);
-      }
-
-      function normalizeDateText(value) {
-        if (!value) return "";
-        const text = String(value);
-        const match = text.match(/^(\d{4})-(\d{2})-(\d{2})T/);
-        if (match) return `${match[1]}-${match[2]}-${match[3]}`;
-        return text;
       }
 
       function toDateInputValue(value) {
@@ -2372,6 +2349,9 @@
           records = cloudRecords;
           saveLocalRecords();
           render();
+          if (calendarViewDialog && calendarViewDialog.open) {
+            renderCalendarView();
+          }
         } catch (error) {
           console.warn(error);
         }
@@ -2668,6 +2648,14 @@
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
               </svg>
             </button>
+            <button class="secondary btn-icon" type="button" data-action="book" data-id="${record.id}" title="預約估價">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </button>
             <button class="action-blue" type="button" data-action="toggle-purchased" data-id="${record.id}">已買</button>
             <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2710,6 +2698,14 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="secondary btn-icon" type="button" data-action="book" data-id="${record.id}" title="預約交車">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
             </button>
             <button class="action-green" type="button" data-action="sell" data-id="${record.id}">已售</button>
@@ -2993,10 +2989,6 @@
       }
 
       function renderDailyAgenda(dateISO) {
-        const agendaDateTitle = document.querySelector("#agendaDateTitle");
-        const agendaList = document.querySelector("#agendaList");
-        const agendaAddBookingBtn = document.querySelector("#agendaAddBookingBtn");
-
         if (!agendaDateTitle || !agendaList) return;
 
         if (!dateISO) {
@@ -3143,7 +3135,6 @@
       }
 
       function updateBookingDialogTitle(recordId) {
-        const bookingDialogTitle = document.querySelector("#bookingDialogTitle");
         if (!bookingDialogTitle) return;
         const targetRec = records.find((r) => r.id === recordId);
         if (targetRec && targetRec.isPurchased) {
@@ -3190,7 +3181,6 @@
       });
 
       openCalendarViewBtn?.addEventListener("click", () => {
-        calendarCurrentDate = new Date();
         const todayStr = new Date().toISOString().split("T")[0];
         if (!selectedCalendarDateISO) {
           selectedCalendarDateISO = todayStr;
@@ -3537,6 +3527,9 @@
         }
       });
 
+      // 初始化系統
+      initTimeSelects();
+      initReportMonthSelect();
       resetForm(); 
       updateSoldHeadersUI(); 
       render(); 
