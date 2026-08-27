@@ -298,7 +298,6 @@
         box-shadow: 0 4px 8px rgba(15, 23, 42, 0.15);
       }
 
-      /* 詳細欄位展開/收起按鈕樣式 */
       .btn-toggle-detail {
         min-height: 36px;
         height: 36px;
@@ -1280,28 +1279,44 @@
         background-color: #fef2f2;
       }
 
-      .bonus-n-btn {
+      /* 優化後的獎金標註按鈕樣式 */
+      .bonus-opt-btn {
         min-height: 38px;
         height: 38px;
-        padding: 0 16px;
+        padding: 0 18px;
         border-radius: 8px;
         border: 1px solid #cbd5e1;
-        background-color: #f1f5f9;
+        background-color: #ffffff;
         color: #64748b;
-        font-weight: 800;
+        font-weight: 700;
         font-size: 15px;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 6px;
-        transition: all 0.18s ease;
+        transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      .bonus-n-btn.is-active {
-        background-color: #2563eb;
-        border-color: #2563eb;
-        color: #ffffff;
-        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      .bonus-opt-btn:hover {
+        background-color: #f1f5f9;
+        border-color: #94a3b8;
+        color: #0f172a;
+      }
+
+      /* 淺灰底樣式 (選中時高亮) */
+      .bonus-opt-btn.is-active {
+        background-color: #e2e8f0 !important;
+        border-color: #475569 !important;
+        color: #0f172a !important;
+        font-weight: 800;
+        box-shadow: none !important;
+      }
+
+      .bonus-opt-btn.is-active:hover {
+        background-color: #cbd5e1 !important;
+        border-color: #334155 !important;
+        color: #0f172a !important;
       }
 
       @media (max-width: 768px) {
@@ -1936,10 +1951,12 @@
         <label>
           <span>獎金標註</span>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <button type="button" class="bonus-n-btn" id="sellBonusNBtn">
+            <button type="button" class="bonus-opt-btn" id="sellBonusYBtn">
+              <span>獎金 Y</span>
+            </button>
+            <button type="button" class="bonus-opt-btn" id="sellBonusNBtn">
               <span>獎金 N</span>
             </button>
-            <span style="font-size: 13px; color: #64748b;">點擊切換是否標註 N</span>
           </div>
         </label>
 
@@ -2048,6 +2065,7 @@
       const sellForm = document.getElementById("sellForm");
       const sellRecordId = document.getElementById("sellRecordId");
       const sellBuyPriceDisplay = document.getElementById("sellBuyPriceDisplay");
+      const sellBonusYBtn = document.getElementById("sellBonusYBtn");
       const sellBonusNBtn = document.getElementById("sellBonusNBtn");
       const sellPriceInput = document.getElementById("sellPriceInput");
       const cancelSellButton = document.getElementById("cancelSellButton");
@@ -2114,7 +2132,7 @@
       let purchasedDetailExpanded = false;
       let soldSortField = "receivedDate";
       let soldSortDesc = true;
-      let sellBonusStateN = false;
+      let sellBonusValue = "";
       let currentSubmitAction = "valuation";
 
       let calendarCurrentDate = new Date();
@@ -2186,7 +2204,6 @@
         const text = String(value).trim();
         if (!text) return "";
 
-        // 若從 Google 試算表/Apps Script 回傳 ISO 時間字串 (含 T 或 Z，如 1899-12-30T01:00:00.000Z)
         if (text.includes("T") || text.includes("Z")) {
           const d = new Date(text);
           if (!isNaN(d.getTime())) {
@@ -2196,7 +2213,6 @@
           }
         }
 
-        // 標準 "09:00" 或 "9:00" 時間格式
         const match = text.match(/(?:^|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
         if (match) {
           const h = match[1].padStart(2, "0");
@@ -2211,7 +2227,6 @@
         const text = String(value).trim();
         if (!text) return "";
 
-        // 若從 Google 試算表/Apps Script 回傳 ISO 日期時間字串 (含 T 或 Z，如 2026-08-27T16:00:00.000Z)
         if (text.includes("T") || text.includes("Z")) {
           const d = new Date(text);
           if (!isNaN(d.getTime())) {
@@ -2222,7 +2237,6 @@
           }
         }
 
-        // 一般 "2026-08-28" 或 "2026/08/28" 日期格式
         const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
         if (isoMatch) {
           const y = isoMatch[1];
@@ -2399,7 +2413,7 @@
       }
 
       async function persistDelete(id) {
-        try { await apiPost("delete", { id }); } catch (e) { console.warn(e); }
+        try { await apiPost("delete", { id }); } catch (error) { console.warn(error); }
       }
 
       function getFilteredRecords() {
@@ -3137,9 +3151,11 @@
         const availableRecords = records.filter((r) => !r.isSold || r.id === selectedId);
 
         availableRecords.sort((a, b) => {
-          const typeA = a.isPurchased ? 1 : 0;
-          const typeB = b.isPurchased ? 1 : 0;
-          if (typeA !== typeB) return typeA - typeB;
+          const groupA = a.isPurchased ? 1 : 0;
+          const groupB = b.isPurchased ? 1 : 0;
+          if (groupA !== groupB) {
+            return groupA - groupB;
+          }
           return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
         });
 
@@ -3284,7 +3300,6 @@
               }));
             }
           } else {
-            // 車輛為選填：若未選擇車輛，自動建立一筆新的預約紀錄
             const newRec = normalizeRecord({
               id: createId(),
               model: "預約估價",
@@ -3300,7 +3315,6 @@
             records.push(await persistCreate(newRec));
           }
 
-          // 同步選取日期與月曆視圖，防止畫面跳動或跑掉
           if (bDate) {
             selectedCalendarDateISO = bDate;
             const parts = bDate.split("-").map(Number);
@@ -3409,9 +3423,19 @@
         submitPurchasedBtn.disabled = false;
       });
 
+      function updateSellBonusUI() {
+        if (sellBonusYBtn) sellBonusYBtn.classList.toggle("is-active", sellBonusValue === "Y");
+        if (sellBonusNBtn) sellBonusNBtn.classList.toggle("is-active", sellBonusValue === "N");
+      }
+
+      sellBonusYBtn?.addEventListener("click", () => {
+        sellBonusValue = sellBonusValue === "Y" ? "" : "Y";
+        updateSellBonusUI();
+      });
+
       sellBonusNBtn?.addEventListener("click", () => {
-        sellBonusStateN = !sellBonusStateN;
-        sellBonusNBtn.classList.toggle("is-active", sellBonusStateN);
+        sellBonusValue = sellBonusValue === "N" ? "" : "N";
+        updateSellBonusUI();
       });
 
       buyForm.addEventListener("submit", async (event) => {
@@ -3434,7 +3458,8 @@
         event.preventDefault();
         const index = records.findIndex((i) => i.id === sellRecordId.value);
         if (index >= 0) {
-          const updatedBonus = sellBonusStateN ? "N" : (records[index].bonus === "N" ? "" : records[index].bonus);
+          const rawBonus = records[index].bonus;
+          const updatedBonus = sellBonusValue !== "" ? sellBonusValue : (rawBonus === "Y" || rawBonus === "N" ? "" : rawBonus);
           records[index] = await persistUpdate(normalizeRecord({
             ...records[index],
             salePrice: sellPriceInput.value.trim(),
@@ -3541,8 +3566,8 @@
           sellRecordId.value = record.id;
           sellBuyPriceDisplay.value = record.actualDealPrice || "未填寫";
           sellPriceInput.value = record.salePrice || "";
-          sellBonusStateN = (record.bonus === "N");
-          sellBonusNBtn.classList.toggle("is-active", sellBonusStateN);
+          sellBonusValue = record.bonus === "Y" ? "Y" : (record.bonus === "N" ? "N" : "");
+          updateSellBonusUI();
           sellDialog.showModal(); sellPriceInput.focus();
         } else if (button.dataset.action === "toggle-sold") {
           records[index] = await persistUpdate(normalizeRecord({ ...record, isSold: false, state: "N", updatedAt: new Date().toISOString() }));
