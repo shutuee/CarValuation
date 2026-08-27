@@ -2184,7 +2184,20 @@
       function normalizeBookingTime(value) {
         if (!value) return "";
         const text = String(value).trim();
-        const match = text.match(/(?:^|T|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
+        if (!text) return "";
+
+        // 若從 Google 試算表/Apps Script 回傳 ISO 時間字串 (含 T 或 Z，如 1899-12-30T01:00:00.000Z)
+        if (text.includes("T") || text.includes("Z")) {
+          const d = new Date(text);
+          if (!isNaN(d.getTime())) {
+            const h = String(d.getHours()).padStart(2, "0");
+            const m = String(d.getMinutes()).padStart(2, "0");
+            return `${h}:${m}`;
+          }
+        }
+
+        // 標準 "09:00" 或 "9:00" 時間格式
+        const match = text.match(/(?:^|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
         if (match) {
           const h = match[1].padStart(2, "0");
           const m = match[2].padStart(2, "0");
@@ -2196,6 +2209,20 @@
       function normalizeDateText(value) {
         if (!value) return "";
         const text = String(value).trim();
+        if (!text) return "";
+
+        // 若從 Google 試算表/Apps Script 回傳 ISO 日期時間字串 (含 T 或 Z，如 2026-08-27T16:00:00.000Z)
+        if (text.includes("T") || text.includes("Z")) {
+          const d = new Date(text);
+          if (!isNaN(d.getTime())) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, "0");
+            const day = String(d.getDate()).padStart(2, "0");
+            return `${y}-${m}-${day}`;
+          }
+        }
+
+        // 一般 "2026-08-28" 或 "2026/08/28" 日期格式
         const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
         if (isoMatch) {
           const y = isoMatch[1];
