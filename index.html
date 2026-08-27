@@ -2175,18 +2175,48 @@
       }
 
       /**
-       * 預約時間格式化：
-       * 不論試算表回傳 1899-12-30T14:30:00.000Z 還是標準時間字串，均自動處理為 HH:MM 格式。
+       * 預約時間與日期格式化：
+       * 解決 Google Sheets / Apps Script 回傳 UTC ISO 時間字串（如 1899-12-30T01:00:00.000Z 或 2026-08-27T16:00:00.000Z）
+       * 時，未經 GMT+8 時區校正導致日期與時間跑掉（少 8 小時）的問題。
        */
       function normalizeBookingTime(value) {
         if (!value) return "";
         const text = String(value).trim();
-        const match = text.match(/(?:T|\b)(\d{1,2}:\d{2})(?::\d{2})?/);
+        if (text.includes("T")) {
+          const d = new Date(text);
+          if (!isNaN(d.getTime())) {
+            const h = String(d.getHours()).padStart(2, "0");
+            const m = String(d.getMinutes()).padStart(2, "0");
+            return `${h}:${m}`;
+          }
+        }
+        const match = text.match(/(?:^|\b)(\d{1,2}):(\d{2})(?::\d{2})?/);
         if (match) {
-          const parts = match[1].split(":");
-          const h = parts[0].padStart(2, "0");
-          const m = parts[1].padStart(2, "0");
+          const h = match[1].padStart(2, "0");
+          const m = match[2].padStart(2, "0");
           return `${h}:${m}`;
+        }
+        return text;
+      }
+
+      function normalizeDateText(value) {
+        if (!value) return "";
+        const text = String(value).trim();
+        if (text.includes("T")) {
+          const d = new Date(text);
+          if (!isNaN(d.getTime())) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, "0");
+            const day = String(d.getDate()).padStart(2, "0");
+            return `${y}-${m}-${day}`;
+          }
+        }
+        const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
+        if (isoMatch) {
+          const y = isoMatch[1];
+          const m = isoMatch[2].padStart(2, "0");
+          const day = isoMatch[3].padStart(2, "0");
+          return `${y}-${m}-${day}`;
         }
         return text;
       }
