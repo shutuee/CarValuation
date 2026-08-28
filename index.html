@@ -861,6 +861,7 @@
         box-shadow: 0 24px 70px rgba(15, 23, 42, 0.26);
         padding: 0;
         background: #ffffff;
+        margin: auto;
       }
 
       dialog::backdrop {
@@ -1590,6 +1591,8 @@
                   <th class="col-date">進件日</th>
                   <th class="col-year">年份</th>
                   <th class="col-model">車型</th>
+                  <th class="col-buy-price">買進價</th>
+                  <th class="col-sell-price">賣出價</th>
                   <th class="col-km">里程</th>
                   <th class="col-color">顏色</th>
                   <th class="col-cond">車況</th>
@@ -1632,13 +1635,14 @@
                   <th class="col-date col-purchased-detail">進件日</th>
                   <th class="col-year">年份</th>
                   <th class="col-model">車型</th>
+                  <th class="col-buy-price">買進價</th>
+                  <th class="col-sell-price">賣出價</th>
                   <th class="col-km">里程</th>
                   <th class="col-color">顏色</th>
                   <th class="col-cond">車況</th>
                   <th class="col-ver">版本</th>
                   <th class="col-quote">報價</th>
                   <th class="col-price">報價(金額)</th>
-                  <th class="col-buy-price">買進價</th>
                   <th class="col-seller">賣家</th>
                   <th class="col-auth col-purchased-detail">權威</th>
                   <th class="col-remarks col-purchased-detail">備註</th>
@@ -1674,6 +1678,8 @@
                   <th class="col-date">買進日</th>
                   <th class="col-year">年份</th>
                   <th class="col-model">車型</th>
+                  <th class="col-buy-price">買進價</th>
+                  <th class="col-sell-price">賣出價</th>
                   <th class="col-km">里程</th>
                   <th class="col-color">顏色</th>
                   <th class="col-cond">車況</th>
@@ -1681,8 +1687,6 @@
                   <th class="col-auth">權威</th>
                   <th class="col-quote">報價</th>
                   <th class="col-price">報價(金額)</th>
-                  <th class="col-buy-price">買進價</th>
-                  <th class="col-sell-price">賣出價</th>
                   <th class="col-remarks">備註</th>
                   <th class="col-repair">整理項目</th>
                   <th class="col-seller">賣家</th>
@@ -1741,6 +1745,14 @@
             <input id="model" type="text" />
           </label>
           <label>
+            <span>買進價</span>
+            <input id="actualDealPrice" type="text" />
+          </label>
+          <label>
+            <span>賣出價</span>
+            <input id="salePrice" type="text" />
+          </label>
+          <label>
             <span>里程</span>
             <input id="km" type="text" />
           </label>
@@ -1786,14 +1798,6 @@
           <label>
             <span>報價(金額)</span>
             <input id="purchasePrice" type="text" />
-          </label>
-          <label>
-            <span>買進價</span>
-            <input id="actualDealPrice" type="text" />
-          </label>
-          <label>
-            <span>賣出價</span>
-            <input id="salePrice" type="text" />
           </label>
           <label>
             <span>備註</span>
@@ -2038,7 +2042,7 @@
           </div>
         </div>
         <div style="max-height: 60vh; overflow-y: auto; overflow-x: auto; -webkit-overflow-scrolling: touch;">
-          <table style="width: 100%; min-width: 480px; border-collapse: separate; border-spacing: 0; white-space: nowrap;">
+          <table style="width: 100%; min-width: 520px; border-collapse: separate; border-spacing: 0; white-space: nowrap;">
             <thead>
               <tr>
                 <th style="padding: 8px 10px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: left;">來源</th>
@@ -2175,6 +2179,8 @@
         "sourceCustom",
         "year",
         "model",
+        "actualDealPrice",
+        "salePrice",
         "km",
         "color",
         "condition",
@@ -2182,8 +2188,6 @@
         "authority",
         "quote",
         "purchasePrice",
-        "actualDealPrice",
-        "salePrice",
         "remarks",
         "repairItems",
         "seller",
@@ -2281,20 +2285,13 @@
         }
       }
 
+      // 修正後的精準時間解析函式（解決 ISO UTC 轉本地 GMT+8 時區問題）
       function normalizeBookingTime(value) {
         if (!value) return "";
         const text = String(value).trim();
         if (!text) return "";
 
-        // 優先檢查純時間格式（如 "9:00", "09:00", "14:30"）
-        const timeMatch = text.match(/^(?:1899-12-30T)?(\d{1,2}):(\d{2})/);
-        if (timeMatch) {
-          const h = timeMatch[1].padStart(2, "0");
-          const m = timeMatch[2];
-          return `${h}:${m}`;
-        }
-
-        // 當含有 ISO 日期字串且為完整 UTC 時，轉換為本地時間
+        // 1. 若含有 T 或 Z（如 "1899-12-30T01:00:00.000Z"），優先利用 JS Date 自動轉為本地台灣時間 (+8小時)
         if (text.includes("T") || text.includes("Z")) {
           const d = new Date(text);
           if (!isNaN(d.getTime())) {
@@ -2304,24 +2301,24 @@
           }
         }
 
+        // 2. 若為純時間格式（如 "9:00", "09:00", "14:30"），直接正規化為 HH:mm
+        const timeMatch = text.match(/^(\d{1,2}):(\d{2})/);
+        if (timeMatch) {
+          const h = timeMatch[1].padStart(2, "0");
+          const m = timeMatch[2];
+          return `${h}:${m}`;
+        }
+
         return text;
       }
 
+      // 修正後的精準日期解析函式
       function normalizeDateText(value) {
         if (!value) return "";
         const text = String(value).trim();
         if (!text) return "";
 
-        // 若為直接可抓取的 YYYY-MM-DD 格式
-        const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$/);
-        if (isoMatch) {
-          const y = isoMatch[1];
-          const m = isoMatch[2].padStart(2, "0");
-          const day = isoMatch[3].padStart(2, "0");
-          return `${y}-${m}-${day}`;
-        }
-
-        // 若帶有 ISO 時區字串，解析為本地時間
+        // 1. 若帶有 ISO 時區字串（含 T 或 Z），解析為本地時間
         if (text.includes("T") || text.includes("Z")) {
           const d = new Date(text);
           if (!isNaN(d.getTime())) {
@@ -2330,6 +2327,15 @@
             const day = String(d.getDate()).padStart(2, "0");
             return `${y}-${m}-${day}`;
           }
+        }
+
+        // 2. 若為直接可抓取的 YYYY-MM-DD 或 YYYY/MM/DD 格式
+        const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
+        if (isoMatch) {
+          const y = isoMatch[1];
+          const m = isoMatch[2].padStart(2, "0");
+          const day = isoMatch[3].padStart(2, "0");
+          return `${y}-${m}-${day}`;
         }
 
         return text;
@@ -2756,6 +2762,8 @@
           createCell(formatMMDD(record.receivedDate), "col-date"),
           createCell(record.year, "col-year"),
           createCell(record.model, "model-cell col-model"),
+          createCell(record.actualDealPrice, "col-buy-price"),
+          createCell(record.salePrice, "col-sell-price"),
           createCell(record.km, "col-km"),
           createCell(record.color, "col-color"),
           createCell(record.condition, "col-cond"), 
@@ -2806,13 +2814,14 @@
           createCell(formatMMDD(record.receivedDate), "col-date col-purchased-detail"),
           createCell(record.year, "col-year"),
           createCell(record.model, "model-cell col-model"),
+          createCell(record.actualDealPrice, "col-buy-price"),
+          createCell(record.salePrice, "col-sell-price"),
           createCell(record.km, "col-km"),
           createCell(record.color, "col-color"),
           createCell(record.condition, "col-cond"), 
           createCell(record.version, "col-ver"),
           createCell(record.quote, "col-quote"), 
           createCell(record.purchasePrice, "col-price"),
-          createCell(record.actualDealPrice, "col-buy-price"),
           createCell(record.seller, "col-seller"),
           createCell(record.authority, "col-auth col-purchased-detail"),
           createCell(record.remarks, "note-cell col-remarks col-purchased-detail"),
@@ -2859,6 +2868,8 @@
           createCell(formatMMDD(record.boughtDate), "col-date"),
           createCell(record.year, "col-year"),
           createCell(record.model, "model-cell col-model"),
+          createCell(record.actualDealPrice, "col-buy-price"),
+          createCell(record.salePrice, "col-sell-price"),
           createCell(record.km, "col-km"),
           createCell(record.color, "col-color"),
           createCell(record.condition, "col-cond"), 
@@ -2866,8 +2877,6 @@
           createCell(record.authority, "col-auth"),
           createCell(record.quote, "col-quote"), 
           createCell(record.purchasePrice, "col-price"),
-          createCell(record.actualDealPrice, "col-buy-price"),
-          createCell(record.salePrice, "col-sell-price"),
           createCell(record.remarks, "note-cell col-remarks"),
           createCell(record.repairItems, "wide-cell col-repair"),
           createCell(record.seller, "col-seller"),
