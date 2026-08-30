@@ -923,14 +923,50 @@
       dialog#queryBonusDialog {
         width: min(640px, calc(100% - 32px));
         border-radius: 16px;
+        margin: auto;
       }
 
       @media (max-width: 620px) {
         dialog#queryBonusDialog {
-          width: calc(100vw - 24px) !important;
+          width: calc(100vw - 16px) !important;
           max-height: 85vh;
           margin: auto !important;
         }
+
+        #queryBonusDialog .modal-content-wrap {
+          padding: 16px 10px !important;
+        }
+
+        #queryBonusDialog th,
+        #queryBonusDialog td {
+          padding: 6px 2px !important;
+          font-size: 12px !important;
+        }
+      }
+
+      #queryBonusTable {
+        width: 100% !important;
+        min-width: 0 !important;
+        table-layout: fixed !important;
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      #queryBonusTable th,
+      #queryBonusTable td {
+        padding: 8px 4px;
+        font-size: 13px;
+        border-bottom: 1px solid #cbd5e1;
+        text-align: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        box-sizing: border-box;
+      }
+
+      #queryBonusTable td {
+        border-bottom-color: #e2e8f0;
+        color: #0f172a;
       }
 
       dialog form, .modal-content-wrap {
@@ -1321,7 +1357,7 @@
         background-color: #fef2f2;
       }
 
-      /* 優化後的獎金標註按鈕樣式 */
+      /* 優化後的獎金標註按鈕樣式 (無陰影，淺灰底選中高亮) */
       .bonus-opt-btn {
         min-height: 38px;
         height: 38px;
@@ -2041,17 +2077,26 @@
             <button class="secondary" type="button" id="closeQueryBonusDialogBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px;">✕</button>
           </div>
         </div>
-        <div style="max-height: 60vh; overflow-y: auto; overflow-x: auto; -webkit-overflow-scrolling: touch;">
-          <table style="width: 100%; min-width: 520px; border-collapse: separate; border-spacing: 0; white-space: nowrap;">
+        <div style="max-height: 60vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;">
+          <table id="queryBonusTable">
+            <colgroup>
+              <col style="width: 13%;">
+              <col style="width: 15%;">
+              <col style="width: 13%;">
+              <col style="width: 25%;">
+              <col style="width: 11%;">
+              <col style="width: 11%;">
+              <col style="width: 12%;">
+            </colgroup>
             <thead>
               <tr>
-                <th style="padding: 8px 10px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: left;">來源</th>
-                <th style="padding: 8px 10px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: left;">買進日</th>
-                <th style="padding: 8px 10px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: left;">年份</th>
-                <th style="padding: 8px 10px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: left;">車型</th>
-                <th style="padding: 8px 10px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: left;">買進</th>
-                <th style="padding: 8px 10px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: left;">賣出</th>
-                <th style="padding: 8px 10px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center;">轉 Y</th>
+                <th>來源</th>
+                <th>買進日</th>
+                <th>年份</th>
+                <th>車型</th>
+                <th>買進</th>
+                <th>賣出</th>
+                <th style="text-align: center;">轉 Y</th>
               </tr>
             </thead>
             <tbody id="queryBonusBody"></tbody>
@@ -2285,13 +2330,13 @@
         }
       }
 
-      // 修正後的精準時間解析函式（解決 ISO UTC 轉本地 GMT+8 時區問題）
+      // 精準時間解析函式（處理試算表回傳格式與 ISO 時區）
       function normalizeBookingTime(value) {
         if (!value) return "";
         const text = String(value).trim();
         if (!text) return "";
 
-        // 1. 若含有 T 或 Z（如 "1899-12-30T01:00:00.000Z"），優先利用 JS Date 自動轉為本地台灣時間 (+8小時)
+        // 1. 若含有 T 或 Z（如 "1899-12-30T01:00:00.000Z"），使用 JS Date 自動轉為本地台灣時間 (+8小時)
         if (text.includes("T") || text.includes("Z")) {
           const d = new Date(text);
           if (!isNaN(d.getTime())) {
@@ -2312,13 +2357,12 @@
         return text;
       }
 
-      // 修正後的精準日期解析函式
+      // 精準日期解析函式
       function normalizeDateText(value) {
         if (!value) return "";
         const text = String(value).trim();
         if (!text) return "";
 
-        // 1. 若帶有 ISO 時區字串（含 T 或 Z），解析為本地時間
         if (text.includes("T") || text.includes("Z")) {
           const d = new Date(text);
           if (!isNaN(d.getTime())) {
@@ -2329,7 +2373,6 @@
           }
         }
 
-        // 2. 若為直接可抓取的 YYYY-MM-DD 或 YYYY/MM/DD 格式
         const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
         if (isoMatch) {
           const y = isoMatch[1];
@@ -3571,6 +3614,15 @@
 
       function renderQueryBonusList() {
         const bonusNRecords = records.filter((r) => r.isSold && String(r.bonus).trim().toUpperCase() === "N");
+        
+        // 依照買進日月份由遠到近 (日期數字小到大、最早至最新) 排序
+        bonusNRecords.sort((a, b) => {
+          const dateA = dateValueToNumber(a.boughtDate || a.receivedDate) || 0;
+          const dateB = dateValueToNumber(b.boughtDate || b.receivedDate) || 0;
+          if (dateA !== dateB) return dateA - dateB; // 升冪排序：遠 -> 近
+          return String(a.updatedAt || a.createdAt).localeCompare(String(b.updatedAt || b.createdAt));
+        });
+
         if (queryBonusTitle) {
           queryBonusTitle.textContent = `獎金 N 車輛清單 (${bonusNRecords.length} 筆)`;
         }
@@ -3584,15 +3636,15 @@
           bonusNRecords.forEach((r) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-              <td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; white-space: nowrap;">${getSourceLabel(r) || "-"}</td>
-              <td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; white-space: nowrap;">${formatMMDD(r.boughtDate) || "-"}</td>
-              <td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; white-space: nowrap;">${r.year || "-"}</td>
-              <td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-size: 14px; font-weight: 700; color: #0f172a; white-space: nowrap;">${r.model || "-"}</td>
-              <td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; white-space: nowrap;">${r.actualDealPrice || "-"}</td>
-              <td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; white-space: nowrap;">${r.salePrice || "-"}</td>
-              <td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-size: 14px; text-align: center; white-space: nowrap;">
-                <label style="display: inline-flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; user-select: none;">
-                  <input type="checkbox" class="bonus-y-check" data-id="${r.id}" style="width: 18px; height: 18px; cursor: pointer; accent-color: #d97706;" />
+              <td title="${getSourceLabel(r) || ''}">${getSourceLabel(r) || "-"}</td>
+              <td title="${formatMMDD(r.boughtDate) || ''}">${formatMMDD(r.boughtDate) || "-"}</td>
+              <td title="${r.year || ''}">${r.year || "-"}</td>
+              <td style="font-weight: 700;" title="${r.model || ''}">${r.model || "-"}</td>
+              <td title="${r.actualDealPrice || ''}">${r.actualDealPrice || "-"}</td>
+              <td title="${r.salePrice || ''}">${r.salePrice || "-"}</td>
+              <td style="text-align: center;">
+                <label style="display: inline-flex; align-items: center; justify-content: center; gap: 2px; cursor: pointer; user-select: none;">
+                  <input type="checkbox" class="bonus-y-check" data-id="${r.id}" style="width: 16px; height: 16px; cursor: pointer; accent-color: #d97706;" />
                   <span style="font-weight: 800; color: #d97706;">Y</span>
                 </label>
               </td>
