@@ -39,7 +39,6 @@
         box-sizing: border-box;
       }
 
-      /* 背景防捲動鎖定樣式 */
       body.modal-open {
         overflow: hidden !important;
         touch-action: none;
@@ -242,10 +241,6 @@
         transform: translateY(-1px);
       }
 
-      .btn-calendar-view:active {
-        transform: translateY(0);
-      }
-
       .btn-add-booking {
         height: 36px;
         min-height: 36px;
@@ -271,7 +266,6 @@
         color: #0f172a;
       }
 
-      /* 查詢獎金按鈕樣式 (黃底白字) */
       .btn-query-bonus {
         height: 36px;
         min-height: 36px;
@@ -749,16 +743,16 @@
       .col-date      { width: 85px;  min-width: 85px; }
       .col-year      { width: 75px;  min-width: 75px; }
       .col-model     { width: 165px; min-width: 165px; }
+      .col-price     { width: 110px; min-width: 110px; }
+      .col-buy-price { width: 110px; min-width: 110px; }
+      .col-sell-price{ width: 110px; min-width: 110px; }
       .col-km        { width: 85px;  min-width: 85px; }
       .col-color     { width: 70px;  min-width: 70px; }
       .col-cond      { width: 65px;  min-width: 65px; }
       .col-ver       { width: 120px; min-width: 120px; }
       .col-quote     { width: 65px;  min-width: 65px; }
-      .col-price     { width: 110px; min-width: 110px; }
       .col-seller    { width: 130px; min-width: 130px; }
       .col-auth      { width: 90px;  min-width: 90px; }
-      .col-buy-price { width: 110px; min-width: 110px; }
-      .col-sell-price{ width: 110px; min-width: 110px; }
       .col-remarks   { width: 180px; min-width: 180px; }
       .col-repair    { width: 220px; min-width: 220px; }
       .col-bonus     { width: 90px;  min-width: 90px; }
@@ -861,7 +855,6 @@
         box-shadow: 0 24px 70px rgba(15, 23, 42, 0.26);
         padding: 0;
         background: #ffffff;
-        margin: auto;
       }
 
       dialog::backdrop {
@@ -923,51 +916,27 @@
       dialog#queryBonusDialog {
         width: min(640px, calc(100% - 32px));
         border-radius: 16px;
-        margin: auto;
+      }
+
+      /* 查詢獎金表格專屬強制置中規則 (電腦版與手機版同步) */
+      #queryBonusTable th,
+      #queryBonusTable td {
+        text-align: center !important;
       }
 
       @media (max-width: 620px) {
         dialog#queryBonusDialog {
-          width: calc(100vw - 16px) !important;
+          width: calc(100vw - 24px) !important;
           max-height: 85vh;
           margin: auto !important;
         }
 
-        #queryBonusDialog .modal-content-wrap {
-          padding: 16px 10px !important;
-        }
-
-        #queryBonusDialog th,
-        #queryBonusDialog td {
+        #queryBonusTable th,
+        #queryBonusTable td {
           padding: 6px 2px !important;
           font-size: 12px !important;
           text-align: center !important;
         }
-      }
-
-      #queryBonusTable {
-        width: 100% !important;
-        min-width: 0 !important;
-        table-layout: fixed !important;
-        border-collapse: separate;
-        border-spacing: 0;
-      }
-
-      #queryBonusTable th,
-      #queryBonusTable td {
-        padding: 10px 6px;
-        font-size: 14px;
-        border-bottom: 1px solid #cbd5e1;
-        text-align: center !important;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        box-sizing: border-box;
-      }
-
-      #queryBonusTable td {
-        border-bottom-color: #e2e8f0;
-        color: #0f172a;
       }
 
       dialog form, .modal-content-wrap {
@@ -1358,7 +1327,7 @@
         background-color: #fef2f2;
       }
 
-      /* 優化後的獎金標註按鈕樣式 (無陰影，淺灰底選中高亮) */
+      /* 獎金標註按鈕樣式 */
       .bonus-opt-btn {
         min-height: 38px;
         height: 38px;
@@ -1609,7 +1578,6 @@
           </div>
         </section>
 
-        <!-- 估價進行中 -->
         <section class="records-section ongoing-section hide-ongoing-details" id="ongoingSection" aria-labelledby="ongoingTitle">
           <header class="section-title">
             <div>
@@ -1628,14 +1596,12 @@
                   <th class="col-date">進件日</th>
                   <th class="col-year">年份</th>
                   <th class="col-model">車型</th>
-                  <th class="col-buy-price">買進價</th>
-                  <th class="col-sell-price">賣出價</th>
+                  <th class="col-price">報價(金額)</th>
                   <th class="col-km">里程</th>
                   <th class="col-color">顏色</th>
                   <th class="col-cond">車況</th>
                   <th class="col-ver">版本</th>
                   <th class="col-quote">報價</th>
-                  <th class="col-price">報價(金額)</th>
                   <th class="col-seller">賣家</th>
                   <th class="col-auth col-ongoing-detail">權威</th>
                   <th class="col-remarks col-ongoing-detail">備註</th>
@@ -1652,7 +1618,6 @@
           </div>
         </section>
 
-        <!-- 已買入 -->
         <section class="records-section purchased-section hide-purchased-details" id="purchasedSection" aria-labelledby="purchasedTitle">
           <header class="section-title">
             <div>
@@ -1673,13 +1638,12 @@
                   <th class="col-year">年份</th>
                   <th class="col-model">車型</th>
                   <th class="col-buy-price">買進價</th>
-                  <th class="col-sell-price">賣出價</th>
+                  <th class="col-price">報價(金額)</th>
                   <th class="col-km">里程</th>
                   <th class="col-color">顏色</th>
                   <th class="col-cond">車況</th>
                   <th class="col-ver">版本</th>
                   <th class="col-quote">報價</th>
-                  <th class="col-price">報價(金額)</th>
                   <th class="col-seller">賣家</th>
                   <th class="col-auth col-purchased-detail">權威</th>
                   <th class="col-remarks col-purchased-detail">備註</th>
@@ -1697,7 +1661,6 @@
           </div>
         </section>
 
-        <!-- 已售出 -->
         <section class="records-section sold-section" id="soldSection" aria-labelledby="soldTitle">
           <header class="section-title">
             <div>
@@ -1742,7 +1705,6 @@
       </section>
     </main>
 
-    <!-- 估價資料彈窗 -->
     <dialog id="valuationDialog">
       <form id="valuationForm" autocomplete="off">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 4px;">
@@ -1780,6 +1742,10 @@
           <label>
             <span>車型</span>
             <input id="model" type="text" />
+          </label>
+          <label>
+            <span>報價(金額)</span>
+            <input id="purchasePrice" type="text" />
           </label>
           <label>
             <span>買進價</span>
@@ -1833,10 +1799,6 @@
             </select>
           </label>
           <label>
-            <span>報價(金額)</span>
-            <input id="purchasePrice" type="text" />
-          </label>
-          <label>
             <span>備註</span>
             <input id="remarks" type="text" />
           </label>
@@ -1871,7 +1833,6 @@
       </form>
     </dialog>
 
-    <!-- 預約時間彈窗 -->
     <dialog id="bookingDialog">
       <form id="bookingForm" autocomplete="off">
         <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px;">
@@ -1939,7 +1900,6 @@
       </div>
     </dialog>
 
-    <!-- 數據報告彈窗 -->
     <dialog id="reportDialog">
       <div class="modal-content-wrap">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px;">
@@ -1968,7 +1928,7 @@
 
           <div class="report-stats-grid">
             <div class="stat-card primary">
-              <span class="stat-label">年度總買進台數</span>
+              <span class="stat-label" id="annualTotalLabel">年度總買進台數</span>
               <div class="stat-value"><span id="annualTotalPurchased">0</span> <span style="font-size:18px; font-weight:700;">台</span></div>
             </div>
             <div class="sub-stats-row">
@@ -2068,7 +2028,6 @@
       </form>
     </dialog>
 
-    <!-- 查詢獎金 N 彈窗 -->
     <dialog id="queryBonusDialog">
       <div class="modal-content-wrap">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px; gap: 8px;">
@@ -2078,8 +2037,8 @@
             <button class="secondary" type="button" id="closeQueryBonusDialogBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px;">✕</button>
           </div>
         </div>
-        <div style="max-height: 60vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;">
-          <table id="queryBonusTable">
+        <div style="max-height: 60vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; width: 100%;">
+          <table id="queryBonusTable" style="width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; white-space: nowrap;">
             <colgroup>
               <col style="width: 12%;">
               <col style="width: 13%;">
@@ -2091,13 +2050,13 @@
             </colgroup>
             <thead>
               <tr>
-                <th>來源</th>
-                <th>買進日</th>
-                <th>年份</th>
-                <th>車型</th>
-                <th>買進</th>
-                <th>賣出</th>
-                <th>轉 Y</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">來源</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">買進日</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">年份</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">車型</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">買進</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">賣出</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">轉 Y</th>
               </tr>
             </thead>
             <tbody id="queryBonusBody"></tbody>
@@ -2171,6 +2130,7 @@
       const closeReportDialogBtn = document.getElementById("closeReportDialogBtn");
       const reportYearSelect = document.getElementById("reportYearSelect");
       const reportMonthSelect = document.getElementById("reportMonthSelect");
+      const annualTotalLabel = document.getElementById("annualTotalLabel");
       const annualTotalPurchased = document.getElementById("annualTotalPurchased");
       const annualPurchasedCount = document.getElementById("annualPurchasedCount");
       const annualSoldCount = document.getElementById("annualSoldCount");
@@ -2225,6 +2185,7 @@
         "sourceCustom",
         "year",
         "model",
+        "purchasePrice",
         "actualDealPrice",
         "salePrice",
         "km",
@@ -2233,7 +2194,6 @@
         "version",
         "authority",
         "quote",
-        "purchasePrice",
         "remarks",
         "repairItems",
         "seller",
@@ -2331,13 +2291,12 @@
         }
       }
 
-      // 精準時間解析函式（處理試算表回傳格式與 ISO 時區）
       function normalizeBookingTime(value) {
         if (!value) return "";
         const text = String(value).trim();
         if (!text) return "";
 
-        // 1. 若含有 T 或 Z（如 "1899-12-30T01:00:00.000Z"），使用 JS Date 自動轉為本地台灣時間 (+8小時)
+        // 當含有 ISO 時區或完整 Date 物件字串時 (如 1899-12-30T01:00:00.000Z)，優先轉換為台灣本地時間
         if (text.includes("T") || text.includes("Z")) {
           const d = new Date(text);
           if (!isNaN(d.getTime())) {
@@ -2347,22 +2306,29 @@
           }
         }
 
-        // 2. 若為純時間格式（如 "9:00", "09:00", "14:30"），直接正規化為 HH:mm
-        const timeMatch = text.match(/^(\d{1,2}):(\d{2})/);
-        if (timeMatch) {
-          const h = timeMatch[1].padStart(2, "0");
-          const m = timeMatch[2];
+        // 純時間格式 (如 "9:00", "09:00", "14:30") 直接對齊補零，防止 Date 物件誤算時區
+        const directTimeMatch = text.match(/^(\d{1,2}):(\d{2})/);
+        if (directTimeMatch) {
+          const h = directTimeMatch[1].padStart(2, "0");
+          const m = directTimeMatch[2];
           return `${h}:${m}`;
         }
 
         return text;
       }
 
-      // 精準日期解析函式
       function normalizeDateText(value) {
         if (!value) return "";
         const text = String(value).trim();
         if (!text) return "";
+
+        const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
+        if (isoMatch) {
+          const y = isoMatch[1];
+          const m = isoMatch[2].padStart(2, "0");
+          const day = isoMatch[3].padStart(2, "0");
+          return `${y}-${m}-${day}`;
+        }
 
         if (text.includes("T") || text.includes("Z")) {
           const d = new Date(text);
@@ -2372,14 +2338,6 @@
             const day = String(d.getDate()).padStart(2, "0");
             return `${y}-${m}-${day}`;
           }
-        }
-
-        const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
-        if (isoMatch) {
-          const y = isoMatch[1];
-          const m = isoMatch[2].padStart(2, "0");
-          const day = isoMatch[3].padStart(2, "0");
-          return `${y}-${m}-${day}`;
         }
 
         return text;
@@ -2458,16 +2416,25 @@
       function formatMMDD(value) {
         if (!value) return "";
         const text = String(value).trim();
-        const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
-        if (isoDate) return `${isoDate[2]}/${isoDate[3]}`;
+        const isoDate = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
+        if (isoDate) {
+          const m = isoDate[2].padStart(2, "0");
+          const d = isoDate[3].padStart(2, "0");
+          return `${m}/${d}`;
+        }
         return text;
       }
 
       function getRecordMonth(value) {
         if (!value) return "";
         const text = String(value).trim();
-        const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
-        if (isoDate) return isoDate[2];
+        if (!text) return "";
+        const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
+        if (isoMatch) return isoMatch[2].padStart(2, "0");
+        if (text.includes("T") || text.includes("Z")) {
+          const d = new Date(text);
+          if (!isNaN(d.getTime())) return String(d.getMonth() + 1).padStart(2, "0");
+        }
         return "";
       }
 
@@ -2666,6 +2633,10 @@
         const selectedYear = reportYearSelect.value;
         const selectedMonth = reportMonthSelect.value;
 
+        if (annualTotalLabel) {
+          annualTotalLabel.textContent = selectedMonth !== "all" ? `${parseInt(selectedMonth, 10)} 月份買進台數` : "年度總買進台數";
+        }
+
         const filteredDeals = dealRecords.filter((r) => {
           if (selectedYear !== "all" && getRecordPurchaseYear(r) !== selectedYear) return false;
           if (selectedMonth !== "all") {
@@ -2685,6 +2656,7 @@
         let soldInYear = filteredDeals.filter((r) => r.isSold).length;
         let totalInYear = purchasedInYear + soldInYear;
 
+        // 保留規則：2025 年選取全部月份時強制顯示 42 台，並隱藏在庫/售出卡片與管道占比
         if (selectedYear === "2025" && selectedMonth === "all") {
           totalInYear = 42;
         }
@@ -2806,14 +2778,12 @@
           createCell(formatMMDD(record.receivedDate), "col-date"),
           createCell(record.year, "col-year"),
           createCell(record.model, "model-cell col-model"),
-          createCell(record.actualDealPrice, "col-buy-price"),
-          createCell(record.salePrice, "col-sell-price"),
+          createCell(record.purchasePrice, "col-price"),
           createCell(record.km, "col-km"),
           createCell(record.color, "col-color"),
           createCell(record.condition, "col-cond"), 
           createCell(record.version, "col-ver"),
           createCell(record.quote, "col-quote"), 
-          createCell(record.purchasePrice, "col-price"),
           createCell(record.seller, "col-seller"),
           createCell(record.authority, "col-auth col-ongoing-detail"),
           createCell(record.remarks, "note-cell col-remarks col-ongoing-detail"),
@@ -2859,13 +2829,12 @@
           createCell(record.year, "col-year"),
           createCell(record.model, "model-cell col-model"),
           createCell(record.actualDealPrice, "col-buy-price"),
-          createCell(record.salePrice, "col-sell-price"),
+          createCell(record.purchasePrice, "col-price"),
           createCell(record.km, "col-km"),
           createCell(record.color, "col-color"),
           createCell(record.condition, "col-cond"), 
           createCell(record.version, "col-ver"),
           createCell(record.quote, "col-quote"), 
-          createCell(record.purchasePrice, "col-price"),
           createCell(record.seller, "col-seller"),
           createCell(record.authority, "col-auth col-purchased-detail"),
           createCell(record.remarks, "note-cell col-remarks col-purchased-detail"),
@@ -3291,7 +3260,6 @@
 
         const availableRecords = records.filter((r) => !r.isSold || r.id === selectedId);
 
-        // 依類別排序：[估價] 在上方、[已買入] 在下方
         availableRecords.sort((a, b) => {
           const groupA = a.isPurchased ? 1 : 0;
           const groupB = b.isPurchased ? 1 : 0;
@@ -3616,12 +3584,10 @@
       function renderQueryBonusList() {
         const bonusNRecords = records.filter((r) => r.isSold && String(r.bonus).trim().toUpperCase() === "N");
         
-        // 依照買進日月份由遠到近 (日期數字小到大、最早至最新) 排序
         bonusNRecords.sort((a, b) => {
           const dateA = dateValueToNumber(a.boughtDate || a.receivedDate) || 0;
           const dateB = dateValueToNumber(b.boughtDate || b.receivedDate) || 0;
-          if (dateA !== dateB) return dateA - dateB; // 升冪排序：遠 -> 近
-          return String(a.updatedAt || a.createdAt).localeCompare(String(b.updatedAt || b.createdAt));
+          return dateA - dateB;
         });
 
         if (queryBonusTitle) {
@@ -3637,15 +3603,15 @@
           bonusNRecords.forEach((r) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-              <td title="${getSourceLabel(r) || ''}">${getSourceLabel(r) || "-"}</td>
-              <td title="${formatMMDD(r.boughtDate) || ''}">${formatMMDD(r.boughtDate) || "-"}</td>
-              <td title="${r.year || ''}">${r.year || "-"}</td>
-              <td style="font-weight: 700; text-align: center;" title="${r.model || ''}">${r.model || "-"}</td>
-              <td title="${r.actualDealPrice || ''}">${r.actualDealPrice || "-"}</td>
-              <td title="${r.salePrice || ''}">${r.salePrice || "-"}</td>
-              <td style="text-align: center;">
-                <label style="display: inline-flex; align-items: center; justify-content: center; gap: 2px; cursor: pointer; user-select: none;">
-                  <input type="checkbox" class="bonus-y-check" data-id="${r.id}" style="width: 16px; height: 16px; cursor: pointer; accent-color: #d97706;" />
+              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${getSourceLabel(r) || "-"}</td>
+              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${formatMMDD(r.boughtDate) || "-"}</td>
+              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.year || "-"}</td>
+              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; font-weight: 700; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.model || ''}">${r.model || "-"}</td>
+              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.actualDealPrice || "-"}</td>
+              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.salePrice || "-"}</td>
+              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; text-align: center !important; white-space: nowrap;">
+                <label style="display: inline-flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; user-select: none; width: 100%;">
+                  <input type="checkbox" class="bonus-y-check" data-id="${r.id}" style="width: 18px; height: 18px; cursor: pointer; accent-color: #d97706;" />
                   <span style="font-weight: 800; color: #d97706;">Y</span>
                 </label>
               </td>
@@ -3711,6 +3677,9 @@
       closeReportDialogBtn?.addEventListener("click", () => {
         reportDialog.close();
       });
+
+      reportYearSelect?.addEventListener("change", updateReportSection);
+      reportMonthSelect?.addEventListener("change", updateReportSection);
 
       document.querySelectorAll(".switch-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
