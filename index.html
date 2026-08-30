@@ -954,10 +954,10 @@
 
       #queryBonusTable th,
       #queryBonusTable td {
-        padding: 8px 4px;
-        font-size: 13px;
+        padding: 10px 6px;
+        font-size: 14px;
         border-bottom: 1px solid #cbd5e1;
-        text-align: left;
+        text-align: center;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -2080,12 +2080,12 @@
         <div style="max-height: 60vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;">
           <table id="queryBonusTable">
             <colgroup>
+              <col style="width: 12%;">
               <col style="width: 13%;">
-              <col style="width: 15%;">
-              <col style="width: 13%;">
-              <col style="width: 25%;">
-              <col style="width: 11%;">
-              <col style="width: 11%;">
+              <col style="width: 12%;">
+              <col style="width: 23%;">
+              <col style="width: 14%;">
+              <col style="width: 14%;">
               <col style="width: 12%;">
             </colgroup>
             <thead>
@@ -2096,7 +2096,7 @@
                 <th>車型</th>
                 <th>買進</th>
                 <th>賣出</th>
-                <th style="text-align: center;">轉 Y</th>
+                <th>轉 Y</th>
               </tr>
             </thead>
             <tbody id="queryBonusBody"></tbody>
@@ -3642,7 +3642,7 @@
               <td style="font-weight: 700;" title="${r.model || ''}">${r.model || "-"}</td>
               <td title="${r.actualDealPrice || ''}">${r.actualDealPrice || "-"}</td>
               <td title="${r.salePrice || ''}">${r.salePrice || "-"}</td>
-              <td style="text-align: center;">
+              <td>
                 <label style="display: inline-flex; align-items: center; justify-content: center; gap: 2px; cursor: pointer; user-select: none;">
                   <input type="checkbox" class="bonus-y-check" data-id="${r.id}" style="width: 16px; height: 16px; cursor: pointer; accent-color: #d97706;" />
                   <span style="font-weight: 800; color: #d97706;">Y</span>
