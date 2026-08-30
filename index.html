@@ -215,6 +215,30 @@
         border-color: #b91c1c;
       }
 
+      .btn-slate {
+        height: 32px;
+        min-height: 32px;
+        padding: 0 12px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        background-color: #f1f5f9;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+      }
+
+      .btn-slate:hover {
+        background-color: #e2e8f0;
+        border-color: #94a3b8;
+        color: #1e293b;
+      }
+
       .btn-calendar-view {
         min-height: 44px;
         height: 44px;
@@ -291,31 +315,6 @@
         border-color: #d97706;
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(217, 119, 6, 0.25);
-      }
-
-      .btn-slate {
-        height: 30px;
-        min-height: 30px;
-        padding: 0 12px;
-        border-radius: 6px;
-        border: 1px solid #cbd5e1;
-        background-color: #f1f5f9;
-        color: #475569;
-        font-size: 13px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: all 0.2s ease;
-      }
-
-      .btn-slate:hover {
-        background-color: #e2e8f0;
-        border-color: #94a3b8;
-        color: #1e293b;
       }
 
       .btn-black {
@@ -880,6 +879,7 @@
         box-shadow: 0 24px 70px rgba(15, 23, 42, 0.26);
         padding: 0;
         background: #ffffff;
+        margin: auto;
       }
 
       dialog::backdrop {
@@ -940,6 +940,11 @@
 
       dialog#queryBonusDialog {
         width: min(640px, calc(100% - 32px));
+        border-radius: 16px;
+      }
+
+      dialog#reportVehicleDialog {
+        width: min(580px, calc(100% - 32px));
         border-radius: 16px;
       }
 
@@ -1352,7 +1357,6 @@
         background-color: #fef2f2;
       }
 
-      /* 獎金標註按鈕樣式 */
       .bonus-opt-btn {
         min-height: 38px;
         height: 38px;
@@ -1377,7 +1381,6 @@
         color: #0f172a;
       }
 
-      /* 淺灰底樣式 (選中時高亮) */
       .bonus-opt-btn.is-active {
         background-color: #e2e8f0 !important;
         border-color: #475569 !important;
@@ -1952,10 +1955,10 @@
           </div>
 
           <div class="report-stats-grid">
-            <div class="stat-card primary">
-              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div class="stat-card primary" style="position: relative;">
+              <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                 <span class="stat-label" id="annualTotalLabel">年度總買進台數</span>
-                <button type="button" class="btn-slate" id="viewReportVehiclesBtn">車輛</button>
+                <button type="button" class="btn-slate" id="openReportVehicleListBtn">車輛</button>
               </div>
               <div class="stat-value"><span id="annualTotalPurchased">0</span> <span style="font-size:18px; font-weight:700;">台</span></div>
             </div>
@@ -1983,6 +1986,38 @@
             <div class="channel-grid" id="channelGridList">
               <!-- JS 動態生成管道占比資料 -->
             </div>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- 數據報告車輛清單彈窗 -->
+    <dialog id="reportVehicleDialog">
+      <div class="modal-content-wrap">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px;">
+          <h2 style="margin:0; font-size:18px; font-weight:800; color:var(--text-main);" id="reportVehicleDialogTitle">車輛清單</h2>
+          <button class="secondary" type="button" id="closeReportVehicleDialogBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px;">✕</button>
+        </div>
+        <div style="max-height: 60vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; width: 100%;">
+          <table id="reportVehicleTable" style="width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; white-space: nowrap;">
+            <colgroup>
+              <col style="width: 20%;">
+              <col style="width: 18%;">
+              <col style="width: 42%;">
+              <col style="width: 20%;">
+            </colgroup>
+            <thead>
+              <tr>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">買進日</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">年份</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">車型</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">狀態</th>
+              </tr>
+            </thead>
+            <tbody id="reportVehicleBody"></tbody>
+          </table>
+          <div class="empty-state" id="reportVehicleEmpty" style="padding: 24px 0;">
+            <strong>無符合條件的車輛資料</strong>
           </div>
         </div>
       </div>
@@ -2057,34 +2092,40 @@
     </dialog>
 
     <dialog id="queryBonusDialog">
-      <!-- ... queryBonusDialog content ... -->
-    </dialog>
-
-    <!-- 數據報告車輛清單彈窗 -->
-    <dialog id="reportVehicleDialog">
       <div class="modal-content-wrap">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px; gap: 8px;">
-          <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="reportVehicleTitle">買進車輛清單</h2>
-          <button class="secondary" type="button" id="closeReportVehicleDialogBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px;">✕</button>
+          <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="queryBonusTitle">獎金 N 車輛清單</h2>
+          <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+            <button type="button" class="btn-query-bonus" id="saveQueryBonusBtn" style="min-height:36px; height:36px; padding:0 14px; border-radius:8px; font-size:14px; font-weight:700;">儲存</button>
+            <button class="secondary" type="button" id="closeQueryBonusDialogBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px;">✕</button>
+          </div>
         </div>
         <div style="max-height: 60vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; width: 100%;">
-          <table id="reportVehicleTable" style="width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; white-space: nowrap;">
+          <table id="queryBonusTable" style="width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; white-space: nowrap;">
             <colgroup>
-              <col style="width: 25%;">
-              <col style="width: 50%;">
-              <col style="width: 25%;">
+              <col style="width: 12%;">
+              <col style="width: 13%;">
+              <col style="width: 12%;">
+              <col style="width: 23%;">
+              <col style="width: 14%;">
+              <col style="width: 14%;">
+              <col style="width: 12%;">
             </colgroup>
             <thead>
               <tr>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">來源</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">買進日</th>
                 <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">年份</th>
                 <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">車型</th>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">狀態</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">買進</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">賣出</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">轉 Y</th>
               </tr>
             </thead>
-            <tbody id="reportVehicleBody"></tbody>
+            <tbody id="queryBonusBody"></tbody>
           </table>
-          <div class="empty-state" id="reportVehicleEmpty" style="padding: 24px 0;">
-            <strong>當前條件下尚無車輛資料</strong>
+          <div class="empty-state" id="queryBonusEmpty" style="padding: 24px 0;">
+            <strong>尚無標註獎金 N 的已售出車輛</strong>
           </div>
         </div>
       </div>
@@ -2159,11 +2200,11 @@
       const yearBreakdownList = document.getElementById("yearBreakdownList");
       const channelBreakdownWrap = document.getElementById("channelBreakdownWrap");
       const channelGridList = document.getElementById("channelGridList");
-      const viewReportVehiclesBtn = document.getElementById("viewReportVehiclesBtn");
 
       const reportVehicleDialog = document.getElementById("reportVehicleDialog");
+      const reportVehicleDialogTitle = document.getElementById("reportVehicleDialogTitle");
       const closeReportVehicleDialogBtn = document.getElementById("closeReportVehicleDialogBtn");
-      const reportVehicleTitle = document.getElementById("reportVehicleTitle");
+      const openReportVehicleListBtn = document.getElementById("openReportVehicleListBtn");
       const reportVehicleBody = document.getElementById("reportVehicleBody");
       const reportVehicleEmpty = document.getElementById("reportVehicleEmpty");
 
@@ -2240,29 +2281,52 @@
       ];
 
       const fields = {
-        recordId: document.getElementById("recordId")
+        recordId: document.getElementById("recordId"),
+        receivedDate: document.getElementById("receivedDate"),
+        boughtDate: document.getElementById("boughtDate"),
+        sourceType: document.getElementById("sourceType"),
+        sourceCustom: document.getElementById("sourceCustom"),
+        year: document.getElementById("year"),
+        model: document.getElementById("model"),
+        purchasePrice: document.getElementById("purchasePrice"),
+        actualDealPrice: document.getElementById("actualDealPrice"),
+        salePrice: document.getElementById("salePrice"),
+        km: document.getElementById("km"),
+        color: document.getElementById("color"),
+        condition: document.getElementById("condition"),
+        version: document.getElementById("version"),
+        authority: document.getElementById("authority"),
+        quote: document.getElementById("quote"),
+        remarks: document.getElementById("remarks"),
+        repairItems: document.getElementById("repairItems"),
+        seller: document.getElementById("seller"),
+        bonus: document.getElementById("bonus"),
+        bookingDate: document.getElementById("bookingDate"),
+        bookingTime: document.getElementById("bookingTime")
       };
-      fieldNames.forEach((name) => {
-        fields[name] = document.getElementById(name);
-      });
 
-      // 狀態變數定義
-      let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      let records = [];
+      try {
+        const localData = localStorage.getItem(STORAGE_KEY);
+        if (localData) records = JSON.parse(localData).map(normalizeRecord);
+      } catch (e) {
+        records = [];
+      }
+
       let currentStatusFilter = "all";
-      let ongoingDetailExpanded = false;
-      let purchasedDetailExpanded = false;
-      let soldSortField = "receivedDate";
-      let soldSortDesc = true;
-      let sellBonusValue = "";
-      let currentSubmitAction = "valuation";
-
       let calendarCurrentDate = new Date();
       let selectedCalendarDateISO = "";
       let calendarFilterType = "all";
+      let currentSubmitAction = "valuation";
+      let sellBonusValue = "";
+      let soldSortField = "receivedDate";
+      let soldSortDesc = true;
+      let ongoingDetailExpanded = false;
+      let purchasedDetailExpanded = false;
 
-      function cleanSheetText(val) {
-        if (val === null || val === undefined) return "";
-        return String(val).trim();
+      function cleanSheetText(value) {
+        if (value === null || value === undefined) return "";
+        return String(value).trim();
       }
 
       function normalizeBoolean(val) {
@@ -2325,7 +2389,6 @@
         const text = String(value).trim();
         if (!text) return "";
 
-        // 當含有 ISO 時區或完整 Date 物件字串時 (如 1899-12-30T01:00:00.000Z)，優先轉換為台灣本地時間
         if (text.includes("T") || text.includes("Z")) {
           const d = new Date(text);
           if (!isNaN(d.getTime())) {
@@ -2335,7 +2398,6 @@
           }
         }
 
-        // 純時間格式 (如 "9:00", "09:00", "14:30") 直接對齊補零，防止 Date 物件誤算時區
         const directTimeMatch = text.match(/^(\d{1,2}):(\d{2})/);
         if (directTimeMatch) {
           const h = directTimeMatch[1].padStart(2, "0");
@@ -2628,6 +2690,62 @@
         return String(new Date().getFullYear());
       }
 
+      function openReportVehicleModal() {
+        if (!reportYearSelect || !reportMonthSelect) return;
+        const selectedYear = reportYearSelect.value;
+        const selectedMonth = reportMonthSelect.value;
+
+        const dealRecords = records.filter((r) => r.isPurchased || r.isSold);
+        const filteredDeals = dealRecords.filter((r) => {
+          if (selectedYear !== "all" && getRecordPurchaseYear(r) !== selectedYear) return false;
+          if (selectedMonth !== "all") {
+            const m = getRecordMonth(r.boughtDate || r.receivedDate);
+            if (m !== selectedMonth) return false;
+          }
+          return true;
+        });
+
+        // 依買進日（或進件日）舊到新進行順序排序
+        filteredDeals.sort((a, b) => {
+          const dateA = dateValueToNumber(a.boughtDate || a.receivedDate) || 0;
+          const dateB = dateValueToNumber(b.boughtDate || b.receivedDate) || 0;
+          return dateA - dateB;
+        });
+
+        const monthText = selectedMonth !== "all" ? `${parseInt(selectedMonth, 10)}月` : "全年";
+        const yearText = selectedYear !== "all" ? `${selectedYear}年` : "全部年份";
+        if (reportVehicleDialogTitle) {
+          reportVehicleDialogTitle.textContent = `${yearText} ${monthText} 車輛清單 (${filteredDeals.length} 筆)`;
+        }
+
+        if (reportVehicleBody) {
+          reportVehicleBody.innerHTML = "";
+          if (filteredDeals.length === 0) {
+            if (reportVehicleEmpty) reportVehicleEmpty.classList.add("is-visible");
+          } else {
+            if (reportVehicleEmpty) reportVehicleEmpty.classList.remove("is-visible");
+            filteredDeals.forEach((r) => {
+              const tr = document.createElement("tr");
+              const statusTag = r.isSold ? `<span style="color:#b45309; font-weight:700;">已售出</span>` : `<span style="color:#16a34a; font-weight:700;">已買入</span>`;
+              const boughtDateStr = formatMMDD(r.boughtDate || r.receivedDate) || "-";
+              tr.innerHTML = `
+                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important;">${boughtDateStr}</td>
+                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important;">${r.year || "-"}</td>
+                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; font-weight: 700; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.model || ''}">${r.model || "-"}</td>
+                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; text-align: center !important;">${statusTag}</td>
+              `;
+              reportVehicleBody.appendChild(tr);
+            });
+          }
+        }
+
+        reportVehicleDialog.showModal();
+        if (document.activeElement) document.activeElement.blur();
+      }
+
+      openReportVehicleListBtn?.addEventListener("click", openReportVehicleModal);
+      closeReportVehicleDialogBtn?.addEventListener("click", () => reportVehicleDialog.close());
+
       function updateReportSection() {
         if (!reportYearSelect || !reportMonthSelect) return;
 
@@ -2664,6 +2782,15 @@
 
         if (annualTotalLabel) {
           annualTotalLabel.textContent = selectedMonth !== "all" ? `${parseInt(selectedMonth, 10)} 月份買進台數` : "年度總買進台數";
+        }
+
+        // 當為 2025 年時，隱藏「車輛」按鈕
+        if (openReportVehicleListBtn) {
+          if (selectedYear === "2025") {
+            openReportVehicleListBtn.classList.add("is-hidden");
+          } else {
+            openReportVehicleListBtn.classList.remove("is-hidden");
+          }
         }
 
         const filteredDeals = dealRecords.filter((r) => {
@@ -3695,65 +3822,6 @@
         queryBonusDialog.close();
       });
 
-      function openReportVehiclesList() {
-        const selectedYear = reportYearSelect.value;
-        const selectedMonth = reportMonthSelect.value;
-
-        let titleText = "";
-        if (selectedYear !== "all") titleText += `${selectedYear}年 `;
-        if (selectedMonth !== "all") titleText += `${parseInt(selectedMonth, 10)}月 `;
-        titleText += "買進車輛清單";
-
-        const dealRecords = records.filter((r) => r.isPurchased || r.isSold);
-        const filteredList = dealRecords.filter((r) => {
-          if (selectedYear !== "all" && getRecordPurchaseYear(r) !== selectedYear) return false;
-          if (selectedMonth !== "all") {
-            const m = getRecordMonth(r.boughtDate || r.receivedDate);
-            if (m !== selectedMonth) return false;
-          }
-          return true;
-        });
-
-        filteredList.sort((a, b) => {
-          const dateA = dateValueToNumber(a.boughtDate || a.receivedDate) || 0;
-          const dateB = dateValueToNumber(b.boughtDate || b.receivedDate) || 0;
-          return dateB - dateA;
-        });
-
-        if (reportVehicleTitle) {
-          reportVehicleTitle.textContent = `${titleText} (${filteredList.length} 筆)`;
-        }
-
-        if (reportVehicleBody) {
-          reportVehicleBody.innerHTML = "";
-          if (filteredList.length === 0) {
-            if (reportVehicleEmpty) reportVehicleEmpty.classList.add("is-visible");
-          } else {
-            if (reportVehicleEmpty) reportVehicleEmpty.classList.remove("is-visible");
-            filteredList.forEach((r) => {
-              const tr = document.createElement("tr");
-              const statusTag = r.isSold ? '<span style="color:#d97706; font-weight:700;">已售出</span>' : '<span style="color:#16a34a; font-weight:700;">已買入</span>';
-              tr.innerHTML = `
-                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important;">${r.year || "-"}</td>
-                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; font-weight: 700; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.model || ''}">${r.model || "-"}</td>
-                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; text-align: center !important;">${statusTag}</td>
-              `;
-              reportVehicleBody.appendChild(tr);
-            });
-          }
-        }
-
-        reportVehicleDialog.showModal();
-        if (document.activeElement) {
-          document.activeElement.blur();
-        }
-      }
-
-      viewReportVehiclesBtn?.addEventListener("click", openReportVehiclesList);
-      closeReportVehicleDialogBtn?.addEventListener("click", () => {
-        reportVehicleDialog.close();
-      });
-
       openReportModalBtn?.addEventListener("click", () => {
         updateReportSection();
         reportDialog.showModal();
@@ -3860,7 +3928,6 @@
         }
       });
 
-      // 初始化系統
       initTimeSelects();
       initReportMonthSelect();
       resetForm(); 
