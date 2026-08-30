@@ -941,6 +941,7 @@
         #queryBonusDialog td {
           padding: 6px 2px !important;
           font-size: 12px !important;
+          text-align: center !important;
         }
       }
 
@@ -957,7 +958,7 @@
         padding: 10px 6px;
         font-size: 14px;
         border-bottom: 1px solid #cbd5e1;
-        text-align: center;
+        text-align: center !important;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -3639,10 +3640,10 @@
               <td title="${getSourceLabel(r) || ''}">${getSourceLabel(r) || "-"}</td>
               <td title="${formatMMDD(r.boughtDate) || ''}">${formatMMDD(r.boughtDate) || "-"}</td>
               <td title="${r.year || ''}">${r.year || "-"}</td>
-              <td style="font-weight: 700;" title="${r.model || ''}">${r.model || "-"}</td>
+              <td style="font-weight: 700; text-align: center;" title="${r.model || ''}">${r.model || "-"}</td>
               <td title="${r.actualDealPrice || ''}">${r.actualDealPrice || "-"}</td>
               <td title="${r.salePrice || ''}">${r.salePrice || "-"}</td>
-              <td>
+              <td style="text-align: center;">
                 <label style="display: inline-flex; align-items: center; justify-content: center; gap: 2px; cursor: pointer; user-select: none;">
                   <input type="checkbox" class="bonus-y-check" data-id="${r.id}" style="width: 16px; height: 16px; cursor: pointer; accent-color: #d97706;" />
                   <span style="font-weight: 800; color: #d97706;">Y</span>
