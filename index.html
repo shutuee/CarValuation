@@ -939,13 +939,17 @@
       }
 
       dialog#queryBonusDialog {
-        width: min(640px, calc(100% - 32px));
+        width: min(640px, calc(100% - 24px));
+        max-height: 85vh;
         border-radius: 16px;
+        overflow: hidden;
       }
 
       dialog#reportVehicleDialog {
-        width: min(580px, calc(100% - 32px));
+        width: min(580px, calc(100% - 24px));
+        max-height: 85vh;
         border-radius: 16px;
+        overflow: hidden;
       }
 
       /* 查詢獎金表格專屬強制置中規則 (電腦版與手機版同步) */
@@ -956,23 +960,29 @@
 
       @media (max-width: 620px) {
         dialog#queryBonusDialog {
-          width: calc(100vw - 24px) !important;
-          max-height: 85vh;
+          width: calc(100vw - 20px) !important;
+          max-height: 85vh !important;
           margin: auto !important;
+        }
+
+        #queryBonusTitle {
+          font-size: 15px !important;
         }
 
         #queryBonusTable th,
         #queryBonusTable td {
-          padding: 6px 2px !important;
+          padding: 8px 2px !important;
           font-size: 12px !important;
           text-align: center !important;
         }
       }
 
       dialog form, .modal-content-wrap {
-        display: grid;
-        gap: 18px;
-        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px;
+        box-sizing: border-box;
       }
 
       dialog h2 {
@@ -1410,7 +1420,7 @@
         }
         
         .modal-content-wrap {
-          padding: 12px 6px;
+          padding: 16px 12px;
           position: relative;
         }
 
@@ -1994,11 +2004,11 @@
     <!-- 數據報告車輛清單彈窗 -->
     <dialog id="reportVehicleDialog">
       <div class="modal-content-wrap">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px;">
-          <h2 style="margin:0; font-size:18px; font-weight:800; color:var(--text-main);" id="reportVehicleDialogTitle">車輛清單</h2>
-          <button class="secondary" type="button" id="closeReportVehicleDialogBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px;">✕</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px; flex-shrink: 0;">
+          <h2 style="margin:0; font-size:18px; font-weight:800; color:var(--text-main); min-width:0; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="reportVehicleDialogTitle">車輛清單</h2>
+          <button class="secondary" type="button" id="closeReportVehicleDialogBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px; flex-shrink:0;">✕</button>
         </div>
-        <div style="max-height: 60vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; width: 100%;">
+        <div style="min-height: 150px; max-height: 60vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; width: 100%;">
           <table id="reportVehicleTable" style="width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; white-space: nowrap;">
             <colgroup>
               <col style="width: 20%;">
@@ -2091,16 +2101,17 @@
       </form>
     </dialog>
 
+    <!-- 查詢獎金彈窗 -->
     <dialog id="queryBonusDialog">
       <div class="modal-content-wrap">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px; gap: 8px;">
-          <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="queryBonusTitle">獎金 N 車輛清單</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px; gap: 8px; flex-shrink: 0;">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-main); min-width: 0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="queryBonusTitle">獎金 N 車輛清單</h2>
           <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
             <button type="button" class="btn-query-bonus" id="saveQueryBonusBtn" style="min-height:36px; height:36px; padding:0 14px; border-radius:8px; font-size:14px; font-weight:700;">儲存</button>
             <button class="secondary" type="button" id="closeQueryBonusDialogBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px;">✕</button>
           </div>
         </div>
-        <div style="max-height: 60vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; width: 100%;">
+        <div style="min-height: 150px; max-height: 60vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; width: 100%;">
           <table id="queryBonusTable" style="width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; white-space: nowrap;">
             <colgroup>
               <col style="width: 12%;">
@@ -2113,13 +2124,13 @@
             </colgroup>
             <thead>
               <tr>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">來源</th>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">買進日</th>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">年份</th>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">車型</th>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">買進</th>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">賣出</th>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">轉 Y</th>
+                <th style="padding: 8px 2px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">來源</th>
+                <th style="padding: 8px 2px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">買進日</th>
+                <th style="padding: 8px 2px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">年份</th>
+                <th style="padding: 8px 2px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">車型</th>
+                <th style="padding: 8px 2px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">買進</th>
+                <th style="padding: 8px 2px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">賣出</th>
+                <th style="padding: 8px 2px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">轉 Y</th>
               </tr>
             </thead>
             <tbody id="queryBonusBody"></tbody>
@@ -2389,6 +2400,7 @@
         const text = String(value).trim();
         if (!text) return "";
 
+        // 情況 1: 若含有 ISO 時間標記 (包含 T 或 Z)，則使用 JS Date 自動加回 8 小時 (GMT+8 台灣時區)
         if (text.includes("T") || text.includes("Z")) {
           const d = new Date(text);
           if (!isNaN(d.getTime())) {
@@ -2398,6 +2410,7 @@
           }
         }
 
+        // 情況 2: 純文字時間 (如 9:00 或 11:30)，直接對齊輸出，防止被 Date 誤轉換時區
         const directTimeMatch = text.match(/^(\d{1,2}):(\d{2})/);
         if (directTimeMatch) {
           const h = directTimeMatch[1].padStart(2, "0");
@@ -3759,13 +3772,13 @@
           bonusNRecords.forEach((r) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${getSourceLabel(r) || "-"}</td>
-              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${formatMMDD(r.boughtDate) || "-"}</td>
-              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.year || "-"}</td>
-              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; font-weight: 700; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.model || ''}">${r.model || "-"}</td>
-              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.actualDealPrice || "-"}</td>
-              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.salePrice || "-"}</td>
-              <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; text-align: center !important; white-space: nowrap;">
+              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${getSourceLabel(r) || "-"}</td>
+              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${formatMMDD(r.boughtDate) || "-"}</td>
+              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.year || "-"}</td>
+              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 700; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.model || ''}">${r.model || "-"}</td>
+              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.actualDealPrice || "-"}</td>
+              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.salePrice || "-"}</td>
+              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; text-align: center !important; white-space: nowrap;">
                 <label style="display: inline-flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; user-select: none; width: 100%;">
                   <input type="checkbox" class="bonus-y-check" data-id="${r.id}" style="width: 18px; height: 18px; cursor: pointer; accent-color: #d97706;" />
                   <span style="font-weight: 800; color: #d97706;">Y</span>
