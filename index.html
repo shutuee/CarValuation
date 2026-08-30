@@ -293,6 +293,31 @@
         box-shadow: 0 4px 8px rgba(217, 119, 6, 0.25);
       }
 
+      .btn-slate {
+        height: 30px;
+        min-height: 30px;
+        padding: 0 12px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        background-color: #f1f5f9;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+      }
+
+      .btn-slate:hover {
+        background-color: #e2e8f0;
+        border-color: #94a3b8;
+        color: #1e293b;
+      }
+
       .btn-black {
         height: 36px;
         min-height: 36px;
@@ -1928,7 +1953,10 @@
 
           <div class="report-stats-grid">
             <div class="stat-card primary">
-              <span class="stat-label" id="annualTotalLabel">年度總買進台數</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span class="stat-label" id="annualTotalLabel">年度總買進台數</span>
+                <button type="button" class="btn-slate" id="viewReportVehiclesBtn">車輛</button>
+              </div>
               <div class="stat-value"><span id="annualTotalPurchased">0</span> <span style="font-size:18px; font-weight:700;">台</span></div>
             </div>
             <div class="sub-stats-row">
@@ -2029,40 +2057,34 @@
     </dialog>
 
     <dialog id="queryBonusDialog">
+      <!-- ... queryBonusDialog content ... -->
+    </dialog>
+
+    <!-- 數據報告車輛清單彈窗 -->
+    <dialog id="reportVehicleDialog">
       <div class="modal-content-wrap">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px; gap: 8px;">
-          <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="queryBonusTitle">獎金 N 車輛清單</h2>
-          <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-            <button type="button" class="btn-query-bonus" id="saveQueryBonusBtn" style="min-height:36px; height:36px; padding:0 14px; border-radius:8px; font-size:14px; font-weight:700;">儲存</button>
-            <button class="secondary" type="button" id="closeQueryBonusDialogBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px;">✕</button>
-          </div>
+          <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="reportVehicleTitle">買進車輛清單</h2>
+          <button class="secondary" type="button" id="closeReportVehicleDialogBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px;">✕</button>
         </div>
         <div style="max-height: 60vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; width: 100%;">
-          <table id="queryBonusTable" style="width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; white-space: nowrap;">
+          <table id="reportVehicleTable" style="width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; white-space: nowrap;">
             <colgroup>
-              <col style="width: 12%;">
-              <col style="width: 13%;">
-              <col style="width: 12%;">
-              <col style="width: 23%;">
-              <col style="width: 14%;">
-              <col style="width: 14%;">
-              <col style="width: 12%;">
+              <col style="width: 25%;">
+              <col style="width: 50%;">
+              <col style="width: 25%;">
             </colgroup>
             <thead>
               <tr>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">來源</th>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">買進日</th>
                 <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">年份</th>
                 <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">車型</th>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">買進</th>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">賣出</th>
-                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">轉 Y</th>
+                <th style="padding: 8px 4px; background: #f8fafc; font-size: 14px; font-weight: 700; border-bottom: 1px solid #cbd5e1; text-align: center !important;">狀態</th>
               </tr>
             </thead>
-            <tbody id="queryBonusBody"></tbody>
+            <tbody id="reportVehicleBody"></tbody>
           </table>
-          <div class="empty-state" id="queryBonusEmpty" style="padding: 24px 0;">
-            <strong>尚無標註獎金 N 的已售出車輛</strong>
+          <div class="empty-state" id="reportVehicleEmpty" style="padding: 24px 0;">
+            <strong>當前條件下尚無車輛資料</strong>
           </div>
         </div>
       </div>
@@ -2137,6 +2159,13 @@
       const yearBreakdownList = document.getElementById("yearBreakdownList");
       const channelBreakdownWrap = document.getElementById("channelBreakdownWrap");
       const channelGridList = document.getElementById("channelGridList");
+      const viewReportVehiclesBtn = document.getElementById("viewReportVehiclesBtn");
+
+      const reportVehicleDialog = document.getElementById("reportVehicleDialog");
+      const closeReportVehicleDialogBtn = document.getElementById("closeReportVehicleDialogBtn");
+      const reportVehicleTitle = document.getElementById("reportVehicleTitle");
+      const reportVehicleBody = document.getElementById("reportVehicleBody");
+      const reportVehicleEmpty = document.getElementById("reportVehicleEmpty");
 
       const buyDialog = document.getElementById("buyDialog");
       const buyForm = document.getElementById("buyForm");
@@ -3664,6 +3693,65 @@
 
       closeQueryBonusDialogBtn?.addEventListener("click", () => {
         queryBonusDialog.close();
+      });
+
+      function openReportVehiclesList() {
+        const selectedYear = reportYearSelect.value;
+        const selectedMonth = reportMonthSelect.value;
+
+        let titleText = "";
+        if (selectedYear !== "all") titleText += `${selectedYear}年 `;
+        if (selectedMonth !== "all") titleText += `${parseInt(selectedMonth, 10)}月 `;
+        titleText += "買進車輛清單";
+
+        const dealRecords = records.filter((r) => r.isPurchased || r.isSold);
+        const filteredList = dealRecords.filter((r) => {
+          if (selectedYear !== "all" && getRecordPurchaseYear(r) !== selectedYear) return false;
+          if (selectedMonth !== "all") {
+            const m = getRecordMonth(r.boughtDate || r.receivedDate);
+            if (m !== selectedMonth) return false;
+          }
+          return true;
+        });
+
+        filteredList.sort((a, b) => {
+          const dateA = dateValueToNumber(a.boughtDate || a.receivedDate) || 0;
+          const dateB = dateValueToNumber(b.boughtDate || b.receivedDate) || 0;
+          return dateB - dateA;
+        });
+
+        if (reportVehicleTitle) {
+          reportVehicleTitle.textContent = `${titleText} (${filteredList.length} 筆)`;
+        }
+
+        if (reportVehicleBody) {
+          reportVehicleBody.innerHTML = "";
+          if (filteredList.length === 0) {
+            if (reportVehicleEmpty) reportVehicleEmpty.classList.add("is-visible");
+          } else {
+            if (reportVehicleEmpty) reportVehicleEmpty.classList.remove("is-visible");
+            filteredList.forEach((r) => {
+              const tr = document.createElement("tr");
+              const statusTag = r.isSold ? '<span style="color:#d97706; font-weight:700;">已售出</span>' : '<span style="color:#16a34a; font-weight:700;">已買入</span>';
+              tr.innerHTML = `
+                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important;">${r.year || "-"}</td>
+                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; font-weight: 700; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.model || ''}">${r.model || "-"}</td>
+                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; text-align: center !important;">${statusTag}</td>
+              `;
+              reportVehicleBody.appendChild(tr);
+            });
+          }
+        }
+
+        reportVehicleDialog.showModal();
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+      }
+
+      viewReportVehiclesBtn?.addEventListener("click", openReportVehiclesList);
+      closeReportVehicleDialogBtn?.addEventListener("click", () => {
+        reportVehicleDialog.close();
       });
 
       openReportModalBtn?.addEventListener("click", () => {
