@@ -779,7 +779,7 @@
       .col-auth      { width: 90px;  min-width: 90px; }
       .col-remarks   { width: 180px; min-width: 180px; }
       .col-repair    { width: 220px; min-width: 220px; }
-      .col-bonus     { width: 90px;  min-width: 90px; }
+      .col-bonus     { width: 105px; min-width: 105px; }
       
       .col-actions   { width: 230px; min-width: 230px; }
       .ongoing-section .col-actions { width: 230px; min-width: 230px; }
@@ -943,6 +943,11 @@
         max-height: 85vh;
         border-radius: 16px;
         overflow: hidden;
+      }
+
+      dialog#bonusDateDialog {
+        width: min(360px, calc(100% - 32px));
+        border-radius: 16px;
       }
 
       dialog#reportVehicleDialog {
@@ -2142,6 +2147,25 @@
       </div>
     </dialog>
 
+    <!-- 選擇獎金日期彈窗 -->
+    <dialog id="bonusDateDialog">
+      <form id="bonusDateForm" autocomplete="off">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-main);">選擇獎金日期</h2>
+          <button class="secondary" type="button" id="closeBonusDateDialogBtn" style="min-height:32px; height:32px; padding:0 10px; border-radius:6px;">✕</button>
+        </div>
+        <input type="hidden" id="bonusDateTargetId" />
+        <label>
+          <span>請選擇日期</span>
+          <input id="bonusDateInput" type="date" required style="width: 100%; min-height: 42px; font-size: 16px;" />
+        </label>
+        <div class="dialog-actions" style="margin-top: 20px;">
+          <button type="button" class="secondary" id="cancelBonusDateBtn">取消</button>
+          <button type="submit" class="btn-query-bonus" style="min-height:38px; height:38px; padding:0 18px; font-size: 14px; font-weight: 700;">確認</button>
+        </div>
+      </form>
+    </dialog>
+
     <script>
       const STORAGE_KEY = "carvaluation.records.v2";
       const API_URL = "https://script.google.com/macros/s/AKfycbx83aRvR1MpZwqlTKKHyfej-aSJOrIPUI4aRlvX7Qy81Owz-9VxjYjCL3pRKzewkQu6/exec";
@@ -2253,6 +2277,13 @@
       const queryBonusEmpty = document.getElementById("queryBonusEmpty");
       const queryBonusTitle = document.getElementById("queryBonusTitle");
 
+      const bonusDateDialog = document.getElementById("bonusDateDialog");
+      const bonusDateForm = document.getElementById("bonusDateForm");
+      const bonusDateTargetId = document.getElementById("bonusDateTargetId");
+      const bonusDateInput = document.getElementById("bonusDateInput");
+      const closeBonusDateDialogBtn = document.getElementById("closeBonusDateDialogBtn");
+      const cancelBonusDateBtn = document.getElementById("cancelBonusDateBtn");
+
       const switchCountAll = document.getElementById("switchCountAll");
       const switchCountOngoing = document.getElementById("switchCountOngoing");
       const switchCountPurchased = document.getElementById("switchCountPurchased");
@@ -2334,6 +2365,7 @@
       let soldSortDesc = true;
       let ongoingDetailExpanded = false;
       let purchasedDetailExpanded = false;
+      let selectedBonusDates = {};
 
       function cleanSheetText(value) {
         if (value === null || value === undefined) return "";
@@ -2395,14 +2427,13 @@
         }
       }
 
-      function normalizeBookingTime(value) {
-        if (!value) return "";
-        const text = String(value).trim();
-        if (!text) return "";
-
-        // 情況 1: 若含有 ISO 時間標記 (包含 T 或 Z)，則使用 JS Date 自動加回 8 小時 (GMT+8 台灣時區)
-        if (text.includes("T") || text.includes("Z")) {
-          const d = new Date(text);
+      function normalizeBookingTime(timeStr) {
+        if (!timeStr) return "";
+        let str = String(timeStr).trim();
+        
+        // 情況 1: 若含有 ISO 時間標記 (包含 T 或 Z)，優先透過 JavaScript Date 自動加回 8 小時 (GMT+8 台灣時區)
+        if (str.includes("T") || str.includes("Z")) {
+          const d = new Date(str);
           if (!isNaN(d.getTime())) {
             const h = String(d.getHours()).padStart(2, "0");
             const m = String(d.getMinutes()).padStart(2, "0");
@@ -2411,14 +2442,14 @@
         }
 
         // 情況 2: 純文字時間 (如 9:00 或 11:30)，直接對齊輸出，防止被 Date 誤轉換時區
-        const directTimeMatch = text.match(/^(\d{1,2}):(\d{2})/);
+        const directTimeMatch = str.match(/^(\d{1,2}):(\d{2})/);
         if (directTimeMatch) {
           const h = directTimeMatch[1].padStart(2, "0");
           const m = directTimeMatch[2];
           return `${h}:${m}`;
         }
 
-        return text;
+        return str;
       }
 
       function normalizeDateText(value) {
@@ -2797,9 +2828,9 @@
           annualTotalLabel.textContent = selectedMonth !== "all" ? `${parseInt(selectedMonth, 10)} 月份買進台數` : "年度總買進台數";
         }
 
-        // 當為 2025 年時，隱藏「車輛」按鈕
+        // 當為 2025 年選取全部月份時，隱藏「車輛」按鈕
         if (openReportVehicleListBtn) {
-          if (selectedYear === "2025") {
+          if (selectedYear === "2025" && selectedMonth === "all") {
             openReportVehicleListBtn.classList.add("is-hidden");
           } else {
             openReportVehicleListBtn.classList.remove("is-hidden");
@@ -3377,7 +3408,7 @@
                 <button type="button" class="btn-delete-agenda" title="清除該筆預約" data-id="${b.id}">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2 2v2"></path>
                     <line x1="10" y1="11" x2="10" y2="17"></line>
                     <line x1="14" y1="11" x2="14" y2="17"></line>
                   </svg>
@@ -3751,6 +3782,7 @@
       });
 
       function renderQueryBonusList() {
+        selectedBonusDates = {};
         const bonusNRecords = records.filter((r) => r.isSold && String(r.bonus).trim().toUpperCase() === "N");
         
         bonusNRecords.sort((a, b) => {
@@ -3779,9 +3811,12 @@
               <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.actualDealPrice || "-"}</td>
               <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.salePrice || "-"}</td>
               <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; text-align: center !important; white-space: nowrap;">
-                <label style="display: inline-flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; user-select: none; width: 100%;">
-                  <input type="checkbox" class="bonus-y-check" data-id="${r.id}" style="width: 18px; height: 18px; cursor: pointer; accent-color: #d97706;" />
-                  <span style="font-weight: 800; color: #d97706;">Y</span>
+                <label style="display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; user-select: none; width: 100%;">
+                  <div style="display: inline-flex; align-items: center; gap: 4px;">
+                    <input type="checkbox" class="bonus-y-check" data-id="${r.id}" style="width: 18px; height: 18px; cursor: pointer; accent-color: #d97706;" />
+                    <span style="font-weight: 800; color: #d97706;">Y</span>
+                  </div>
+                  <span class="bonus-date-display" id="bonusDateDisp_${r.id}" style="font-size: 11px; font-weight: 700; color: #d97706;"></span>
                 </label>
               </td>
             `;
@@ -3789,6 +3824,40 @@
           });
         }
       }
+
+      queryBonusBody?.addEventListener("click", (e) => {
+        const checkbox = e.target.closest(".bonus-y-check");
+        if (!checkbox) return;
+
+        const recId = checkbox.dataset.id;
+        if (checkbox.checked) {
+          checkbox.checked = false;
+          bonusDateTargetId.value = recId;
+          bonusDateInput.value = new Date().toISOString().split("T")[0];
+          bonusDateDialog.showModal();
+        } else {
+          delete selectedBonusDates[recId];
+          const disp = document.getElementById(`bonusDateDisp_${recId}`);
+          if (disp) disp.textContent = "";
+        }
+      });
+
+      bonusDateForm?.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const targetId = bonusDateTargetId.value;
+        const chosenDate = bonusDateInput.value;
+        if (targetId && chosenDate) {
+          selectedBonusDates[targetId] = chosenDate;
+          const checkbox = document.querySelector(`.bonus-y-check[data-id="${targetId}"]`);
+          if (checkbox) checkbox.checked = true;
+          const disp = document.getElementById(`bonusDateDisp_${targetId}`);
+          if (disp) disp.textContent = formatMMDD(chosenDate);
+        }
+        bonusDateDialog.close();
+      });
+
+      closeBonusDateDialogBtn?.addEventListener("click", () => bonusDateDialog.close());
+      cancelBonusDateBtn?.addEventListener("click", () => bonusDateDialog.close());
 
       saveQueryBonusBtn?.addEventListener("click", async () => {
         const checkedBoxes = document.querySelectorAll(".bonus-y-check:checked");
@@ -3801,13 +3870,16 @@
         saveQueryBonusBtn.textContent = "儲存中...";
 
         try {
-          const updatedIds = Array.from(checkedBoxes).map((cb) => cb.dataset.id);
-          for (const id of updatedIds) {
+          for (const cb of checkedBoxes) {
+            const id = cb.dataset.id;
+            const chosenDate = selectedBonusDates[id] || new Date().toISOString().split("T")[0];
+            const bonusStr = `Y ${formatMMDD(chosenDate)}`;
+
             const index = records.findIndex((r) => r.id === id);
             if (index >= 0) {
               records[index] = await persistUpdate(normalizeRecord({
                 ...records[index],
-                bonus: "Y",
+                bonus: bonusStr,
                 updatedAt: new Date().toISOString()
               }));
             }
