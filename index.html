@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>估價與預約管理系統</title>
     <style>
       :root {
@@ -19,7 +19,6 @@
         --focus: #2563eb;
         --shadow: 0 16px 50px rgba(21, 33, 48, 0.12);
 
-        /* 系統核心顏色規範 */
         --primary-blue: #2563eb;
         --primary-blue-hover: #1d4ed8;
         --primary-blue-active: #1e40af;
@@ -37,6 +36,11 @@
 
       * {
         box-sizing: border-box;
+      }
+
+      html, body {
+        overflow-x: hidden;
+        max-width: 100vw;
       }
 
       body.modal-open {
@@ -106,21 +110,14 @@
         min-height: 44px;
         border: 1px solid #c7d0da;
         border-radius: 6px;
-        background: #ffffff;
-        color: #0f172a;
+        background: #ffffff !important;
+        color: #0f172a !important;
         padding: 9px 11px;
         outline: none;
       }
 
-      option {
-        background-color: #ffffff !important;
-        color: #0f172a !important;
-      }
-
-      #year,
-      #yearOptions,
-      #yearOptions option {
-        background-color: #ffffff !important;
+      select option {
+        background: #ffffff !important;
         color: #0f172a !important;
       }
 
@@ -208,13 +205,12 @@
 
       button.btn-add-valuation,
       button.action-red,
-      #submitButton,
       #submitValuationBtn {
         min-height: 44px;
         height: 44px;
         padding: 0 18px;
         border-radius: 6px;
-        border: 1px solid #dc2626;
+        border-color: #dc2626;
         background: #dc2626;
         color: #ffffff;
         font-weight: 700;
@@ -223,7 +219,6 @@
 
       button.btn-add-valuation:hover,
       button.action-red:hover,
-      #submitButton:hover,
       #submitValuationBtn:hover {
         background: #b91c1c;
         border-color: #b91c1c;
@@ -971,29 +966,10 @@
         overflow: hidden;
       }
 
-      /* 查詢獎金表格專屬強制置中規則 (電腦版與手機版同步) */
+      /* Mandatory centering rule for Query Bonus Table across desktop and mobile devices */
       #queryBonusTable th,
       #queryBonusTable td {
         text-align: center !important;
-      }
-
-      @media (max-width: 620px) {
-        dialog#queryBonusDialog {
-          width: calc(100vw - 20px) !important;
-          max-height: 85vh !important;
-          margin: auto !important;
-        }
-
-        #queryBonusTitle {
-          font-size: 15px !important;
-        }
-
-        #queryBonusTable th,
-        #queryBonusTable td {
-          padding: 8px 2px !important;
-          font-size: 12px !important;
-          text-align: center !important;
-        }
       }
 
       dialog form, .modal-content-wrap {
@@ -1065,12 +1041,6 @@
         outline: none !important;
       }
 
-      .month-nav-btn:focus,
-      .month-nav-btn:focus-visible {
-        outline: none !important;
-        box-shadow: none !important;
-      }
-
       .month-nav-btn:hover {
         background: #ffffff;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -1106,12 +1076,6 @@
         user-select: none;
         white-space: nowrap;
         outline: none !important;
-      }
-
-      .filter-chip:focus,
-      .filter-chip:focus-visible {
-        outline: none !important;
-        box-shadow: none !important;
       }
 
       .filter-chip:hover {
@@ -1238,7 +1202,6 @@
         text-overflow: ellipsis;
         text-align: center;
         box-shadow: 0 1px 2px rgba(37, 99, 235, 0.15);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
         pointer-events: none;
       }
 
@@ -1304,22 +1267,11 @@
         border-radius: 8px;
         padding: 10px 14px;
         gap: 12px;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
       }
 
-      .agenda-item:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
-      }
-
-      .agenda-item.type-valuation-card {
-        border-left-color: #2563eb;
-      }
-
-      .agenda-item.type-delivery-card {
-        border-left-color: #16a34a;
-      }
+      .agenda-item.type-valuation-card { border-left-color: #2563eb; }
+      .agenda-item.type-delivery-card { border-left-color: #16a34a; }
 
       .agenda-item-left {
         display: flex;
@@ -1368,22 +1320,6 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .btn-edit-agenda:hover,
-      .btn-delete-agenda:hover {
-        background-color: #f8fafc;
-        border-color: #0f172a;
-        color: #0f172a;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1);
-      }
-
-      .btn-delete-agenda:hover {
-        border-color: #ef4444;
-        color: #ef4444;
-        background-color: #fef2f2;
       }
 
       .bonus-opt-btn {
@@ -1401,13 +1337,6 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
-        transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .bonus-opt-btn:hover {
-        background-color: #f1f5f9;
-        border-color: #94a3b8;
-        color: #0f172a;
       }
 
       .bonus-opt-btn.is-active {
@@ -1415,13 +1344,6 @@
         border-color: #475569 !important;
         color: #0f172a !important;
         font-weight: 800;
-        box-shadow: none !important;
-      }
-
-      .bonus-opt-btn.is-active:hover {
-        background-color: #cbd5e1 !important;
-        border-color: #334155 !important;
-        color: #0f172a !important;
       }
 
       @media (max-width: 768px) {
@@ -1448,99 +1370,43 @@
           grid-template-columns: auto 1fr auto;
           align-items: center;
           gap: 8px;
-          padding-right: 0;
         }
 
-        .month-nav {
-          justify-self: center;
-        }
+        .month-nav { justify-self: center; }
+        #calendarMonthTitle { font-size: 18px !important; }
 
-        #calendarMonthTitle {
-          font-size: 18px !important;
-        }
-
-        #closeCalendarViewBtn {
-          position: static;
-          min-height: 32px !important;
-          padding: 0 10px !important;
-        }
-
-        .calendar-cell {
-          min-height: 52px;
-          padding: 3px 2px;
-          gap: 2px;
-        }
-
-        .calendar-day-header {
-          font-size: 12px;
-          padding: 6px 0;
-        }
-
-        .cell-date-row {
-          flex-direction: row;
-          justify-content: center;
-          gap: 2px;
-          margin-bottom: 1px;
-        }
-
-        .cell-date-num {
-          width: 20px;
-          height: 20px;
-          font-size: 12px;
-        }
-
-        .cell-holiday {
-          display: none;
-        }
-
-        .calendar-badge {
-          font-size: 11px;
-          padding: 2px 3px;
-          border-radius: 4px;
-          text-align: center;
-        }
-
-        .calendar-more-badge {
-          font-size: 9px;
-          padding: 1px 2px;
-        }
+        .calendar-cell { min-height: 52px; padding: 3px 2px; gap: 2px; }
+        .calendar-day-header { font-size: 12px; padding: 6px 0; }
+        .cell-date-row { flex-direction: row; justify-content: center; gap: 2px; margin-bottom: 1px; }
+        .cell-date-num { width: 20px; height: 20px; font-size: 12px; }
+        .cell-holiday { display: none; }
+        .calendar-badge { font-size: 11px; padding: 2px 3px; border-radius: 4px; text-align: center; }
+        .calendar-more-badge { font-size: 9px; padding: 1px 2px; }
       }
 
       @media (max-width: 620px) {
-        .list-tools {
-          padding: 12px 14px;
+        dialog#queryBonusDialog {
+          width: calc(100vw - 16px) !important;
+          max-height: 85vh !important;
+          margin: auto !important;
         }
-        .search-tools-group { 
-          display: flex;
-          width: 100%;
+
+        #queryBonusTitle { font-size: 15px !important; }
+
+        #queryBonusTable th,
+        #queryBonusTable td {
+          padding: 8px 2px !important;
+          font-size: 12px !important;
+          text-align: center !important;
         }
+
+        .list-tools { padding: 12px 14px; }
+        .search-tools-group { display: flex; width: 100%; }
         .form-grid { grid-template-columns: 1fr; }
         .wide, .full-row { grid-column: auto; }
-        .search-row { 
-          flex-direction: row; 
-          align-items: center;
-          gap: 10px;
-          width: 100%;
-        }
-        .action-buttons-group {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          box-sizing: border-box;
-        }
-        .action-buttons-group button {
-          min-width: 0;
-          padding: 0 10px !important;
-          font-size: 14px !important;
-          justify-content: center;
-          gap: 4px !important;
-          box-sizing: border-box;
-        }
-        .action-buttons-group button svg {
-          width: 16px !important;
-          height: 16px !important;
-          flex-shrink: 0;
-        }
+        .search-row { flex-direction: row; align-items: center; gap: 10px; width: 100%; }
+        .action-buttons-group { display: flex; align-items: center; gap: 6px; }
+        .action-buttons-group button { min-width: 0; padding: 0 10px !important; font-size: 14px !important; }
         .quick-switch-wrap { flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; }
         .switch-btn-group { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         .switch-btn { justify-content: center; width: 100%; padding: 8px 10px; }
@@ -1548,26 +1414,11 @@
 
       @media print {
         body { background: #fff !important; }
-        .entry-panel, .list-tools, .ongoing-section, .row-actions, .empty-state, dialog {
-          display: none !important;
-        }
-        .purchased-section, .sold-section,
-        .purchased-section.is-hidden, .sold-section.is-hidden {
-          display: block !important;
-          padding: 0 !important;
-          border: 0 !important;
-          margin-bottom: 24px !important;
-        }
+        .entry-panel, .list-tools, .ongoing-section, .row-actions, .empty-state, dialog { display: none !important; }
+        .purchased-section, .sold-section { display: block !important; padding: 0 !important; border: 0 !important; margin-bottom: 24px !important; }
         .table-wrap { overflow: visible !important; max-height: none !important; padding: 0 !important; }
         table { min-width: 0 !important; width: 100% !important; font-size: 11px !important; table-layout: auto !important; }
-        th, td {
-          padding: 4px 6px !important;
-          font-size: 11px !important;
-          border: 1px solid #64748b !important;
-          line-height: 1.4 !important;
-          background: #ffffff !important;
-          color: #000000 !important;
-        }
+        th, td { padding: 4px 6px !important; font-size: 11px !important; border: 1px solid #64748b !important; background: #ffffff !important; color: #000000 !important; }
         th:last-child, td:last-child { display: none !important; }
       }
     </style>
@@ -1611,7 +1462,6 @@
               </label>
             </div>
 
-            <!-- 下方快速切換按鈕區域 -->
             <div class="quick-switch-wrap">
               <div class="switch-btn-group">
                 <button type="button" class="switch-btn is-active" data-status="all">
@@ -1794,36 +1644,41 @@
           </label>
           <label>
             <span>年份</span>
-            <input list="yearOptions" id="year" placeholder="選擇或輸入" />
-            <datalist id="yearOptions">
-              <option value="2028"></option>
-              <option value="2027"></option>
-              <option value="2026"></option>
-              <option value="2025"></option>
-              <option value="2024"></option>
-              <option value="2023"></option>
-              <option value="2022"></option>
-              <option value="2021"></option>
-              <option value="2020"></option>
-              <option value="2019"></option>
-              <option value="2018"></option>
-              <option value="2017"></option>
-              <option value="2016"></option>
-              <option value="2015"></option>
-              <option value="2014"></option>
-              <option value="2013"></option>
-              <option value="2012"></option>
-              <option value="2011"></option>
-              <option value="2010"></option>
-              <option value="2009"></option>
-              <option value="2008"></option>
-              <option value="2007"></option>
-              <option value="2006"></option>
-              <option value="2005"></option>
-              <option value="2004"></option>
-              <option value="2003"></option>
-              <option value="2002"></option>
-            </datalist>
+            <select id="yearType">
+              <option value="">請選擇</option>
+              <option value="2028">2028</option>
+              <option value="2027">2027</option>
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+              <option value="2021">2021</option>
+              <option value="2020">2020</option>
+              <option value="2019">2019</option>
+              <option value="2018">2018</option>
+              <option value="2017">2017</option>
+              <option value="2016">2016</option>
+              <option value="2015">2015</option>
+              <option value="2014">2014</option>
+              <option value="2013">2013</option>
+              <option value="2012">2012</option>
+              <option value="2011">2011</option>
+              <option value="2010">2010</option>
+              <option value="2009">2009</option>
+              <option value="2008">2008</option>
+              <option value="2007">2007</option>
+              <option value="2006">2006</option>
+              <option value="2005">2005</option>
+              <option value="2004">2004</option>
+              <option value="2003">2003</option>
+              <option value="2002">2002</option>
+              <option value="自行輸入">自行輸入</option>
+            </select>
+          </label>
+          <label class="is-hidden" id="yearCustomWrap">
+            <span>自行輸入年份</span>
+            <input id="yearCustom" type="text" />
           </label>
           <label>
             <span>車型</span>
@@ -1847,16 +1702,21 @@
           </label>
           <label>
             <span>顏色</span>
-            <input list="colorOptions" id="color" placeholder="選擇或輸入" />
-            <datalist id="colorOptions">
-              <option value="白"></option>
-              <option value="黑"></option>
-              <option value="灰"></option>
-              <option value="銀"></option>
-              <option value="紅"></option>
-              <option value="藍"></option>
-              <option value="綠"></option>
-            </datalist>
+            <select id="colorType">
+              <option value="">請選擇</option>
+              <option value="白">白</option>
+              <option value="黑">黑</option>
+              <option value="灰">灰</option>
+              <option value="銀">銀</option>
+              <option value="紅">紅</option>
+              <option value="藍">藍</option>
+              <option value="綠">綠</option>
+              <option value="自行輸入">自行輸入</option>
+            </select>
+          </label>
+          <label class="is-hidden" id="colorCustomWrap">
+            <span>自行輸入顏色</span>
+            <input id="colorCustom" type="text" />
           </label>
           <label>
             <span>車況</span>
@@ -1898,7 +1758,7 @@
           </label>
           <label>
             <span>獎金</span>
-            <input id="bonus" type="text" />
+            <input id="bonus" type="text" value="N" />
           </label>
           <label>
             <span>預約日期</span>
@@ -1907,7 +1767,7 @@
           <label>
             <span>預約時間</span>
             <select id="bookingTime">
-              <!-- JS 動態生成 30 分鐘間隔選單 -->
+              <!-- JS 動態生成 -->
             </select>
           </label>
         </div>
@@ -1938,7 +1798,7 @@
         <label>
           <span>預約時間</span>
           <select id="modalBookingTime" required>
-            <!-- JS 動態生成 30 分鐘間隔選單 -->
+            <!-- JS 動態生成 -->
           </select>
         </label>
         <div class="dialog-actions">
@@ -1948,7 +1808,6 @@
       </form>
     </dialog>
 
-    <!-- 月曆視圖彈窗 -->
     <dialog id="calendarViewDialog">
       <div class="modal-content-wrap">
         <div class="calendar-header">
@@ -1972,7 +1831,7 @@
         </div>
 
         <div class="calendar-grid" id="calendarGrid">
-          <!-- JS 動態生成月曆網格 -->
+          <!-- JS 動態生成 -->
         </div>
 
         <div class="daily-agenda-panel" id="dailyAgendaPanel">
@@ -2003,12 +1862,8 @@
         <div class="report-wrapper">
           <div class="report-header">
             <div class="report-controls">
-              <select id="reportYearSelect" class="report-select" title="選擇統計年份">
-                <!-- JS 動態生成年份 -->
-              </select>
-              <select id="reportMonthSelect" class="report-select" title="選擇統計月份">
-                <!-- JS 動態生成月份 -->
-              </select>
+              <select id="reportYearSelect" class="report-select" title="選擇統計年份"></select>
+              <select id="reportMonthSelect" class="report-select" title="選擇統計月份"></select>
             </div>
           </div>
 
@@ -2032,24 +1887,19 @@
             </div>
           </div>
 
-          <div class="year-breakdown-wrap" id="yearBreakdownList">
-            <!-- JS 動態渲染各年份快速切換標籤 -->
-          </div>
+          <div class="year-breakdown-wrap" id="yearBreakdownList"></div>
 
           <div class="channel-breakdown-wrap" id="channelBreakdownWrap">
             <div class="channel-title">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
               進件來源管道占比 (Channel Breakdown)
             </div>
-            <div class="channel-grid" id="channelGridList">
-              <!-- JS 動態生成管道占比資料 -->
-            </div>
+            <div class="channel-grid" id="channelGridList"></div>
           </div>
         </div>
       </div>
     </dialog>
 
-    <!-- 數據報告車輛清單彈窗 -->
     <dialog id="reportVehicleDialog">
       <div class="modal-content-wrap">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px; flex-shrink: 0;">
@@ -2081,7 +1931,6 @@
       </div>
     </dialog>
 
-    <!-- 確認買入彈窗 -->
     <dialog id="buyDialog">
       <form id="buyForm" method="dialog">
         <h2>已買入資料</h2>
@@ -2101,12 +1950,10 @@
       </form>
     </dialog>
 
-    <!-- 確認售出彈窗 -->
     <dialog id="sellDialog">
       <form id="sellForm" method="dialog">
         <h2>已售出資料</h2>
         <input type="hidden" id="sellRecordId" />
-        
         <label>
           <span>買進價</span>
           <input id="sellBuyPriceDisplay" type="text" readonly style="background-color: #f1f5f9; color: #475569; font-weight: 700;" />
@@ -2136,7 +1983,6 @@
       </form>
     </dialog>
 
-    <!-- 確認刪除彈窗 -->
     <dialog id="deleteConfirmDialog">
       <form id="deleteConfirmForm" method="dialog">
         <h2>確認刪除</h2>
@@ -2149,7 +1995,6 @@
       </form>
     </dialog>
 
-    <!-- 查詢獎金彈窗 -->
     <dialog id="queryBonusDialog">
       <div class="modal-content-wrap">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px; gap: 8px; flex-shrink: 0;">
@@ -2190,7 +2035,6 @@
       </div>
     </dialog>
 
-    <!-- 選擇獎金日期彈窗 -->
     <dialog id="bonusDateDialog">
       <form id="bonusDateForm" autocomplete="off">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
@@ -2214,8 +2058,9 @@
       const API_URL = "https://script.google.com/macros/s/AKfycbx83aRvR1MpZwqlTKKHyfej-aSJOrIPUI4aRlvX7Qy81Owz-9VxjYjCL3pRKzewkQu6/exec";
       const CUSTOM_SOURCE = "自行輸入";
       const FIXED_SOURCES = ["來店", "網站", "自買"];
+      const FIXED_YEARS = Array.from({ length: 27 }, (_, i) => String(2028 - i));
+      const FIXED_COLORS = ["白", "黑", "灰", "銀", "紅", "藍", "綠"];
 
-      // 核心 DOM 元素宣告
       const form = document.getElementById("valuationForm");
       const searchInput = document.getElementById("searchInput");
       const ongoingSection = document.getElementById("ongoingSection");
@@ -2241,6 +2086,8 @@
       const valuationDialogTitle = document.getElementById("valuationDialogTitle");
       const closeValuationDialogBtn = document.getElementById("closeValuationDialogBtn");
       const sourceCustomWrap = document.getElementById("sourceCustomWrap");
+      const yearCustomWrap = document.getElementById("yearCustomWrap");
+      const colorCustomWrap = document.getElementById("colorCustomWrap");
       const resetButton = document.getElementById("resetButton");
       const submitValuationBtn = document.getElementById("submitValuationBtn");
       const submitPurchasedBtn = document.getElementById("submitPurchasedBtn");
@@ -2250,7 +2097,6 @@
       const bookingDialogTitle = document.getElementById("bookingDialogTitle");
       const bookingTargetRecordId = document.getElementById("bookingTargetRecordId");
       const modalVehicleSelect = document.getElementById("modalVehicleSelect");
-      const modalVehicleSelectWrap = document.getElementById("modalVehicleSelectWrap");
       const modalBookingDate = document.getElementById("modalBookingDate");
       const modalBookingTime = document.getElementById("modalBookingTime");
       const cancelBookingBtn = document.getElementById("cancelBookingBtn");
@@ -2262,7 +2108,6 @@
       const nextMonthBtn = document.getElementById("nextMonthBtn");
       const closeCalendarViewBtn = document.getElementById("closeCalendarViewBtn");
       const calendarGrid = document.getElementById("calendarGrid");
-      const dailyAgendaPanel = document.getElementById("dailyAgendaPanel");
       const agendaDateTitle = document.getElementById("agendaDateTitle");
       const agendaList = document.getElementById("agendaList");
       const agendaAddBookingBtn = document.getElementById("agendaAddBookingBtn");
@@ -2324,44 +2169,21 @@
       const bonusDateForm = document.getElementById("bonusDateForm");
       const bonusDateTargetId = document.getElementById("bonusDateTargetId");
       const bonusDateInput = document.getElementById("bonusDateInput");
-      const closeBonusDateDialogBtn = document.getElementById("closeBonusDateDialogBtn");
-      const cancelBonusDateBtn = document.getElementById("cancelBonusDateBtn");
 
-      const switchCountAll = document.getElementById("switchCountAll");
-      const switchCountOngoing = document.getElementById("switchCountOngoing");
-      const switchCountPurchased = document.getElementById("switchCountPurchased");
-      const switchCountSold = document.getElementById("switchCountSold");
-
-      // 欄位名與表單元素表映射
       const fieldNames = [
-        "receivedDate",
-        "boughtDate",
-        "sourceType",
-        "sourceCustom",
-        "year",
-        "model",
-        "purchasePrice",
-        "actualDealPrice",
-        "salePrice",
-        "km",
-        "color",
-        "condition",
-        "version",
-        "authority",
-        "quote",
-        "remarks",
-        "repairItems",
-        "seller",
-        "bonus",
-        "bookingDate",
-        "bookingTime"
+        "receivedDate", "boughtDate", "sourceType", "sourceCustom",
+        "yearType", "yearCustom", "model", "purchasePrice", "actualDealPrice",
+        "salePrice", "km", "colorType", "colorCustom", "condition",
+        "version", "authority", "quote", "remarks", "repairItems",
+        "seller", "bonus", "bookingDate", "bookingTime"
       ];
 
       const sheetHeaders = [
         "id", "source", "sourceType", "sourceCustom", "receivedDate", "boughtDate",
-        "bookingDate", "bookingTime", "bookingType", "year", "model", "km", "color",
-        "condition", "version", "authority", "quote", "purchasePrice", "actualDealPrice",
-        "salePrice", "remarks", "repairItems", "seller", "bonus", "isPurchased", "state",
+        "bookingDate", "bookingTime", "bookingType", "year", "yearType", "yearCustom",
+        "model", "km", "color", "colorType", "colorCustom", "condition", "version",
+        "authority", "quote", "purchasePrice", "actualDealPrice", "salePrice",
+        "remarks", "repairItems", "seller", "bonus", "isPurchased", "state",
         "createdAt", "updatedAt"
       ];
 
@@ -2371,13 +2193,15 @@
         boughtDate: document.getElementById("boughtDate"),
         sourceType: document.getElementById("sourceType"),
         sourceCustom: document.getElementById("sourceCustom"),
-        year: document.getElementById("year"),
+        yearType: document.getElementById("yearType"),
+        yearCustom: document.getElementById("yearCustom"),
         model: document.getElementById("model"),
         purchasePrice: document.getElementById("purchasePrice"),
         actualDealPrice: document.getElementById("actualDealPrice"),
         salePrice: document.getElementById("salePrice"),
         km: document.getElementById("km"),
-        color: document.getElementById("color"),
+        colorType: document.getElementById("colorType"),
+        colorCustom: document.getElementById("colorCustom"),
         condition: document.getElementById("condition"),
         version: document.getElementById("version"),
         authority: document.getElementById("authority"),
@@ -2409,6 +2233,14 @@
       let ongoingDetailExpanded = false;
       let purchasedDetailExpanded = false;
       let selectedBonusDates = {};
+
+      function saveLocalRecords() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        } catch (e) {
+          console.warn("Save local failed", e);
+        }
+      }
 
       function cleanSheetText(value) {
         if (value === null || value === undefined) return "";
@@ -2473,7 +2305,6 @@
       function normalizeBookingTime(timeStr) {
         if (!timeStr) return "";
         let str = String(timeStr).trim();
-        
         if (str.includes("T") || str.includes("Z")) {
           const d = new Date(str);
           if (!isNaN(d.getTime())) {
@@ -2482,14 +2313,12 @@
             return `${h}:${m}`;
           }
         }
-
         const directTimeMatch = str.match(/^(\d{1,2}):(\d{2})/);
         if (directTimeMatch) {
           const h = directTimeMatch[1].padStart(2, "0");
           const m = directTimeMatch[2];
           return `${h}:${m}`;
         }
-
         return str;
       }
 
@@ -2497,7 +2326,6 @@
         if (!value) return "";
         const text = String(value).trim();
         if (!text) return "";
-
         const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
         if (isoMatch) {
           const y = isoMatch[1];
@@ -2505,7 +2333,6 @@
           const day = isoMatch[3].padStart(2, "0");
           return `${y}-${m}-${day}`;
         }
-
         if (text.includes("T") || text.includes("Z")) {
           const d = new Date(text);
           if (!isNaN(d.getTime())) {
@@ -2515,38 +2342,60 @@
             return `${y}-${m}-${day}`;
           }
         }
-
         return text;
       }
 
       function normalizeRecord(record) {
+        if (!record) record = {};
         const rawSource = cleanSheetText(record.source || "");
         const normalizedSource = rawSource === "估價網站" ? "網站" : rawSource;
         const sourceType = record.sourceType || (FIXED_SOURCES.includes(normalizedSource) ? normalizedSource : normalizedSource ? CUSTOM_SOURCE : "");
         const sourceCustom = cleanSheetText(record.sourceCustom || (sourceType === CUSTOM_SOURCE ? normalizedSource : ""));
 
+        const rawYear = cleanSheetText(record.year || "");
+        const yearType = record.yearType || (FIXED_YEARS.includes(rawYear) ? rawYear : rawYear ? CUSTOM_SOURCE : "");
+        const yearCustom = cleanSheetText(record.yearCustom || (yearType === CUSTOM_SOURCE ? rawYear : ""));
+
+        const rawColor = cleanSheetText(record.color || "");
+        const colorType = record.colorType || (FIXED_COLORS.includes(rawColor) ? rawColor : rawColor ? CUSTOM_SOURCE : "");
+        const colorCustom = cleanSheetText(record.colorCustom || (colorType === CUSTOM_SOURCE ? rawColor : ""));
+
         const rawState = cleanSheetText(record.state || "").toUpperCase();
         const isSold = (rawState === "Y");
-        const isPurchased = normalizeBoolean(record.isPurchased);
+        
+        let isPurchased = false;
+        if (record.isPurchased !== undefined && record.isPurchased !== null && record.isPurchased !== "") {
+          isPurchased = normalizeBoolean(record.isPurchased);
+        } else if (cleanSheetText(record.boughtDate)) {
+          isPurchased = true;
+        }
 
         let bookingType = cleanSheetText(record.bookingType);
         if (!bookingType) {
           bookingType = isPurchased ? "delivery" : "valuation";
         }
 
+        const finalYear = yearType === CUSTOM_SOURCE ? yearCustom : yearType;
+        const finalColor = colorType === CUSTOM_SOURCE ? colorCustom : colorType;
+
         return {
           id: cleanSheetText(record.id) || createId(),
           sourceType,
           sourceCustom,
+          source: sourceType === CUSTOM_SOURCE ? sourceCustom : sourceType,
           receivedDate: normalizeDateText(cleanSheetText(record.receivedDate || record.date || "")),
           boughtDate: normalizeDateText(cleanSheetText(record.boughtDate || "")),
           bookingDate: normalizeDateText(cleanSheetText(record.bookingDate || "")),
           bookingTime: normalizeBookingTime(cleanSheetText(record.bookingTime || "")),
           bookingType: bookingType,
-          year: cleanSheetText(record.year),
+          yearType,
+          yearCustom,
+          year: finalYear,
           model: cleanSheetText(record.model),
           km: normalizeKm(cleanSheetText(record.km || record.mileage || "")),
-          color: cleanSheetText(record.color),
+          colorType,
+          colorCustom,
+          color: finalColor,
           condition: cleanSheetText(record.condition),
           version: cleanSheetText(record.version),
           authority: cleanSheetText(record.authority),
@@ -2557,7 +2406,7 @@
           remarks: cleanSheetText(record.remarks || record.notes || ""),
           repairItems: cleanSheetText(record.repairItems),
           seller: cleanSheetText(record.seller || record.location || [record.sellerName, record.sellerPhone].filter(Boolean).join(" ")),
-          bonus: cleanSheetText(record.bonus),
+          bonus: cleanSheetText(record.bonus || "N"),
           isPurchased: isPurchased,
           isSold: isSold,
           state: isSold ? "Y" : "N",
@@ -2566,8 +2415,74 @@
         };
       }
 
-      function saveLocalRecords() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      function updateCustomVisibilities() {
+        const showSourceCustom = fields.sourceType.value === CUSTOM_SOURCE;
+        sourceCustomWrap.classList.toggle("is-hidden", !showSourceCustom);
+        fields.sourceCustom.disabled = !showSourceCustom;
+        if (!showSourceCustom) fields.sourceCustom.value = "";
+
+        const showYearCustom = fields.yearType.value === CUSTOM_SOURCE;
+        yearCustomWrap.classList.toggle("is-hidden", !showYearCustom);
+        fields.yearCustom.disabled = !showYearCustom;
+        if (!showYearCustom) fields.yearCustom.value = "";
+
+        const showColorCustom = fields.colorType.value === CUSTOM_SOURCE;
+        colorCustomWrap.classList.toggle("is-hidden", !showColorCustom);
+        fields.colorCustom.disabled = !showColorCustom;
+        if (!showColorCustom) fields.colorCustom.value = "";
+      }
+
+      fields.sourceType.addEventListener("change", updateCustomVisibilities);
+      fields.yearType.addEventListener("change", updateCustomVisibilities);
+      fields.colorType.addEventListener("change", updateCustomVisibilities);
+
+      function setFormData(record) {
+        fields.recordId.value = record.id;
+        fields.sourceType.value = record.sourceType || "";
+        fields.sourceCustom.value = record.sourceCustom || "";
+        fields.yearType.value = record.yearType || "";
+        fields.yearCustom.value = record.yearCustom || "";
+        fields.colorType.value = record.colorType || "";
+        fields.colorCustom.value = record.colorCustom || "";
+
+        for (const name of fieldNames) {
+          if (!fields[name]) continue;
+          if (name === "km") fields[name].value = normalizeKm(record[name]);
+          else if (name === "receivedDate" || name === "boughtDate" || name === "bookingDate") fields[name].value = toDateInputValue(record[name]);
+          else if (name === "bookingTime") fields[name].value = normalizeBookingTime(record[name]);
+          else if (!["sourceType", "sourceCustom", "yearType", "yearCustom", "colorType", "colorCustom"].includes(name)) {
+            fields[name].value = record[name] || "";
+          }
+        }
+        updateCustomVisibilities();
+        
+        if (valuationDialogTitle) valuationDialogTitle.textContent = "編輯資料";
+
+        if (record.isPurchased) {
+          submitValuationBtn.classList.add("is-hidden");
+          submitPurchasedBtn.classList.remove("is-hidden");
+          submitPurchasedBtn.textContent = "儲存";
+        } else {
+          submitValuationBtn.classList.remove("is-hidden");
+          submitValuationBtn.textContent = "儲存";
+          submitPurchasedBtn.classList.add("is-hidden");
+        }
+
+        valuationDialog.showModal();
+      }
+
+      function resetForm() {
+        form.reset();
+        fields.recordId.value = "";
+        fields.bonus.value = "N";
+        if (valuationDialogTitle) valuationDialogTitle.textContent = "新增估價資料";
+        
+        submitValuationBtn.classList.remove("is-hidden");
+        submitValuationBtn.textContent = "新增估價";
+        submitPurchasedBtn.classList.remove("is-hidden");
+        submitPurchasedBtn.textContent = "新增買進";
+
+        updateCustomVisibilities();
       }
 
       function createId() {
@@ -2634,6 +2549,8 @@
         const sheetRecord = {
           ...normalized,
           source: getSourceLabel(normalized),
+          year: normalized.year,
+          color: normalized.color,
           isPurchased: normalized.isPurchased ? "TRUE" : "FALSE",
           state: normalized.isSold ? "Y" : "N",
         };
@@ -2704,6 +2621,8 @@
           [
             getSourceLabel(record),
             ...fieldNames.map((name) => record[name]),
+            record.year,
+            record.color,
             record.boughtDate,
             record.bookingDate,
             record.bookingTime,
@@ -2761,11 +2680,6 @@
         if (match) {
           const yr = parseInt(match[1], 10);
           if (yr >= 2000 && yr <= 2100) return String(yr);
-        }
-        const minguoMatch = dateStr.match(/^(\d{3})[^\d]/);
-        if (minguoMatch) {
-          const mYr = parseInt(minguoMatch[1], 10);
-          if (mYr >= 90 && mYr <= 150) return String(mYr + 1911);
         }
         const createdMatch = (record.createdAt || "").match(/(\d{4})/);
         if (createdMatch) {
@@ -3102,7 +3016,7 @@
             <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2 2v2"></path>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
               </svg>
             </button>
           </div>`;
@@ -3198,6 +3112,11 @@
         purchasedCount.textContent = `${purchasedRecords.length} 筆`;
         soldCount.textContent = `${soldRecords.length} 筆`;
 
+        const switchCountOngoing = document.getElementById("switchCountOngoing");
+        const switchCountPurchased = document.getElementById("switchCountPurchased");
+        const switchCountSold = document.getElementById("switchCountSold");
+        const switchCountAll = document.getElementById("switchCountAll");
+
         if (switchCountOngoing) switchCountOngoing.textContent = ongoingRecords.length;
         if (switchCountPurchased) switchCountPurchased.textContent = purchasedRecords.length;
         if (switchCountSold) switchCountSold.textContent = soldRecords.length;
@@ -3209,54 +3128,6 @@
 
         updateStatusFilterUI();
         updateReportSection();
-      }
-
-      function updateSourceCustomVisibility() {
-        const shouldShow = fields.sourceType.value === CUSTOM_SOURCE;
-        sourceCustomWrap.classList.toggle("is-hidden", !shouldShow);
-        fields.sourceCustom.disabled = !shouldShow;
-        if (!shouldShow) fields.sourceCustom.value = "";
-      }
-
-      function setFormData(record) {
-        fields.recordId.value = record.id;
-        for (const name of fieldNames) {
-          if (!fields[name]) continue;
-          if (name === "km") fields[name].value = normalizeKm(record[name]);
-          else if (name === "receivedDate" || name === "boughtDate" || name === "bookingDate") fields[name].value = toDateInputValue(record[name]);
-          else if (name === "bookingTime") fields[name].value = normalizeBookingTime(record[name]);
-          else fields[name].value = record[name] || "";
-        }
-        updateSourceCustomVisibility();
-        
-        if (valuationDialogTitle) valuationDialogTitle.textContent = "編輯資料";
-
-        if (record.isPurchased) {
-          submitValuationBtn.classList.add("is-hidden");
-          submitPurchasedBtn.classList.remove("is-hidden");
-          submitPurchasedBtn.textContent = "儲存";
-        } else {
-          submitValuationBtn.classList.remove("is-hidden");
-          submitValuationBtn.textContent = "儲存";
-          submitPurchasedBtn.classList.add("is-hidden");
-        }
-
-        valuationDialog.showModal();
-      }
-
-      function resetForm() {
-        form.reset();
-        fields.recordId.value = "";
-        if (valuationDialogTitle) valuationDialogTitle.textContent = "新增估價資料";
-        
-        fields.bonus.value = "N"; // 預設打開獎金直接為 N
-
-        submitValuationBtn.classList.remove("is-hidden");
-        submitValuationBtn.textContent = "新增估價";
-        submitPurchasedBtn.classList.remove("is-hidden");
-        submitPurchasedBtn.textContent = "新增買進";
-
-        updateSourceCustomVisibility();
       }
 
       function renderCalendarView() {
@@ -3708,69 +3579,86 @@
         submitValuationBtn.disabled = true;
         submitPurchasedBtn.disabled = true;
 
-        const data = { id: fields.recordId.value || createId(), updatedAt: new Date().toISOString() };
-        for (const name of fieldNames) {
-          if (fields[name]) {
-            data[name] = fields[name].value.trim();
+        try {
+          const data = { id: fields.recordId.value || createId(), updatedAt: new Date().toISOString() };
+          data.sourceType = fields.sourceType.value;
+          data.sourceCustom = fields.sourceCustom.value.trim();
+          data.yearType = fields.yearType.value;
+          data.yearCustom = fields.yearCustom.value.trim();
+          data.year = fields.yearType.value === CUSTOM_SOURCE ? fields.yearCustom.value.trim() : fields.yearType.value.trim();
+          data.colorType = fields.colorType.value;
+          data.colorCustom = fields.colorCustom.value.trim();
+          data.color = fields.colorType.value === CUSTOM_SOURCE ? fields.colorCustom.value.trim() : fields.colorType.value.trim();
+
+          if (data.sourceType !== CUSTOM_SOURCE) data.sourceCustom = "";
+          if (data.yearType !== CUSTOM_SOURCE) data.yearCustom = "";
+          if (data.colorType !== CUSTOM_SOURCE) data.colorCustom = "";
+
+          for (const name of fieldNames) {
+            if (fields[name] && !["year", "color", "sourceType", "sourceCustom", "yearType", "yearCustom", "colorType", "colorCustom"].includes(name)) {
+              data[name] = fields[name].value.trim();
+            }
           }
-        }
-        if (data.sourceType !== CUSTOM_SOURCE) data.sourceCustom = "";
-        data.km = normalizeKm(data.km);
+          data.km = normalizeKm(data.km);
 
-        const existingIndex = records.findIndex((r) => r.id === data.id);
-        const todayStr = new Date().toISOString().split("T")[0];
+          const existingIndex = records.findIndex((r) => r.id === data.id);
+          const todayStr = new Date().toISOString().split("T")[0];
 
-        if (existingIndex >= 0) {
-          const existingRec = records[existingIndex];
-          const isPurchased = existingRec.isPurchased;
-          const bookingDate = data.bookingDate || existingRec.bookingDate || "";
-          const bookingTime = data.bookingTime || existingRec.bookingTime || "";
-          const bookingType = existingRec.bookingType || (isPurchased ? "delivery" : "valuation");
+          if (existingIndex >= 0) {
+            const existingRec = records[existingIndex];
+            const isPurchased = existingRec.isPurchased;
+            const bookingDate = data.bookingDate || existingRec.bookingDate || "";
+            const bookingTime = data.bookingTime || existingRec.bookingTime || "";
+            const bookingType = existingRec.bookingType || (isPurchased ? "delivery" : "valuation");
 
-          records[existingIndex] = await persistUpdate(normalizeRecord({
-            ...existingRec,
-            ...data,
-            bookingDate,
-            bookingTime,
-            bookingType,
-            isPurchased
-          }));
-        } else {
-          const isPurchased = (currentSubmitAction === "purchased");
-          if (isPurchased && !data.boughtDate) {
-            data.boughtDate = todayStr;
+            records[existingIndex] = await persistUpdate(normalizeRecord({
+              ...existingRec,
+              ...data,
+              bookingDate,
+              bookingTime,
+              bookingType,
+              isPurchased
+            }));
+          } else {
+            const isPurchased = (currentSubmitAction === "purchased");
+            if (isPurchased && !data.boughtDate) {
+              data.boughtDate = todayStr;
+            }
+            const bookingDate = data.bookingDate || "";
+            const bookingTime = data.bookingTime || "";
+            const bookingType = isPurchased ? "delivery" : "valuation";
+
+            records.push(await persistCreate(normalizeRecord({
+              ...data,
+              bookingDate,
+              bookingTime,
+              bookingType,
+              isPurchased: isPurchased,
+              isSold: false,
+              state: "N",
+              createdAt: new Date().toISOString()
+            })));
           }
-          const bookingDate = data.bookingDate || "";
-          const bookingTime = data.bookingTime || "";
-          const bookingType = isPurchased ? "delivery" : "valuation";
 
-          records.push(await persistCreate(normalizeRecord({
-            ...data,
-            bookingDate,
-            bookingTime,
-            bookingType,
-            isPurchased: isPurchased,
-            isSold: false,
-            state: "N",
-            createdAt: new Date().toISOString()
-          })));
-        }
-
-        if (data.bookingDate) {
-          selectedCalendarDateISO = data.bookingDate;
-          const parts = data.bookingDate.split("-").map(Number);
-          if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-            calendarCurrentDate = new Date(parts[0], parts[1] - 1, 1);
+          if (data.bookingDate) {
+            selectedCalendarDateISO = data.bookingDate;
+            const parts = data.bookingDate.split("-").map(Number);
+            if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+              calendarCurrentDate = new Date(parts[0], parts[1] - 1, 1);
+            }
           }
-        }
 
-        saveLocalRecords();
-        resetForm();
-        render();
-        if (calendarViewDialog.open) renderCalendarView();
-        valuationDialog.close();
-        submitValuationBtn.disabled = false;
-        submitPurchasedBtn.disabled = false;
+          saveLocalRecords();
+          resetForm();
+          render();
+          if (calendarViewDialog.open) renderCalendarView();
+          valuationDialog.close();
+        } catch (err) {
+          console.error("Form submit error:", err);
+        } finally {
+          submitValuationBtn.disabled = false;
+          submitPurchasedBtn.disabled = false;
+        }
       });
 
       function updateSellBonusUI() {
