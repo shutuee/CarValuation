@@ -6,7 +6,7 @@
     <title>估價與預約管理系統</title>
     <style>
       :root {
-        color-scheme: light;
+        color-scheme: light;Q
         --bg: #eef2f5;
         --surface: #ffffff;
         --surface-soft: #f7f9fb;
@@ -45,6 +45,9 @@
 
       body.modal-open {
         overflow: hidden !important;
+        position: fixed !important;
+        width: 100% !important;
+        height: 100vh !important;
         touch-action: none;
       }
 
@@ -2169,6 +2172,32 @@
       const bonusDateForm = document.getElementById("bonusDateForm");
       const bonusDateTargetId = document.getElementById("bonusDateTargetId");
       const bonusDateInput = document.getElementById("bonusDateInput");
+
+      const allDialogs = document.querySelectorAll("dialog");
+      
+      function updateBodyScrollLock() {
+        const anyOpen = Array.from(allDialogs).some(d => d.open);
+        if (anyOpen) {
+          document.body.classList.add("modal-open");
+        } else {
+          document.body.classList.remove("modal-open");
+        }
+      }
+
+      allDialogs.forEach(dialog => {
+        const originalShowModal = dialog.showModal.bind(dialog);
+        const originalClose = dialog.close.bind(dialog);
+
+        dialog.showModal = function() {
+          originalShowModal();
+          updateBodyScrollLock();
+        };
+
+        dialog.close = function() {
+          originalClose();
+          updateBodyScrollLock();
+        };
+      });
 
       const fieldNames = [
         "receivedDate", "boughtDate", "sourceType", "sourceCustom",
