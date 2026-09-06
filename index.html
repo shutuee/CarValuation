@@ -918,9 +918,12 @@
       dialog#valuationDialog {
         width: min(760px, calc(100vw - 24px));
         max-width: calc(100vw - 24px) !important;
-        max-height: 90vh;
+        max-height: 88vh;
         overflow-y: auto;
         overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+        overscroll-behavior-x: none;
         box-sizing: border-box;
       }
 
@@ -1384,9 +1387,21 @@
         dialog#valuationDialog {
           width: calc(100vw - 20px) !important;
           max-width: calc(100vw - 20px) !important;
+          max-height: 85vh !important;
           margin: auto;
           padding: 0;
+          overflow-y: auto !important;
           overflow-x: hidden !important;
+          -webkit-overflow-scrolling: touch;
+          touch-action: pan-y !important;
+          overscroll-behavior-x: none;
+        }
+
+        dialog#valuationDialog form {
+          touch-action: pan-y;
+          overflow-x: hidden;
+          max-width: 100%;
+          box-sizing: border-box;
         }
 
         dialog#calendarViewDialog {
