@@ -2405,13 +2405,9 @@
         if (!value) return "";
         const text = String(value).trim();
         if (!text) return "";
-        const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
-        if (isoMatch) {
-          const y = isoMatch[1];
-          const m = isoMatch[2].padStart(2, "0");
-          const day = isoMatch[3].padStart(2, "0");
-          return `${y}-${m}-${day}`;
-        }
+        
+        // 優先處理包含時間戳記的 ISO 字串 (如 Google Apps Script 回傳的 2026-09-14T16:00:00.000Z)
+        // 避免正則表達式先截取 UTC 日期導致時區偏差 (例如 UTC+8 台灣時間 9/15 00:00 會變成 UTC 9/14 16:00)
         if (text.includes("T") || text.includes("Z")) {
           const d = new Date(text);
           if (!isNaN(d.getTime())) {
@@ -2420,6 +2416,14 @@
             const day = String(d.getDate()).padStart(2, "0");
             return `${y}-${m}-${day}`;
           }
+        }
+
+        const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
+        if (isoMatch) {
+          const y = isoMatch[1];
+          const m = isoMatch[2].padStart(2, "0");
+          const day = isoMatch[3].padStart(2, "0");
+          return `${y}-${m}-${day}`;
         }
         return text;
       }
@@ -3224,6 +3228,7 @@
           calendarGrid.appendChild(h);
         });
 
+        // 包含《紀念日及節日實施條例》（新增 4+1 國定假日：9/28教師節、10/25光復節、12/25行憲紀念日、5/1勞動節、小年夜）
         const getTaiwanHoliday = (dateISO) => {
           const holidays = {
             "01-01": "元旦", "02-28": "和平紀念日", "04-04": "兒童節", "05-01": "勞動節", "09-28": "教師節", "10-25": "光復節", "12-25": "行憲紀念日",
@@ -3398,7 +3403,7 @@
                 <button type="button" class="btn-delete-agenda" title="清除該筆預約" data-id="${b.id}">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2 2v2"></path>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                     <line x1="10" y1="11" x2="10" y2="17"></line>
                     <line x1="14" y1="11" x2="14" y2="17"></line>
                   </svg>
