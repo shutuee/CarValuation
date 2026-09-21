@@ -916,14 +916,21 @@
       }
 
       dialog#valuationDialog {
-        width: min(760px, calc(100vw - 24px));
-        max-width: calc(100vw - 24px) !important;
-        max-height: 88vh;
+        width: min(760px, calc(100vw - 20px));
+        max-width: calc(100vw - 20px) !important;
+        max-height: 85vh;
         overflow-y: auto;
         overflow-x: hidden !important;
         -webkit-overflow-scrolling: touch;
         touch-action: pan-y;
         overscroll-behavior-x: none;
+        box-sizing: border-box;
+      }
+
+      dialog#valuationDialog form {
+        touch-action: pan-y;
+        overflow-x: hidden;
+        max-width: 100%;
         box-sizing: border-box;
       }
 
@@ -1457,9 +1464,9 @@
         .search-tools-group { display: flex; width: 100%; }
         .form-grid { grid-template-columns: 1fr !important; width: 100% !important; }
         .wide, .full-row { grid-column: 1 / -1 !important; }
-        .search-row { flex-direction: row; align-items: center; gap: 10px; width: 100%; }
-        .action-buttons-group { display: flex; align-items: center; gap: 6px; }
-        .action-buttons-group button { min-width: 0; padding: 0 10px !important; font-size: 14px !important; }
+        .search-row { flex-direction: row; align-items: center; gap: 8px; width: 100%; }
+        .action-buttons-group { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; width: 100%; justify-content: space-between; }
+        .action-buttons-group button { min-width: 0; padding: 0 8px !important; font-size: 14px !important; flex-shrink: 0; }
         .quick-switch-wrap { flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; }
         .switch-btn-group { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         .switch-btn { justify-content: center; width: 100%; padding: 8px 10px; }
@@ -1483,7 +1490,7 @@
         <section class="list-tools" aria-label="資料工具列">
           <div class="search-tools-group">
             <div class="search-row">
-              <div class="action-buttons-group">
+              <div class="action-buttons-group" style="width: 100%;">
                 <button type="button" class="btn-add-valuation" id="openValuationBtn">+新增估價</button>
 
                 <button type="button" class="btn-calendar-view" id="openCalendarViewBtn">
@@ -1504,15 +1511,9 @@
                   </svg>
                   數據
                 </button>
-              </div>
 
-              <label class="search-box">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%);">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input id="searchInput" type="search" placeholder="搜尋" style="padding-left: 40px;" />
-              </label>
+                <button type="button" class="btn-black" id="openWorkdayBtn" title="工作天數統計" style="font-size: 16px; font-weight: 800; min-width: 42px; height: 44px; padding: 0 12px; border-radius: 6px;">工</button>
+              </div>
             </div>
 
             <div class="quick-switch-wrap">
@@ -2106,13 +2107,54 @@
       </form>
     </dialog>
 
+    <dialog id="workdayDialog">
+      <div class="modal-content-wrap">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px;">
+          <h2 style="margin:0; font-size:18px; font-weight:800; color:var(--text-main);">工作天數</h2>
+          <button class="secondary" type="button" id="closeWorkdayDialogBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
+        </div>
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 4px;">
+          <div style="display: flex; gap: 8px;">
+            <select id="workdayYearSelect" class="report-select" title="選擇年份"></select>
+            <select id="workdayMonthSelect" class="report-select" title="選擇月份"></select>
+          </div>
+          <div style="display: flex; gap: 14px; font-size: 16px; font-weight: 800;">
+            <div>應上班: <span id="targetWorkdaysCount" style="color:#16a34a; font-size:20px; font-weight:900;">0</span> 天</div>
+            <div>已上班: <span id="actualWorkedCount" style="color:#2563eb; font-size:20px; font-weight:900;">0</span> 天</div>
+          </div>
+        </div>
+
+        <div class="calendar-grid" id="workdayCalendarGrid" style="margin-top: 8px;">
+          <!-- JS 動態生成 -->
+        </div>
+        <div style="font-size: 12px; color: #64748b; text-align: center; margin-top: 4px;">
+          💡 點擊日期即可標註 / 取消「已上班」狀態，變更會自動儲存。
+        </div>
+      </div>
+    </dialog>
+
     <script>
       const STORAGE_KEY = "carvaluation.records.v2";
+      const WORKDAY_STORAGE_KEY = "carvaluation.workday.v1";
       const API_URL = "https://script.google.com/macros/s/AKfycbx83aRvR1MpZwqlTKKHyfej-aSJOrIPUI4aRlvX7Qy81Owz-9VxjYjCL3pRKzewkQu6/exec";
       const CUSTOM_SOURCE = "自行輸入";
       const FIXED_SOURCES = ["來店", "網站", "自買"];
       const FIXED_YEARS = Array.from({ length: 27 }, (_, i) => String(2028 - i));
       const FIXED_COLORS = ["白", "黑", "灰", "銀", "紅", "藍", "綠"];
+
+      const TAIWAN_HOLIDAYS = {
+        // 2026
+        "2026-01-01": "元旦", "2026-02-15": "小年夜", "2026-02-16": "除夕", "2026-02-17": "春節", "2026-02-18": "初二", "2026-02-19": "初三", "2026-02-20": "初四", "2026-02-28": "和平紀念日", "2026-04-04": "兒童節", "2026-04-05": "清明節", "2026-05-01": "勞動節", "2026-06-19": "端午節", "2026-09-25": "中秋節", "2026-09-28": "教師節", "2026-10-10": "國慶日", "2026-10-25": "光復節", "2026-12-25": "行憲紀念日",
+        // 2027
+        "2027-01-01": "元旦", "2027-02-05": "小年夜", "2027-02-06": "除夕", "2027-02-07": "春節", "2027-02-08": "初二", "2027-02-09": "初三", "2027-02-28": "和平紀念日", "2027-04-04": "兒童節", "2027-04-05": "清明節", "2027-05-01": "勞動節", "2027-06-09": "端午節", "2027-09-15": "中秋節", "2027-09-28": "教師節", "2027-10-10": "國慶日", "2027-10-25": "光復節", "2027-12-25": "行憲紀念日",
+        // 2028
+        "2028-01-01": "元旦", "2028-01-25": "小年夜", "2028-01-26": "除夕", "2028-01-27": "春節", "2028-01-28": "初二", "2028-01-29": "初三", "2028-02-28": "和平紀念日", "2028-04-04": "兒童節", "2028-04-05": "清明節", "2028-05-01": "勞動節", "2028-05-28": "端午節", "2028-09-28": "教師節", "2028-10-03": "中秋節", "2028-10-10": "國慶日", "2028-10-25": "光復節", "2028-12-25": "行憲紀念日",
+        // 2029
+        "2029-01-01": "元旦", "2029-02-11": "小年夜", "2029-02-12": "除夕", "2029-02-13": "春節", "2029-02-14": "初二", "2029-02-15": "初三", "2029-02-28": "和平紀念日", "2029-04-04": "兒童節", "2029-04-05": "清明節", "2029-05-01": "勞動節", "2029-06-16": "端午節", "2029-09-22": "中秋節", "2029-09-28": "教師節", "2029-10-10": "國慶日", "2029-10-25": "光復節", "2029-12-25": "行憲紀念日",
+        // 2030
+        "2030-01-01": "元旦", "2030-02-01": "小年夜", "2030-02-02": "除夕", "2030-02-03": "春節", "2030-02-04": "初二", "2030-02-05": "初三", "2030-02-28": "和平紀念日", "2030-04-04": "兒童節", "2030-04-05": "清明節", "2030-05-01": "勞動節", "2030-06-05": "端午節", "2030-09-12": "中秋節", "2030-09-28": "教師節", "2030-10-10": "國慶日", "2030-10-25": "光復節", "2030-12-25": "行憲紀念日"
+      };
 
       const form = document.getElementById("valuationForm");
       const searchInput = document.getElementById("searchInput");
@@ -2223,6 +2265,15 @@
       const bonusDateTargetId = document.getElementById("bonusDateTargetId");
       const bonusDateInput = document.getElementById("bonusDateInput");
 
+      const openWorkdayBtn = document.getElementById("openWorkdayBtn");
+      const workdayDialog = document.getElementById("workdayDialog");
+      const closeWorkdayDialogBtn = document.getElementById("closeWorkdayDialogBtn");
+      const workdayYearSelect = document.getElementById("workdayYearSelect");
+      const workdayMonthSelect = document.getElementById("workdayMonthSelect");
+      const targetWorkdaysCount = document.getElementById("targetWorkdaysCount");
+      const actualWorkedCount = document.getElementById("actualWorkedCount");
+      const workdayCalendarGrid = document.getElementById("workdayCalendarGrid");
+
       const allDialogs = document.querySelectorAll("dialog");
       
       function updateBodyScrollLock() {
@@ -2301,6 +2352,22 @@
         records = [];
       }
 
+      let workdayRecords = {};
+      try {
+        const localWorkdays = localStorage.getItem(WORKDAY_STORAGE_KEY);
+        if (localWorkdays) workdayRecords = JSON.parse(localWorkdays);
+      } catch (e) {
+        workdayRecords = {};
+      }
+
+      function saveWorkdayRecords() {
+        try {
+          localStorage.setItem(WORKDAY_STORAGE_KEY, JSON.stringify(workdayRecords));
+        } catch (e) {
+          console.warn("Save workday records failed", e);
+        }
+      }
+
       let currentStatusFilter = "all";
       let calendarCurrentDate = new Date();
       let selectedCalendarDateISO = "";
@@ -2309,6 +2376,42 @@
       let sellBonusValue = "";
       let soldSortField = "receivedDate";
       let soldSortDesc = true;
+
+      function updateSoldHeadersUI() {
+        if (soldDateSortHeader) {
+          soldDateSortHeader.textContent = `進件日 ${soldSortField === "receivedDate" ? (soldSortDesc ? "▼" : "▲") : ""}`;
+        }
+        if (soldBonusSortHeader) {
+          soldBonusSortHeader.textContent = `獎金 ${soldSortField === "bonus" ? (soldSortDesc ? "▼" : "▲") : ""}`;
+        }
+      }
+
+      if (soldDateSortHeader) {
+        soldDateSortHeader.addEventListener("click", () => {
+          if (soldSortField === "receivedDate") {
+            soldSortDesc = !soldSortDesc;
+          } else {
+            soldSortField = "receivedDate";
+            soldSortDesc = true;
+          }
+          updateSoldHeadersUI();
+          render();
+        });
+      }
+
+      if (soldBonusSortHeader) {
+        soldBonusSortHeader.addEventListener("click", () => {
+          if (soldSortField === "bonus") {
+            soldSortDesc = !soldSortDesc;
+          } else {
+            soldSortField = "bonus";
+            soldSortDesc = true;
+          }
+          updateSoldHeadersUI();
+          render();
+        });
+      }
+
       let ongoingDetailExpanded = false;
       let purchasedDetailExpanded = false;
       let selectedBonusDates = {};
@@ -2406,18 +2509,6 @@
         const text = String(value).trim();
         if (!text) return "";
         
-        // 優先處理包含時間戳記的 ISO 字串 (如 Google Apps Script 回傳的 2026-09-14T16:00:00.000Z)
-        // 避免正則表達式先截取 UTC 日期導致時區偏差 (例如 UTC+8 台灣時間 9/15 00:00 會變成 UTC 9/14 16:00)
-        if (text.includes("T") || text.includes("Z")) {
-          const d = new Date(text);
-          if (!isNaN(d.getTime())) {
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, "0");
-            const day = String(d.getDate()).padStart(2, "0");
-            return `${y}-${m}-${day}`;
-          }
-        }
-
         const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
         if (isoMatch) {
           const y = isoMatch[1];
@@ -2605,10 +2696,6 @@
         if (!text) return "";
         const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
         if (isoMatch) return isoMatch[2].padStart(2, "0");
-        if (text.includes("T") || text.includes("Z")) {
-          const d = new Date(text);
-          if (!isNaN(d.getTime())) return String(d.getMonth() + 1).padStart(2, "0");
-        }
         return "";
       }
 
@@ -2698,7 +2785,7 @@
       }
 
       function getFilteredRecords() {
-        const keyword = searchInput.value.trim().toLowerCase();
+        const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
         if (!keyword) return records;
         return records.filter((record) =>
           [
@@ -2714,810 +2801,592 @@
         );
       }
 
-      function sortRecords(items) {
-        return [...items].sort((a, b) => {
-          const dateA = dateValueToNumber(a.receivedDate) || 0;
-          const dateB = dateValueToNumber(b.receivedDate) || 0;
-          if (dateA !== dateB) return dateB - dateA;
-          return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
-        });
-      }
-
-      function sortPurchasedRecords(items) {
-        return [...items].sort((a, b) => {
-          const dateA = dateValueToNumber(a.boughtDate || a.receivedDate) || 0;
-          const dateB = dateValueToNumber(b.boughtDate || b.receivedDate) || 0;
-          if (dateA !== dateB) return dateB - dateA;
-          return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
-        });
-      }
-
-      function sortSoldRecords(items) {
-        return [...items].sort((a, b) => {
-          if (soldSortField === "bonus") {
-            const getBonusNum = (val) => {
-              if (!val) return 0;
-              const num = parseFloat(String(val).replace(/[^\d.-]/g, ""));
-              return isNaN(num) ? 0 : num;
-            };
-            const bonusA = getBonusNum(a.bonus);
-            const bonusB = getBonusNum(b.bonus);
-            if (bonusA !== bonusB) {
-              return soldSortDesc ? (bonusB - bonusA) : (bonusA - bonusB);
-            }
-          } else {
-            const dateA = dateValueToNumber(a.receivedDate) || 0;
-            const dateB = dateValueToNumber(b.receivedDate) || 0;
-            if (dateA !== dateB) {
-              return soldSortDesc ? (dateB - dateA) : (dateA - dateB);
-            }
-          }
-          return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
-        });
-      }
-
-      function getRecordPurchaseYear(record) {
-        if (!record.isPurchased && !record.isSold) return null;
-        const dateStr = record.boughtDate || record.receivedDate || "";
-        const match = dateStr.match(/(\d{4})/);
-        if (match) {
-          const yr = parseInt(match[1], 10);
-          if (yr >= 2000 && yr <= 2100) return String(yr);
-        }
-        const createdMatch = (record.createdAt || "").match(/(\d{4})/);
-        if (createdMatch) {
-          const cYr = parseInt(createdMatch[1], 10);
-          if (cYr >= 2000 && cYr <= 2100) return String(cYr);
-        }
-        return String(new Date().getFullYear());
-      }
-
-      function openReportVehicleModal() {
-        if (!reportYearSelect || !reportMonthSelect) return;
-        const selectedYear = reportYearSelect.value;
-        const selectedMonth = reportMonthSelect.value;
-
-        const dealRecords = records.filter((r) => r.isPurchased || r.isSold);
-        const filteredDeals = dealRecords.filter((r) => {
-          if (selectedYear !== "all" && getRecordPurchaseYear(r) !== selectedYear) return false;
-          if (selectedMonth !== "all") {
-            const m = getRecordMonth(r.boughtDate || r.receivedDate);
-            if (m !== selectedMonth) return false;
-          }
-          return true;
-        });
-
-        filteredDeals.sort((a, b) => {
-          const dateA = dateValueToNumber(a.boughtDate || a.receivedDate) || 0;
-          const dateB = dateValueToNumber(b.boughtDate || b.receivedDate) || 0;
-          return dateA - dateB;
-        });
-
-        const monthText = selectedMonth !== "all" ? `${parseInt(selectedMonth, 10)}月` : "全年";
-        const yearText = selectedYear !== "all" ? `${selectedYear}年` : "全部年份";
-        if (reportVehicleDialogTitle) {
-          reportVehicleDialogTitle.textContent = `${yearText} ${monthText} 車輛清單 (${filteredDeals.length} 筆)`;
-        }
-
-        if (reportVehicleBody) {
-          reportVehicleBody.innerHTML = "";
-          if (filteredDeals.length === 0) {
-            if (reportVehicleEmpty) reportVehicleEmpty.classList.add("is-visible");
-          } else {
-            if (reportVehicleEmpty) reportVehicleEmpty.classList.remove("is-visible");
-            filteredDeals.forEach((r) => {
-              const tr = document.createElement("tr");
-              const statusTag = r.isSold ? `<span style="color:#b45309; font-weight:700;">已售出</span>` : `<span style="color:#16a34a; font-weight:700;">已買入</span>`;
-              const boughtDateStr = formatMMDD(r.boughtDate || r.receivedDate) || "-";
-              tr.innerHTML = `
-                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important;">${boughtDateStr}</td>
-                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; text-align: center !important;">${r.year || "-"}</td>
-                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; font-weight: 700; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.model || ''}">${r.model || "-"}</td>
-                <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-size: 14px; text-align: center !important;">${statusTag}</td>
-              `;
-              reportVehicleBody.appendChild(tr);
-            });
-          }
-        }
-
-        reportVehicleDialog.showModal();
-        if (document.activeElement) document.activeElement.blur();
-      }
-
-      openReportVehicleListBtn?.addEventListener("click", openReportVehicleModal);
-      closeReportVehicleDialogBtn?.addEventListener("click", () => reportVehicleDialog.close());
-
-      function updateReportSection() {
-        if (!reportYearSelect || !reportMonthSelect) return;
-
-        const dealRecords = records.filter((r) => r.isPurchased || r.isSold);
-        const yearsSet = new Set();
-        const currentYearStr = String(new Date().getFullYear());
-        yearsSet.add(currentYearStr);
-        yearsSet.add("2025");
-
-        dealRecords.forEach((r) => {
-          const yr = getRecordPurchaseYear(r);
-          if (yr) yearsSet.add(yr);
-        });
-
-        const sortedYears = Array.from(yearsSet).sort((a, b) => b.localeCompare(a));
-        const previousVal = reportYearSelect.value;
-
-        reportYearSelect.innerHTML = '<option value="all">全部年份</option>';
-        sortedYears.forEach((yr) => {
+      function initWorkdayControls() {
+        if (!workdayYearSelect || !workdayMonthSelect) return;
+        workdayYearSelect.innerHTML = "";
+        ["2026", "2027", "2028", "2029", "2030"].forEach(y => {
           const opt = document.createElement("option");
-          opt.value = yr;
-          opt.textContent = `${yr} 年`;
-          reportYearSelect.appendChild(opt);
+          opt.value = y;
+          opt.textContent = y;
+          workdayYearSelect.appendChild(opt);
         });
 
-        if (previousVal && (previousVal === "all" || sortedYears.includes(previousVal))) {
-          reportYearSelect.value = previousVal;
-        } else {
-          reportYearSelect.value = currentYearStr;
+        workdayMonthSelect.innerHTML = "";
+        for (let m = 1; m <= 12; m++) {
+          const opt = document.createElement("option");
+          const mStr = String(m).padStart(2, "0");
+          opt.value = mStr;
+          opt.textContent = mStr;
+          workdayMonthSelect.appendChild(opt);
         }
 
-        const selectedYear = reportYearSelect.value;
-        const selectedMonth = reportMonthSelect.value;
-
-        if (annualTotalLabel) {
-          annualTotalLabel.textContent = selectedMonth !== "all" ? `${parseInt(selectedMonth, 10)} 月份買進台數` : "年度總買進台數";
-        }
-
-        if (openReportVehicleListBtn) {
-          if (selectedYear === "2025" && selectedMonth === "all") {
-            openReportVehicleListBtn.classList.add("is-hidden");
-          } else {
-            openReportVehicleListBtn.classList.remove("is-hidden");
-          }
-        }
-
-        const filteredDeals = dealRecords.filter((r) => {
-          if (selectedYear !== "all" && getRecordPurchaseYear(r) !== selectedYear) return false;
-          if (selectedMonth !== "all") {
-            const m = getRecordMonth(r.boughtDate || r.receivedDate);
-            if (m !== selectedMonth) return false;
-          }
-          return true;
-        });
-
-        const allInStockCount = records.filter((r) => r.isPurchased && !r.isSold).length;
-        let purchasedInYear = filteredDeals.filter((r) => r.isPurchased && !r.isSold).length;
-        
-        if ((selectedYear === "all" || selectedYear === currentYearStr) && selectedMonth === "all") {
-          purchasedInYear = allInStockCount;
-        }
-
-        let soldInYear = filteredDeals.filter((r) => r.isSold).length;
-        let totalInYear = purchasedInYear + soldInYear;
-
-        if (selectedYear === "2025" && selectedMonth === "all") {
-          totalInYear = 42;
-        }
-
-        if (annualTotalPurchased) annualTotalPurchased.textContent = totalInYear;
-        if (annualPurchasedCount) annualPurchasedCount.textContent = purchasedInYear;
-        if (annualSoldCount) annualSoldCount.textContent = soldInYear;
-
-        const purchasedStatCard = document.querySelector("#purchasedStatCard");
-        const soldStatCard = document.querySelector("#soldStatCard");
-
-        if (purchasedStatCard && soldStatCard) {
-          if (selectedYear === "2025" && selectedMonth === "all") {
-            purchasedStatCard.classList.add("is-hidden");
-            soldStatCard.classList.add("is-hidden");
-          } else {
-            purchasedStatCard.classList.remove("is-hidden");
-            soldStatCard.classList.remove("is-hidden");
-          }
-        }
-
-        if (channelBreakdownWrap && channelGridList) {
-          if (selectedYear === "2025" && selectedMonth === "all") {
-            channelBreakdownWrap.classList.add("is-hidden");
-          } else {
-            channelBreakdownWrap.classList.remove("is-hidden");
-
-            const yearRecords = records.filter((r) => {
-              if (selectedYear !== "all" && getRecordPurchaseYear(r) !== selectedYear) return false;
-              if (selectedMonth !== "all") {
-                const m = getRecordMonth(r.boughtDate || r.receivedDate);
-                if (m !== selectedMonth) return false;
-              }
-              return true;
-            });
-
-            const counts = { "來店": 0, "網站": 0, "自買": 0, "自行輸入": 0 };
-            let total = 0;
-
-            yearRecords.forEach((r) => {
-              const src = r.sourceType || "來店";
-              if (counts.hasOwnProperty(src)) {
-                counts[src]++;
-              } else {
-                counts["自行輸入"]++;
-              }
-              total++;
-            });
-
-            channelGridList.innerHTML = "";
-            const channels = ["來店", "網站", "自買", "自行輸入"];
-
-            channels.forEach((ch) => {
-              const count = counts[ch] || 0;
-              if (ch === "自行輸入" && count === 0) return;
-
-              const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-
-              const card = document.createElement("div");
-              card.className = "channel-card";
-              card.innerHTML = `
-                <div class="channel-card-header">
-                  <span>${ch}</span>
-                  <span style="color:#64748b;">${pct}%</span>
-                </div>
-                <div class="channel-card-val">${count} <span style="font-size:13px; font-weight:700;">台</span></div>
-                <div class="channel-progress-bg">
-                  <div class="channel-progress-fill" style="width: ${pct}%;"></div>
-                </div>
-              `;
-              channelGridList.appendChild(card);
-            });
-          }
-        }
-
-        if (yearBreakdownList) {
-          yearBreakdownList.innerHTML = "";
-          sortedYears.forEach((yr) => {
-            const yrDeals = dealRecords.filter((r) => {
-              if (getRecordPurchaseYear(r) !== yr) return false;
-              if (selectedMonth !== "all") {
-                const m = getRecordMonth(r.boughtDate || r.receivedDate);
-                if (m !== selectedMonth) return false;
-              }
-              return true;
-            });
-
-            let countNum = yrDeals.length;
-            if (yr === currentYearStr && selectedMonth === "all") {
-              countNum = allInStockCount + yrDeals.filter((r) => r.isSold).length;
-            } else if (yr === "2025" && selectedMonth === "all") {
-              countNum = 42;
-            }
-
-            const tag = document.createElement("div");
-            tag.className = "year-stat-tag" + (yr === selectedYear ? " is-active" : "");
-            tag.innerHTML = `<span>${yr}年</span> <span class="yr-num">${countNum}台</span>`;
-            tag.addEventListener("click", () => {
-              reportYearSelect.value = yr;
-              updateReportSection();
-            });
-            yearBreakdownList.appendChild(tag);
-          });
-        }
+        workdayYearSelect.value = "2026";
+        workdayMonthSelect.value = "09";
       }
 
-      function createCell(value, className = "") {
-        const cell = document.createElement("td");
-        if (className) cell.className = className;
-        cell.textContent = value || "";
-        return cell;
-      }
+      function renderWorkdayCalendar() {
+        if (!workdayCalendarGrid) return;
+        const year = parseInt(workdayYearSelect.value, 10);
+        const month = parseInt(workdayMonthSelect.value, 10) - 1;
 
-      function createOngoingRow(record) {
-        const row = document.createElement("tr");
+        workdayCalendarGrid.innerHTML = "";
 
-        row.append(
-          createCell(getSourceLabel(record), "col-src"),
-          createCell(formatMMDD(record.receivedDate), "col-date"),
-          createCell(record.year, "col-year"),
-          createCell(record.model, "model-cell col-model"),
-          createCell(record.purchasePrice, "col-price"),
-          createCell(record.km, "col-km"),
-          createCell(record.color, "col-color"),
-          createCell(record.condition, "col-cond"), 
-          createCell(record.version, "col-ver"),
-          createCell(record.quote, "col-quote"), 
-          createCell(record.seller, "col-seller"),
-          createCell(record.authority, "col-auth col-ongoing-detail"),
-          createCell(record.remarks, "note-cell col-remarks col-ongoing-detail"),
-          createCell(record.repairItems, "wide-cell col-repair col-ongoing-detail")
-        );
-
-        const actionCell = createCell("", "col-actions");
-        actionCell.innerHTML = `
-          <div class="row-actions">
-            <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-            </button>
-            <button class="secondary btn-icon" type="button" data-action="book" data-id="${record.id}" title="預約估價">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-            </button>
-            <button class="action-blue" type="button" data-action="toggle-purchased" data-id="${record.id}">已買</button>
-            <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-            </button>
-          </div>`;
-        row.append(actionCell);
-        return row;
-      }
-
-      function createPurchasedRow(record) {
-        const row = document.createElement("tr");
-
-        row.append(
-          createCell(getSourceLabel(record), "col-src"),
-          createCell(formatMMDD(record.boughtDate), "col-date"),
-          createCell(formatMMDD(record.receivedDate), "col-date col-purchased-detail"),
-          createCell(record.year, "col-year"),
-          createCell(record.model, "model-cell col-model"),
-          createCell(record.actualDealPrice, "col-buy-price"),
-          createCell(record.purchasePrice, "col-price"),
-          createCell(record.km, "col-km"),
-          createCell(record.color, "col-color"),
-          createCell(record.condition, "col-cond"), 
-          createCell(record.version, "col-ver"),
-          createCell(record.quote, "col-quote"), 
-          createCell(record.seller, "col-seller"),
-          createCell(record.authority, "col-auth col-purchased-detail"),
-          createCell(record.remarks, "note-cell col-remarks col-purchased-detail"),
-          createCell(record.repairItems, "wide-cell col-repair col-purchased-detail"),
-          createCell(record.bonus, "col-bonus col-purchased-detail")
-        );
-
-        const actionCell = createCell("", "col-actions");
-        actionCell.innerHTML = `
-          <div class="row-actions">
-            <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-            </button>
-            <button class="secondary btn-icon" type="button" data-action="book" data-id="${record.id}" title="預約交車">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-            </button>
-            <button class="action-green" type="button" data-action="sell" data-id="${record.id}">已售</button>
-            <button class="secondary" type="button" data-action="toggle-purchased" data-id="${record.id}">取消買</button>
-            <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-            </button>
-          </div>`;
-        row.append(actionCell);
-        return row;
-      }
-
-      function createSoldRow(record) {
-        const row = document.createElement("tr");
-
-        row.append(
-          createCell(getSourceLabel(record), "col-src"),
-          createCell(formatMMDD(record.receivedDate), "col-date"),
-          createCell(formatMMDD(record.boughtDate), "col-date"),
-          createCell(record.year, "col-year"),
-          createCell(record.model, "model-cell col-model"),
-          createCell(record.actualDealPrice, "col-buy-price"),
-          createCell(record.salePrice, "col-sell-price"),
-          createCell(record.km, "col-km"),
-          createCell(record.color, "col-color"),
-          createCell(record.condition, "col-cond"), 
-          createCell(record.version, "col-ver"),
-          createCell(record.authority, "col-auth"),
-          createCell(record.quote, "col-quote"), 
-          createCell(record.purchasePrice, "col-price"),
-          createCell(record.remarks, "note-cell col-remarks"),
-          createCell(record.repairItems, "wide-cell col-repair"),
-          createCell(record.seller, "col-seller"),
-          createCell(record.bonus, "col-bonus")
-        );
-
-        const actionCell = createCell("", "col-actions");
-        actionCell.innerHTML = `
-          <div class="row-actions">
-            <button class="secondary btn-icon" type="button" data-action="edit" data-id="${record.id}" title="編輯">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-            </button>
-            <button class="secondary" type="button" data-action="toggle-sold" data-id="${record.id}">取消成交</button>
-            <button class="secondary btn-icon" type="button" data-action="delete" data-id="${record.id}" title="刪除">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-            </button>
-          </div>`;
-        row.append(actionCell);
-        return row;
-      }
-
-      function updateStatusFilterUI() {
-        document.querySelectorAll(".switch-btn").forEach((btn) => {
-          btn.classList.toggle("is-active", btn.dataset.status === currentStatusFilter);
-        });
-
-        if (currentStatusFilter === "all") {
-          ongoingSection.classList.remove("is-hidden");
-          purchasedSection.classList.remove("is-hidden");
-          soldSection.classList.remove("is-hidden");
-        } else if (currentStatusFilter === "ongoing") {
-          ongoingSection.classList.remove("is-hidden");
-          purchasedSection.classList.add("is-hidden");
-          soldSection.classList.add("is-hidden");
-        } else if (currentStatusFilter === "purchased") {
-          ongoingSection.classList.add("is-hidden");
-          purchasedSection.classList.remove("is-hidden");
-          soldSection.classList.add("is-hidden");
-        } else if (currentStatusFilter === "sold") {
-          ongoingSection.classList.add("is-hidden");
-          purchasedSection.classList.add("is-hidden");
-          soldSection.classList.remove("is-hidden");
-        }
-      }
-
-      function render() {
-        const filteredRecords = getFilteredRecords();
-        const ongoingRecords = filteredRecords.filter((record) => !record.isPurchased && !record.isSold);
-        const purchasedRecords = filteredRecords.filter((record) => record.isPurchased && !record.isSold);
-        const soldRecords = filteredRecords.filter((record) => record.isSold);
-
-        ongoingBody.innerHTML = "";
-        for (const record of sortRecords(ongoingRecords)) ongoingBody.append(createOngoingRow(record));
-        
-        purchasedBody.innerHTML = "";
-        for (const record of sortPurchasedRecords(purchasedRecords)) purchasedBody.append(createPurchasedRow(record));
-        
-        soldBody.innerHTML = "";
-        for (const record of sortSoldRecords(soldRecords)) soldBody.append(createSoldRow(record));
-
-        ongoingCount.textContent = `${ongoingRecords.length} 筆`;
-        purchasedCount.textContent = `${purchasedRecords.length} 筆`;
-        soldCount.textContent = `${soldRecords.length} 筆`;
-
-        const switchCountOngoing = document.getElementById("switchCountOngoing");
-        const switchCountPurchased = document.getElementById("switchCountPurchased");
-        const switchCountSold = document.getElementById("switchCountSold");
-        const switchCountAll = document.getElementById("switchCountAll");
-
-        if (switchCountOngoing) switchCountOngoing.textContent = ongoingRecords.length;
-        if (switchCountPurchased) switchCountPurchased.textContent = purchasedRecords.length;
-        if (switchCountSold) switchCountSold.textContent = soldRecords.length;
-        if (switchCountAll) switchCountAll.textContent = ongoingRecords.length + purchasedRecords.length + soldRecords.length;
-
-        ongoingEmpty.classList.toggle("is-visible", ongoingRecords.length === 0);
-        purchasedEmpty.classList.toggle("is-visible", purchasedRecords.length === 0);
-        soldEmpty.classList.toggle("is-visible", soldRecords.length === 0);
-
-        updateStatusFilterUI();
-        updateReportSection();
-      }
-
-      function renderCalendarView() {
-        const year = calendarCurrentDate.getFullYear();
-        const month = calendarCurrentDate.getMonth();
-        calendarMonthTitle.textContent = `${year}年 ${month + 1}月`;
-
-        calendarGrid.innerHTML = "";
-        
         const daysOfWeek = ["一", "二", "三", "四", "五", "六", "日"];
         daysOfWeek.forEach((d, idx) => {
           const h = document.createElement("div");
           h.className = "calendar-day-header" + (idx >= 5 ? " is-weekend" : "");
           h.textContent = d;
-          calendarGrid.appendChild(h);
+          workdayCalendarGrid.appendChild(h);
         });
 
-        // 包含《紀念日及節日實施條例》（新增 4+1 國定假日：9/28教師節、10/25光復節、12/25行憲紀念日、5/1勞動節、小年夜）
-        const getTaiwanHoliday = (dateISO) => {
-          const holidays = {
-            "01-01": "元旦", "02-28": "和平紀念日", "04-04": "兒童節", "05-01": "勞動節", "09-28": "教師節", "10-25": "光復節", "12-25": "行憲紀念日",
-            "2024-02-08": "小年夜", "2024-02-09": "除夕", "2024-02-10": "春節", "2024-02-11": "初二", "2024-02-12": "初三", "2024-02-13": "初四", "2024-02-14": "初五", "2024-04-05": "清明節", "2024-06-10": "端午節", "2024-09-17": "中秋節",
-            "2025-01-25": "春節連假", "2025-01-26": "春節連假", "2025-01-27": "小年夜", "2025-01-28": "除夕", "2025-01-29": "春節", "2025-01-30": "初二", "2025-01-31": "初三", "2025-02-01": "初四", "2025-02-02": "初五", "2025-04-04": "清明節", "2025-05-31": "端午節", "2025-10-06": "中秋節",
-            "2026-02-15": "小年夜", "2026-02-16": "除夕", "2026-02-17": "春節", "2026-02-18": "初二", "2026-02-19": "初三", "2026-02-20": "初四", "2026-04-05": "清明節", "2026-06-19": "端午節", "2026-09-25": "中秋節"
-          };
-          return holidays[dateISO] || holidays[dateISO.substring(5)] || null;
-        };
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startingDay = (firstDay.getDay() + 6) % 7;
+        const totalDays = lastDay.getDate();
 
-        const createCell = (cellYear, cellMonth, cellDay, isOtherMonth) => {
+        const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+        for (let i = startingDay - 1; i >= 0; i--) {
+          const dayNum = prevMonthLastDay - i;
           const cell = document.createElement("div");
-          cell.className = "calendar-cell" + (isOtherMonth ? " other-month" : "");
+          cell.className = "calendar-cell other-month";
+          cell.style.alignItems = "center";
+          cell.style.justifyContent = "center";
+          cell.innerHTML = `<div class="cell-date-row" style="justify-content:center;"><span class="cell-date-num">${dayNum}</span></div>`;
+          workdayCalendarGrid.appendChild(cell);
+        }
 
-          const mStr = String(cellMonth + 1).padStart(2, "0");
-          const dStr = String(cellDay).padStart(2, "0");
-          const dateISO = `${cellYear}-${mStr}-${dStr}`;
-          const todayStr = new Date().toISOString().split("T")[0];
+        let standardWorkdays = 0;
+        let userWorkedDays = 0;
 
-          if (dateISO === todayStr) {
-            cell.classList.add("is-today");
+        for (let day = 1; day <= totalDays; day++) {
+          const mStr = String(month + 1).padStart(2, "0");
+          const dStr = String(day).padStart(2, "0");
+          const dateISO = `${year}-${mStr}-${dStr}`;
+          const curDate = new Date(year, month, day);
+          const dayOfWeek = curDate.getDay();
+
+          const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+          const holidayName = TAIWAN_HOLIDAYS[dateISO];
+          const isOffDay = isWeekend || Boolean(holidayName);
+
+          if (!isOffDay) {
+            standardWorkdays++;
           }
 
-          if (selectedCalendarDateISO && dateISO === selectedCalendarDateISO) {
-            cell.classList.add("is-selected");
+          const isWorked = Boolean(workdayRecords[dateISO]);
+          if (isWorked) {
+            userWorkedDays++;
           }
 
-          const holiday = getTaiwanHoliday(dateISO);
-          let dateHtml = `<span class="cell-date-num">${cellDay}</span>`;
-          if (holiday) {
-            dateHtml += `<span class="cell-holiday">${holiday}</span>`;
-          }
-          cell.innerHTML = `<div class="cell-date-row">${dateHtml}</div>`;
+          const cell = document.createElement("div");
+          cell.className = "calendar-cell";
+          cell.style.alignItems = "center";
+          cell.style.justifyContent = "center";
+          if (isWorked) cell.style.backgroundColor = "#dbeafe";
 
-          let dayBookings = records.filter((r) => r.bookingDate === dateISO);
-          if (calendarFilterType === "valuation") {
-            dayBookings = dayBookings.filter((r) => r.bookingType === "valuation");
-          } else if (calendarFilterType === "delivery") {
-            dayBookings = dayBookings.filter((r) => r.bookingType === "delivery");
-          }
+          const holidayShort = holidayName ? holidayName.slice(0, 2) : "";
+          let holidayHtml = holidayShort ? `<span class="cell-holiday" style="font-size:11px; margin-left:2px;">${holidayShort}</span>` : "";
+          let workedBadge = isWorked ? `<div style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:#2563eb; color:#ffffff; font-size:12px; font-weight:800; margin-top:2px;">✓</div>` : "";
 
-          dayBookings.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
-
-          if (dayBookings.length > 0) {
-            if (dayBookings.length <= 2) {
-              dayBookings.forEach((b) => {
-                const badge = document.createElement("div");
-                const isDeliveryBadge = (b.bookingType === "delivery");
-                badge.className = "calendar-badge" + (isDeliveryBadge ? " is-purchased" : "");
-                badge.textContent = normalizeBookingTime(b.bookingTime) || '預約';
-                cell.appendChild(badge);
-              });
-            } else {
-              dayBookings.slice(0, 1).forEach((b) => {
-                const badge = document.createElement("div");
-                const isDeliveryBadge = (b.bookingType === "delivery");
-                badge.className = "calendar-badge" + (isDeliveryBadge ? " is-purchased" : "");
-                badge.textContent = normalizeBookingTime(b.bookingTime) || '預約';
-                cell.appendChild(badge);
-              });
-              const moreBadge = document.createElement("div");
-              moreBadge.className = "calendar-more-badge";
-              moreBadge.textContent = `+${dayBookings.length - 1} 筆`;
-              cell.appendChild(moreBadge);
-            }
-          }
+          cell.innerHTML = `
+            <div class="cell-date-row" style="justify-content:center; align-items:center;">
+              <span class="cell-date-num" style="${isWeekend ? "color:#ef4444;" : ""}">${day}</span>
+              ${holidayHtml}
+            </div>
+            ${workedBadge}
+          `;
 
           cell.addEventListener("click", () => {
-            selectedCalendarDateISO = dateISO;
-            renderCalendarView();
+            workdayRecords[dateISO] = !workdayRecords[dateISO];
+            if (!workdayRecords[dateISO]) delete workdayRecords[dateISO];
+            saveWorkdayRecords();
+            renderWorkdayCalendar();
           });
 
-          return cell;
-        };
-
-        const firstDayOfMonth = new Date(year, month, 1);
-        let rawDay = firstDayOfMonth.getDay();
-        let startingDay = rawDay === 0 ? 6 : rawDay - 1;
-
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const prevMonthLastDate = new Date(year, month, 0).getDate();
-
-        let prevY = year; let prevM = month - 1;
-        if (prevM < 0) { prevM = 11; prevY--; }
-        
-        let nextY = year; let nextM = month + 1;
-        if (nextM > 11) { nextM = 0; nextY++; }
-
-        for (let i = startingDay; i > 0; i--) {
-          calendarGrid.appendChild(createCell(prevY, prevM, prevMonthLastDate - i + 1, true));
+          workdayCalendarGrid.appendChild(cell);
         }
 
-        for (let day = 1; day <= daysInMonth; day++) {
-          calendarGrid.appendChild(createCell(year, month, day, false));
-        }
-
-        const totalCells = startingDay + daysInMonth;
-        const nextDays = (7 - (totalCells % 7)) % 7;
-        for (let j = 1; j <= nextDays; j++) {
-          calendarGrid.appendChild(createCell(nextY, nextM, j, true));
-        }
-
-        renderDailyAgenda(selectedCalendarDateISO);
+        if (targetWorkdaysCount) targetWorkdaysCount.textContent = String(standardWorkdays);
+        if (actualWorkedCount) actualWorkedCount.textContent = String(userWorkedDays);
       }
 
-      function renderDailyAgenda(dateISO) {
-        if (!agendaDateTitle || !agendaList) return;
+      if (openWorkdayBtn) {
+        openWorkdayBtn.addEventListener("click", () => {
+          initWorkdayControls();
+          renderWorkdayCalendar();
+          workdayDialog.showModal();
+        });
+      }
 
-        if (!dateISO) {
-          agendaDateTitle.textContent = `📌 請點選月曆日期檢視行程`;
-          agendaList.innerHTML = `<div style="color: #64748b; font-size: 14px; text-align: center; padding: 12px 0;">點擊月曆上的日期即可查看當日詳細行程。</div>`;
-          if (agendaAddBookingBtn) {
-            agendaAddBookingBtn.onclick = () => {
-              const todayStr = new Date().toISOString().split("T")[0];
-              bookingTargetRecordId.value = "";
-              populateVehicleSelect("");
-              updateBookingDialogTitle("");
-              modalBookingDate.value = todayStr;
-              modalBookingTime.value = "08:30";
-              openBookingModal();
-            };
+      if (closeWorkdayDialogBtn) {
+        closeWorkdayDialogBtn.addEventListener("click", () => workdayDialog.close());
+      }
+
+      if (workdayYearSelect) workdayYearSelect.addEventListener("change", renderWorkdayCalendar);
+      if (workdayMonthSelect) workdayMonthSelect.addEventListener("change", renderWorkdayCalendar);
+
+      function render() {
+        const filtered = getFilteredRecords();
+        
+        const ongoing = filtered.filter(r => !r.isPurchased && !r.isSold);
+        const purchased = filtered.filter(r => r.isPurchased && !r.isSold);
+        const sold = filtered.filter(r => r.isSold);
+
+        if (document.getElementById("switchCountAll")) document.getElementById("switchCountAll").textContent = filtered.length;
+        if (document.getElementById("switchCountOngoing")) document.getElementById("switchCountOngoing").textContent = ongoing.length;
+        if (document.getElementById("switchCountPurchased")) document.getElementById("switchCountPurchased").textContent = purchased.length;
+        if (document.getElementById("switchCountSold")) document.getElementById("switchCountSold").textContent = sold.length;
+
+        if (ongoingCount) ongoingCount.textContent = `${ongoing.length} 筆`;
+        if (purchasedCount) purchasedCount.textContent = `${purchased.length} 筆`;
+        if (soldCount) soldCount.textContent = `${sold.length} 筆`;
+
+        renderTableBody(ongoingBody, ongoing, "ongoing");
+        renderTableBody(purchasedBody, purchased, "purchased");
+        renderTableBody(soldBody, sold, "sold");
+
+        if (ongoingEmpty) ongoingEmpty.classList.toggle("is-visible", ongoing.length === 0);
+        if (purchasedEmpty) purchasedEmpty.classList.toggle("is-visible", purchased.length === 0);
+        if (soldEmpty) soldEmpty.classList.toggle("is-visible", sold.length === 0);
+
+        if (ongoingSection) ongoingSection.classList.toggle("is-hidden", currentStatusFilter !== "all" && currentStatusFilter !== "ongoing");
+        if (purchasedSection) purchasedSection.classList.toggle("is-hidden", currentStatusFilter !== "all" && currentStatusFilter !== "purchased");
+        if (soldSection) soldSection.classList.toggle("is-hidden", currentStatusFilter !== "all" && currentStatusFilter !== "sold");
+      }
+
+      function renderTableBody(container, list, category) {
+        if (!container) return;
+        container.innerHTML = "";
+
+        let items = [...list];
+        if (category === "sold") {
+          items.sort((a, b) => {
+            let valA, valB;
+            if (soldSortField === "receivedDate") {
+              valA = dateValueToNumber(a.receivedDate) || 0;
+              valB = dateValueToNumber(b.receivedDate) || 0;
+            } else if (soldSortField === "bonus") {
+              valA = a.bonus || "";
+              valB = b.bonus || "";
+            }
+            if (valA < valB) return soldSortDesc ? 1 : -1;
+            if (valA > valB) return soldSortDesc ? -1 : 1;
+            return 0;
+          });
+        }
+
+        items.forEach((item) => {
+          const tr = document.createElement("tr");
+
+          if (category === "ongoing") {
+            tr.innerHTML = `
+              <td class="col-src">${getSourceLabel(item)}</td>
+              <td class="col-date">${formatMMDD(item.receivedDate)}</td>
+              <td class="col-year">${item.year}</td>
+              <td class="col-model model-cell">${item.model}</td>
+              <td class="col-price">${item.purchasePrice}</td>
+              <td class="col-km">${item.km}</td>
+              <td class="col-color">${item.color}</td>
+              <td class="col-cond">${item.condition}</td>
+              <td class="col-ver">${item.version}</td>
+              <td class="col-quote">${item.quote}</td>
+              <td class="col-seller wide-cell">${item.seller}</td>
+              <td class="col-auth col-ongoing-detail">${item.authority}</td>
+              <td class="col-remarks col-ongoing-detail note-cell">${item.remarks}</td>
+              <td class="col-repair col-ongoing-detail note-cell">${item.repairItems}</td>
+              <td class="col-actions">
+                <div class="row-actions">
+                  <button type="button" class="action-blue btn-buy" data-id="${item.id}">已買入</button>
+                  <button type="button" class="secondary btn-edit" data-id="${item.id}">編輯</button>
+                  <button type="button" class="danger btn-delete btn-icon" data-id="${item.id}">✕</button>
+                </div>
+              </td>
+            `;
+          } else if (category === "purchased") {
+            tr.innerHTML = `
+              <td class="col-src">${getSourceLabel(item)}</td>
+              <td class="col-date">${formatMMDD(item.boughtDate)}</td>
+              <td class="col-date col-purchased-detail">${formatMMDD(item.receivedDate)}</td>
+              <td class="col-year">${item.year}</td>
+              <td class="col-model model-cell">${item.model}</td>
+              <td class="col-buy-price">${item.actualDealPrice}</td>
+              <td class="col-price">${item.purchasePrice}</td>
+              <td class="col-km">${item.km}</td>
+              <td class="col-color">${item.color}</td>
+              <td class="col-cond">${item.condition}</td>
+              <td class="col-ver">${item.version}</td>
+              <td class="col-quote">${item.quote}</td>
+              <td class="col-seller wide-cell">${item.seller}</td>
+              <td class="col-auth col-purchased-detail">${item.authority}</td>
+              <td class="col-remarks col-purchased-detail note-cell">${item.remarks}</td>
+              <td class="col-repair col-purchased-detail note-cell">${item.repairItems}</td>
+              <td class="col-bonus col-purchased-detail">${item.bonus}</td>
+              <td class="col-actions">
+                <div class="row-actions">
+                  <button type="button" class="action-green btn-sell" data-id="${item.id}">已售出</button>
+                  <button type="button" class="secondary btn-edit" data-id="${item.id}">編輯</button>
+                  <button type="button" class="danger btn-delete btn-icon" data-id="${item.id}">✕</button>
+                </div>
+              </td>
+            `;
+          } else if (category === "sold") {
+            tr.innerHTML = `
+              <td class="col-src">${getSourceLabel(item)}</td>
+              <td class="col-date">${formatMMDD(item.receivedDate)}</td>
+              <td class="col-date">${formatMMDD(item.boughtDate)}</td>
+              <td class="col-year">${item.year}</td>
+              <td class="col-model model-cell">${item.model}</td>
+              <td class="col-buy-price">${item.actualDealPrice}</td>
+              <td class="col-sell-price">${item.salePrice}</td>
+              <td class="col-km">${item.km}</td>
+              <td class="col-color">${item.color}</td>
+              <td class="col-cond">${item.condition}</td>
+              <td class="col-ver">${item.version}</td>
+              <td class="col-auth">${item.authority}</td>
+              <td class="col-quote">${item.quote}</td>
+              <td class="col-price">${item.purchasePrice}</td>
+              <td class="col-remarks note-cell">${item.remarks}</td>
+              <td class="col-repair note-cell">${item.repairItems}</td>
+              <td class="col-seller wide-cell">${item.seller}</td>
+              <td class="col-bonus">${item.bonus}</td>
+              <td class="col-actions">
+                <div class="row-actions">
+                  <button type="button" class="secondary btn-edit" data-id="${item.id}">編輯</button>
+                  <button type="button" class="danger btn-delete btn-icon" data-id="${item.id}">✕</button>
+                </div>
+              </td>
+            `;
+          }
+
+          container.appendChild(tr);
+        });
+      }
+
+      if (searchInput) searchInput.addEventListener("input", render);
+
+      document.querySelectorAll(".switch-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".switch-btn").forEach((b) => b.classList.remove("is-active"));
+          btn.classList.add("is-active");
+          currentStatusFilter = btn.dataset.status;
+          render();
+        });
+      });
+
+      if (toggleOngoingDetailBtn) {
+        toggleOngoingDetailBtn.addEventListener("click", () => {
+          ongoingDetailExpanded = !ongoingDetailExpanded;
+          ongoingSection.classList.toggle("hide-ongoing-details", !ongoingDetailExpanded);
+          toggleOngoingDetailBtn.textContent = ongoingDetailExpanded ? "▲ 隱藏詳細" : "▼ 展開詳細";
+        });
+      }
+
+      if (togglePurchasedDetailBtn) {
+        togglePurchasedDetailBtn.addEventListener("click", () => {
+          purchasedDetailExpanded = !purchasedDetailExpanded;
+          purchasedSection.classList.toggle("hide-purchased-details", !purchasedDetailExpanded);
+          togglePurchasedDetailBtn.textContent = purchasedDetailExpanded ? "▲ 隱藏詳細" : "▼ 展開詳細";
+        });
+      }
+
+      if (openValuationBtn) {
+        openValuationBtn.addEventListener("click", () => {
+          resetForm();
+          valuationDialog.showModal();
+        });
+      }
+
+      if (closeValuationDialogBtn) {
+        closeValuationDialogBtn.addEventListener("click", () => {
+          valuationDialog.close();
+        });
+      }
+
+      if (resetButton) {
+        resetButton.addEventListener("click", resetForm);
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const isPurchasedAction = (e.submitter && e.submitter.id === "submitPurchasedBtn");
+        
+        const recId = fields.recordId.value;
+        const sourceTypeVal = fields.sourceType.value;
+        const sourceCustomVal = fields.sourceCustom.value;
+        const yearTypeVal = fields.yearType.value;
+        const yearCustomVal = fields.yearCustom.value;
+        const colorTypeVal = fields.colorType.value;
+        const colorCustomVal = fields.colorCustom.value;
+
+        const recordData = {
+          id: recId || createId(),
+          sourceType: sourceTypeVal,
+          sourceCustom: sourceCustomVal,
+          source: sourceTypeVal === CUSTOM_SOURCE ? sourceCustomVal : sourceTypeVal,
+          receivedDate: fields.receivedDate.value,
+          boughtDate: fields.boughtDate.value,
+          yearType: yearTypeVal,
+          yearCustom: yearCustomVal,
+          year: yearTypeVal === CUSTOM_SOURCE ? yearCustomVal : yearTypeVal,
+          model: fields.model.value,
+          purchasePrice: fields.purchasePrice.value,
+          actualDealPrice: fields.actualDealPrice.value,
+          salePrice: fields.salePrice.value,
+          km: fields.km.value,
+          colorType: colorTypeVal,
+          colorCustom: colorCustomVal,
+          color: colorTypeVal === CUSTOM_SOURCE ? colorCustomVal : colorTypeVal,
+          condition: fields.condition.value,
+          version: fields.version.value,
+          authority: fields.authority.value,
+          quote: fields.quote.value,
+          remarks: fields.remarks.value,
+          repairItems: fields.repairItems.value,
+          seller: fields.seller.value,
+          bonus: fields.bonus.value || "N",
+          bookingDate: fields.bookingDate.value,
+          bookingTime: fields.bookingTime.value,
+          isPurchased: isPurchasedAction,
+          isSold: false,
+          state: "N"
+        };
+
+        const existingIdx = records.findIndex(r => r.id === recordData.id);
+        if (existingIdx >= 0) {
+          records[existingIdx] = { ...records[existingIdx], ...recordData };
+          await persistUpdate(records[existingIdx]);
+        } else {
+          records.unshift(recordData);
+          await persistCreate(recordData);
+        }
+
+        saveLocalRecords();
+        render();
+        valuationDialog.close();
+      });
+
+      document.addEventListener("click", async (e) => {
+        const buyBtn = e.target.closest(".btn-buy");
+        if (buyBtn) {
+          const id = buyBtn.dataset.id;
+          const rec = records.find(r => r.id === id);
+          if (rec) {
+            buyRecordId.value = id;
+            buyDate.value = toDateInputValue(rec.boughtDate || new Date().toISOString().slice(0,10));
+            buyActualDealPrice.value = rec.actualDealPrice || rec.purchasePrice || "";
+            buyDialog.showModal();
           }
           return;
         }
 
-        const dateFormatted = dateISO.replaceAll("-", "/");
-        agendaDateTitle.textContent = `📌 ${dateFormatted} 預約行程列表`;
-
-        let dayBookings = records.filter((r) => r.bookingDate === dateISO);
-        if (calendarFilterType === "valuation") {
-          dayBookings = dayBookings.filter((r) => r.bookingType === "valuation");
-        } else if (calendarFilterType === "delivery") {
-          dayBookings = dayBookings.filter((r) => r.bookingType === "delivery");
+        const sellBtn = e.target.closest(".btn-sell");
+        if (sellBtn) {
+          const id = sellBtn.dataset.id;
+          const rec = records.find(r => r.id === id);
+          if (rec) {
+            sellRecordId.value = id;
+            sellBuyPriceDisplay.value = rec.actualDealPrice || "";
+            sellPriceInput.value = rec.salePrice || "";
+            sellBonusValue = rec.bonus || "N";
+            
+            sellBonusYBtn.classList.toggle("is-active", sellBonusValue === "Y");
+            sellBonusNBtn.classList.toggle("is-active", sellBonusValue === "N");
+            sellDialog.showModal();
+          }
+          return;
         }
 
-        dayBookings.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
+        const editBtn = e.target.closest(".btn-edit");
+        if (editBtn) {
+          const id = editBtn.dataset.id;
+          const rec = records.find(r => r.id === id);
+          if (rec) setFormData(rec);
+          return;
+        }
 
-        agendaList.innerHTML = "";
+        const deleteBtn = e.target.closest(".btn-delete");
+        if (deleteBtn) {
+          const id = deleteBtn.dataset.id;
+          deleteTargetId.value = id;
+          deleteConfirmDialog.showModal();
+          return;
+        }
+      });
 
-        if (dayBookings.length > 0) {
-          dayBookings.forEach((b) => {
-            const item = document.createElement("div");
-            const isDeliveryAgenda = (b.bookingType === "delivery");
-            item.className = "agenda-item " + (isDeliveryAgenda ? "type-delivery-card" : "type-valuation-card");
+      if (cancelBuyButton) cancelBuyButton.addEventListener("click", () => buyDialog.close());
+      buyForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = buyRecordId.value;
+        const idx = records.findIndex(r => r.id === id);
+        if (idx >= 0) {
+          records[idx].isPurchased = true;
+          records[idx].boughtDate = buyDate.value;
+          records[idx].actualDealPrice = buyActualDealPrice.value;
+          await persistUpdate(records[idx]);
+          saveLocalRecords();
+          render();
+        }
+        buyDialog.close();
+      });
 
-            const badgeLabel = isDeliveryAgenda ? "交車" : "估價";
-            const badgeClass = isDeliveryAgenda ? "type-delivery" : "type-valuation";
+      if (sellBonusYBtn) {
+        sellBonusYBtn.addEventListener("click", () => {
+          sellBonusValue = "Y";
+          sellBonusYBtn.classList.add("is-active");
+          sellBonusNBtn.classList.remove("is-active");
+        });
+      }
 
-            const vehicleStr = [b.year, b.model].filter(Boolean).join(" ");
-            const infoParts = [];
-            if (vehicleStr) infoParts.push(vehicleStr);
-            if (b.seller) infoParts.push(b.seller);
-            if (b.remarks) infoParts.push(b.remarks);
+      if (sellBonusNBtn) {
+        sellBonusNBtn.addEventListener("click", () => {
+          sellBonusValue = "N";
+          sellBonusNBtn.classList.add("is-active");
+          sellBonusYBtn.classList.remove("is-active");
+        });
+      }
 
-            const infoText = infoParts.join(" • ") || "未指定車輛資訊";
+      if (cancelSellButton) cancelSellButton.addEventListener("click", () => sellDialog.close());
+      sellForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = sellRecordId.value;
+        const idx = records.findIndex(r => r.id === id);
+        if (idx >= 0) {
+          records[idx].isSold = true;
+          records[idx].state = "Y";
+          records[idx].salePrice = sellPriceInput.value;
+          records[idx].bonus = sellBonusValue || "N";
+          await persistUpdate(records[idx]);
+          saveLocalRecords();
+          render();
+        }
+        sellDialog.close();
+      });
 
-            item.innerHTML = `
-              <div class="agenda-item-left">
-                <span class="agenda-type-badge ${badgeClass}">${badgeLabel}</span>
-                <div class="agenda-info">
-                  <span class="agenda-time">⏰ ${normalizeBookingTime(b.bookingTime) || '未定時間'}</span>
-                  <span class="agenda-detail" title="${infoText}">${infoText}</span>
-                </div>
-              </div>
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <button type="button" class="btn-edit-agenda" data-id="${b.id}" title="編輯預約">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                  </svg>
-                </button>
-                <button type="button" class="btn-delete-agenda" title="清除該筆預約" data-id="${b.id}">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    <line x1="10" y1="11" x2="10" y2="17"></line>
-                    <line x1="14" y1="11" x2="14" y2="17"></line>
-                  </svg>
-                </button>
-              </div>
-            `;
+      if (cancelDeleteButton) cancelDeleteButton.addEventListener("click", () => deleteConfirmDialog.close());
+      deleteConfirmForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = deleteTargetId.value;
+        records = records.filter(r => r.id !== id);
+        await persistDelete(id);
+        saveLocalRecords();
+        render();
+        deleteConfirmDialog.close();
+      });
 
-            item.querySelector(".btn-edit-agenda")?.addEventListener("click", () => {
-              openBookingModalForRecord(b.id);
-            });
+      if (queryBonusBtn) {
+        queryBonusBtn.addEventListener("click", () => {
+          renderQueryBonusList();
+          queryBonusDialog.showModal();
+        });
+      }
 
-            item.querySelector(".btn-delete-agenda")?.addEventListener("click", async () => {
-              const idx = records.findIndex((r) => r.id === b.id);
-              if (idx >= 0) {
-                records[idx] = await persistUpdate(normalizeRecord({
-                  ...records[idx],
-                  bookingDate: "",
-                  bookingTime: "",
-                  updatedAt: new Date().toISOString()
-                }));
-                saveLocalRecords();
-                render();
-                renderCalendarView();
-              }
-            });
+      if (closeQueryBonusDialogBtn) closeQueryBonusDialogBtn.addEventListener("click", () => queryBonusDialog.close());
 
-            agendaList.appendChild(item);
+      function renderQueryBonusList() {
+        if (!queryBonusBody) return;
+        queryBonusBody.innerHTML = "";
+        
+        const soldNList = records.filter(r => r.isSold && (r.bonus === "N" || !r.bonus));
+        
+        if (queryBonusEmpty) queryBonusEmpty.classList.toggle("is-visible", soldNList.length === 0);
+
+        soldNList.forEach(item => {
+          const tr = document.createElement("tr");
+          const isChecked = Boolean(selectedBonusDates[item.id]);
+          const dateTagHtml = isChecked ? `<div style="font-size:11px; color:#d97706; font-weight:800;">${selectedBonusDates[item.id]}</div>` : "";
+
+          tr.innerHTML = `
+            <td style="padding:8px 2px; text-align:center !important;">${getSourceLabel(item)}</td>
+            <td style="padding:8px 2px; text-align:center !important;">${formatMMDD(item.boughtDate)}</td>
+            <td style="padding:8px 2px; text-align:center !important;">${item.year}</td>
+            <td style="padding:8px 2px; text-align:center !important; font-weight:700;">${item.model}</td>
+            <td style="padding:8px 2px; text-align:center !important;">${item.actualDealPrice}</td>
+            <td style="padding:8px 2px; text-align:center !important;">${item.salePrice}</td>
+            <td style="padding:8px 2px; text-align:center !important;">
+              <input type="checkbox" class="bonus-turn-y-checkbox" data-id="${item.id}" ${isChecked ? "checked" : ""} style="width:18px; height:18px; cursor:pointer;" />
+              ${dateTagHtml}
+            </td>
+          `;
+
+          const chk = tr.querySelector(".bonus-turn-y-checkbox");
+          chk.addEventListener("click", (e) => {
+            e.preventDefault();
+            bonusDateTargetId.value = item.id;
+            bonusDateInput.value = toDateInputValue(new Date().toISOString().slice(0, 10));
+            bonusDateDialog.showModal();
           });
-        } else {
-          agendaList.innerHTML = `<div style="color: #64748b; font-size: 14px; text-align: center; padding: 12px 0;">當日尚無預約行程。</div>`;
-        }
 
-        if (agendaAddBookingBtn) {
-          agendaAddBookingBtn.onclick = () => {
-            bookingTargetRecordId.value = "";
-            populateVehicleSelect("");
-            updateBookingDialogTitle("");
-            const defaultDate = dateISO || selectedCalendarDateISO || new Date().toISOString().split("T")[0];
-            modalBookingDate.value = defaultDate;
-            modalBookingTime.value = "08:30";
-            openBookingModal();
-          };
-        }
-      }
-
-      function populateVehicleSelect(selectedId) {
-        if (!modalVehicleSelect) return;
-        modalVehicleSelect.innerHTML = '<option value="">請選擇車輛 (選填)</option>';
-
-        const availableRecords = records.filter((r) => !r.isSold || r.id === selectedId);
-
-        availableRecords.sort((a, b) => {
-          const groupA = a.isPurchased ? 1 : 0;
-          const groupB = b.isPurchased ? 1 : 0;
-          if (groupA !== groupB) {
-            return groupA - groupB;
-          }
-          return String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt));
+          queryBonusBody.appendChild(tr);
         });
+      }
 
-        availableRecords.forEach((r) => {
-          const opt = document.createElement("option");
-          opt.value = r.id;
-          const tag = r.isPurchased ? "[已買入]" : "[估價]";
-          const yearStr = r.year ? `${r.year} ` : "";
-          const modelStr = r.model || "未命名車輛";
-          const sellerStr = r.seller ? ` • ${r.seller}` : "";
-          opt.textContent = `${tag} ${yearStr}${modelStr}${sellerStr}`;
-          if (r.id === selectedId) {
-            opt.selected = true;
+      if (document.getElementById("closeBonusDateDialogBtn")) {
+        document.getElementById("closeBonusDateDialogBtn").addEventListener("click", () => bonusDateDialog.close());
+      }
+      if (document.getElementById("cancelBonusDateBtn")) {
+        document.getElementById("cancelBonusDateBtn").addEventListener("click", () => bonusDateDialog.close());
+      }
+
+      bonusDateForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const targetId = bonusDateTargetId.value;
+        const selectedDate = bonusDateInput.value;
+        if (targetId && selectedDate) {
+          const formatted = formatMMDD(selectedDate);
+          selectedBonusDates[targetId] = formatted;
+          renderQueryBonusList();
+        }
+        bonusDateDialog.close();
+      });
+
+      if (saveQueryBonusBtn) {
+        saveQueryBonusBtn.addEventListener("click", async () => {
+          let updatedCount = 0;
+          for (const [id, dateStr] of Object.entries(selectedBonusDates)) {
+            const idx = records.findIndex(r => r.id === id);
+            if (idx >= 0) {
+              records[idx].bonus = `Y ${dateStr}`;
+              await persistUpdate(records[idx]);
+              updatedCount++;
+            }
           }
-          modalVehicleSelect.appendChild(opt);
+          selectedBonusDates = {};
+          saveLocalRecords();
+          render();
+          queryBonusDialog.close();
         });
-
-        modalVehicleSelect.value = selectedId || "";
-        updateBookingDialogTitle(selectedId);
       }
 
-      function updateBookingDialogTitle(recordId) {
-        if (!bookingDialogTitle) return;
-        const targetRec = records.find((r) => r.id === recordId);
-        if (targetRec && targetRec.isPurchased) {
-          bookingDialogTitle.textContent = "新增預約交車";
-        } else {
-          bookingDialogTitle.textContent = "新增預約時間";
-        }
+      if (openCalendarViewBtn) {
+        openCalendarViewBtn.addEventListener("click", () => {
+          renderCalendarView();
+          calendarViewDialog.showModal();
+        });
       }
 
-      function openBookingModal() {
-        bookingDialog.showModal();
-        if (document.activeElement) {
-          document.activeElement.blur();
-        }
+      if (closeCalendarViewBtn) closeCalendarViewBtn.addEventListener("click", () => calendarViewDialog.close());
+
+      if (prevMonthBtn) {
+        prevMonthBtn.addEventListener("click", () => {
+          calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() - 1);
+          renderCalendarView();
+        });
       }
 
-      toggleOngoingDetailBtn?.addEventListener("click", () => {
-        ongoingDetailExpanded = !ongoingDetailExpanded;
-        ongoingSection.classList.toggle("hide-ongoing-details", !ongoingDetailExpanded);
-        toggleOngoingDetailBtn.innerHTML = ongoingDetailExpanded ? "▲ 收起詳細" : "▼ 展開詳細";
-        toggleOngoingDetailBtn.setAttribute("aria-expanded", ongoingDetailExpanded);
-      });
+      if (todayMonthBtn) {
+        todayMonthBtn.addEventListener("click", () => {
+          calendarCurrentDate = new Date();
+          renderCalendarView();
+        });
+      }
 
-      togglePurchasedDetailBtn?.addEventListener("click", () => {
-        purchasedDetailExpanded = !purchasedDetailExpanded;
-        purchasedSection.classList.toggle("hide-purchased-details", !purchasedDetailExpanded);
-        togglePurchasedDetailBtn.innerHTML = purchasedDetailExpanded ? "▲ 收起詳細" : "▼ 展開詳細";
-        togglePurchasedDetailBtn.setAttribute("aria-expanded", purchasedDetailExpanded);
-      });
-
-      modalVehicleSelect?.addEventListener("change", (e) => {
-        const selectedId = e.target.value;
-        bookingTargetRecordId.value = selectedId;
-        updateBookingDialogTitle(selectedId);
-      });
+      if (nextMonthBtn) {
+        nextMonthBtn.addEventListener("click", () => {
+          calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + 1);
+          renderCalendarView();
+        });
+      }
 
       document.querySelectorAll("#calendarFilterBar .filter-chip").forEach((chip) => {
         chip.addEventListener("click", () => {
@@ -3528,502 +3397,362 @@
         });
       });
 
-      openCalendarViewBtn?.addEventListener("click", () => {
-        const todayStr = new Date().toISOString().split("T")[0];
-        if (!selectedCalendarDateISO) {
-          selectedCalendarDateISO = todayStr;
+      function renderCalendarView() {
+        if (!calendarGrid) return;
+
+        const year = calendarCurrentDate.getFullYear();
+        const month = calendarCurrentDate.getMonth();
+        
+        if (calendarMonthTitle) {
+          calendarMonthTitle.textContent = `${year}年 ${month + 1}月`;
         }
-        renderCalendarView();
-        calendarViewDialog.showModal();
-        if (document.activeElement) {
-          document.activeElement.blur();
+
+        calendarGrid.innerHTML = "";
+
+        const daysOfWeek = ["日", "一", "二", "三", "四", "五", "六"];
+        daysOfWeek.forEach((d, idx) => {
+          const h = document.createElement("div");
+          h.className = "calendar-day-header" + (idx === 0 || idx === 6 ? " is-weekend" : "");
+          h.textContent = d;
+          calendarGrid.appendChild(h);
+        });
+
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startingDay = firstDay.getDay();
+        const totalDays = lastDay.getDate();
+
+        const todayISO = new Date().toISOString().slice(0, 10);
+        if (!selectedCalendarDateISO) selectedCalendarDateISO = todayISO;
+
+        const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+        for (let i = startingDay - 1; i >= 0; i--) {
+          const dayNum = prevMonthLastDay - i;
+          const cell = document.createElement("div");
+          cell.className = "calendar-cell other-month";
+          cell.innerHTML = `<div class="cell-date-row"><span class="cell-date-num">${dayNum}</span></div>`;
+          workdayCalendarGrid.appendChild(cell);
         }
-      });
 
-      closeCalendarViewBtn?.addEventListener("click", () => {
-        calendarViewDialog.close();
-      });
+        let standardWorkdays = 0;
+        let userWorkedDays = 0;
 
-      prevMonthBtn?.addEventListener("click", () => {
-        calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() - 1);
-        renderCalendarView();
-      });
+        for (let day = 1; day <= totalDays; day++) {
+          const mStr = String(month + 1).padStart(2, "0");
+          const dStr = String(day).padStart(2, "0");
+          const dateISO = `${year}-${mStr}-${dStr}`;
+          const curDate = new Date(year, month, day);
+          const dayOfWeek = curDate.getDay();
 
-      todayMonthBtn?.addEventListener("click", () => {
-        calendarCurrentDate = new Date();
-        selectedCalendarDateISO = new Date().toISOString().split("T")[0];
-        renderCalendarView();
-      });
+          const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+          const holidayName = TAIWAN_HOLIDAYS[dateISO];
+          const isOffDay = isWeekend || Boolean(holidayName);
 
-      nextMonthBtn?.addEventListener("click", () => {
-        calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + 1);
-        renderCalendarView();
-      });
+          if (!isOffDay) {
+            standardWorkdays++;
+          }
 
-      function openBookingModalForRecord(recId) {
-        bookingTargetRecordId.value = recId || "";
-        populateVehicleSelect(recId || "");
-        updateBookingDialogTitle(recId || "");
+          const isWorked = Boolean(workdayRecords[dateISO]);
+          if (isWorked) {
+            userWorkedDays++;
+          }
 
-        const targetRec = records.find((r) => r.id === recId);
-        const todayStr = new Date().toISOString().split("T")[0];
-        modalBookingDate.value = targetRec?.bookingDate || selectedCalendarDateISO || todayStr;
-        modalBookingTime.value = normalizeBookingTime(targetRec?.bookingTime) || "09:00";
-        openBookingModal();
+          const cell = document.createElement("div");
+          cell.className = "calendar-cell";
+          if (isWorked) cell.style.backgroundColor = "#dbeafe";
+
+          const holidayShort = holidayName ? holidayName.slice(0, 2) : "";
+          let holidayHtml = holidayShort ? `<span class="cell-holiday" style="font-size:11px; margin-left:2px;">${holidayShort}</span>` : "";
+          let workedBadge = isWorked ? `<div style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:#2563eb; color:#ffffff; font-size:12px; font-weight:800; margin-top:2px; align-self:center;">✓</div>` : "";
+
+          cell.innerHTML = `
+            <div class="cell-date-row">
+              <span class="cell-date-num" style="${isWeekend ? "color:#ef4444;" : ""}">${day}</span>
+              ${holidayHtml}
+            </div>
+            ${workedBadge}
+          `;
+
+          cell.addEventListener("click", () => {
+            selectedCalendarDateISO = dateISO;
+            renderCalendarView();
+          });
+
+          calendarGrid.appendChild(cell);
+        }
+
+        renderAgendaPanel();
       }
 
-      cancelBookingBtn?.addEventListener("click", () => {
-        bookingDialog.close();
-      });
+      function renderAgendaPanel() {
+        if (!agendaList || !agendaDateTitle) return;
+
+        if (selectedCalendarDateISO) {
+          const parts = selectedCalendarDateISO.split("-");
+          agendaDateTitle.textContent = `📌 ${parts[0]}年${parseInt(parts[1], 10)}月${parseInt(parts[2], 10)}日 預約行程`;
+        }
+
+        agendaList.innerHTML = "";
+
+        const dayRecords = records.filter(r => r.bookingDate === selectedCalendarDateISO);
+        dayRecords.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
+
+        if (dayRecords.length === 0) {
+          agendaList.innerHTML = `<div style="text-align:center; padding:12px; color:#64748b; font-size:14px;">本日尚無預約行程</div>`;
+          return;
+        }
+
+        dayRecords.forEach(rec => {
+          const item = document.createElement("div");
+          const isDelivery = rec.isPurchased;
+          item.className = "agenda-item " + (isDelivery ? "type-delivery-card" : "type-valuation-card");
+
+          const typeText = isDelivery ? "交車" : "估價";
+          const typeClass = isDelivery ? "type-delivery" : "type-valuation";
+
+          item.innerHTML = `
+            <div class="agenda-item-left">
+              <span class="agenda-type-badge ${typeClass}">${typeText}</span>
+              <div class="agenda-info">
+                <span class="agenda-time">${rec.bookingTime || "未設時間"}</span>
+                <span class="agenda-detail">${rec.model} / ${getSourceLabel(rec)} / ${rec.seller}</span>
+              </div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn-edit-agenda" data-id="${rec.id}">編輯</button>
+            </div>
+          `;
+
+          item.querySelector(".btn-edit-agenda").addEventListener("click", () => {
+            setFormData(rec);
+          });
+
+          agendaList.appendChild(item);
+        });
+      }
+
+      if (agendaAddBookingBtn) {
+        agendaAddBookingBtn.addEventListener("click", () => {
+          openBookingModal(selectedCalendarDateISO);
+        });
+      }
+
+      function openBookingModal(dateISO) {
+        bookingTargetRecordId.value = "";
+        modalBookingDate.value = dateISO || new Date().toISOString().slice(0, 10);
+        modalBookingTime.value = "";
+
+        modalVehicleSelect.innerHTML = '<option value="">請選擇車輛 (選填)</option>';
+        records.forEach(r => {
+          const opt = document.createElement("option");
+          opt.value = r.id;
+          opt.textContent = `${r.model || "未命名"} (${getSourceLabel(r)})`;
+          modalVehicleSelect.appendChild(opt);
+        });
+
+        bookingDialog.showModal();
+      }
+
+      if (cancelBookingBtn) cancelBookingBtn.addEventListener("click", () => bookingDialog.close());
 
       bookingForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const saveBtn = bookingForm.querySelector("button[type='submit']");
-        if (saveBtn) saveBtn.disabled = true;
+        const selectedId = modalVehicleSelect.value;
+        const bDate = modalBookingDate.value;
+        const bTime = modalBookingTime.value;
 
-        try {
-          const targetId = modalVehicleSelect.value || bookingTargetRecordId.value;
-          const bDate = modalBookingDate.value;
-          const bTime = modalBookingTime.value;
-
-          if (!bDate) {
-            if (saveBtn) saveBtn.disabled = false;
-            return;
+        if (selectedId) {
+          const idx = records.findIndex(r => r.id === selectedId);
+          if (idx >= 0) {
+            records[idx].bookingDate = bDate;
+            records[idx].bookingTime = bTime;
+            await persistUpdate(records[idx]);
           }
-
-          if (targetId) {
-            const idx = records.findIndex((r) => r.id === targetId);
-            if (idx >= 0) {
-              const rec = records[idx];
-              const bType = rec.bookingType || (rec.isPurchased ? "delivery" : "valuation");
-              records[idx] = await persistUpdate(normalizeRecord({
-                ...rec,
-                bookingDate: bDate,
-                bookingTime: bTime,
-                bookingType: bType,
-                updatedAt: new Date().toISOString()
-              }));
-            }
-          } else {
-            const newRec = normalizeRecord({
-              id: createId(),
-              model: "預約估價",
-              bookingDate: bDate,
-              bookingTime: bTime,
-              bookingType: "valuation",
-              isPurchased: false,
-              isSold: false,
-              state: "N",
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString()
-            });
-            records.push(await persistCreate(newRec));
-          }
-
-          if (bDate) {
-            selectedCalendarDateISO = bDate;
-            const parts = bDate.split("-").map(Number);
-            if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-              calendarCurrentDate = new Date(parts[0], parts[1] - 1, 1);
-            }
-          }
-
-          saveLocalRecords();
-          render();
-          if (calendarViewDialog.open) {
-            renderCalendarView();
-          }
-          bookingDialog.close();
-        } catch (error) {
-          console.error("Booking save error:", error);
-        } finally {
-          if (saveBtn) saveBtn.disabled = false;
+        } else {
+          const newRecord = normalizeRecord({
+            id: createId(),
+            bookingDate: bDate,
+            bookingTime: bTime,
+            model: "新預約",
+            isPurchased: false
+          });
+          records.unshift(newRecord);
+          await persistCreate(newRecord);
         }
+
+        saveLocalRecords();
+        render();
+        if (calendarViewDialog.open) renderCalendarView();
+        bookingDialog.close();
       });
 
-      openValuationBtn?.addEventListener("click", () => {
-        resetForm();
-        valuationDialog.showModal();
-      });
-
-      closeValuationDialogBtn?.addEventListener("click", () => {
-        valuationDialog.close();
-      });
-
-      submitValuationBtn?.addEventListener("click", () => {
-        currentSubmitAction = "valuation";
-      });
-
-      submitPurchasedBtn?.addEventListener("click", () => {
-        currentSubmitAction = "purchased";
-      });
-
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        submitValuationBtn.disabled = true;
-        submitPurchasedBtn.disabled = true;
-
-        try {
-          const data = { id: fields.recordId.value || createId(), updatedAt: new Date().toISOString() };
-          data.sourceType = fields.sourceType.value;
-          data.sourceCustom = fields.sourceCustom.value.trim();
-          data.yearType = fields.yearType.value;
-          data.yearCustom = fields.yearCustom.value.trim();
-          data.year = fields.yearType.value === CUSTOM_SOURCE ? fields.yearCustom.value.trim() : fields.yearType.value.trim();
-          data.colorType = fields.colorType.value;
-          data.colorCustom = fields.colorCustom.value.trim();
-          data.color = fields.colorType.value === CUSTOM_SOURCE ? fields.colorCustom.value.trim() : fields.colorType.value.trim();
-
-          if (data.sourceType !== CUSTOM_SOURCE) data.sourceCustom = "";
-          if (data.yearType !== CUSTOM_SOURCE) data.yearCustom = "";
-          if (data.colorType !== CUSTOM_SOURCE) data.colorCustom = "";
-
-          for (const name of fieldNames) {
-            if (fields[name] && !["year", "color", "sourceType", "sourceCustom", "yearType", "yearCustom", "colorType", "colorCustom"].includes(name)) {
-              data[name] = fields[name].value.trim();
-            }
-          }
-          data.km = normalizeKm(data.km);
-
-          const existingIndex = records.findIndex((r) => r.id === data.id);
-          const todayStr = new Date().toISOString().split("T")[0];
-
-          if (existingIndex >= 0) {
-            const existingRec = records[existingIndex];
-            const isPurchased = existingRec.isPurchased;
-            const bookingDate = data.bookingDate || existingRec.bookingDate || "";
-            const bookingTime = data.bookingTime || existingRec.bookingTime || "";
-            const bookingType = existingRec.bookingType || (isPurchased ? "delivery" : "valuation");
-
-            records[existingIndex] = await persistUpdate(normalizeRecord({
-              ...existingRec,
-              ...data,
-              bookingDate,
-              bookingTime,
-              bookingType,
-              isPurchased
-            }));
-          } else {
-            const isPurchased = (currentSubmitAction === "purchased");
-            if (isPurchased && !data.boughtDate) {
-              data.boughtDate = todayStr;
-            }
-            const bookingDate = data.bookingDate || "";
-            const bookingTime = data.bookingTime || "";
-            const bookingType = isPurchased ? "delivery" : "valuation";
-
-            records.push(await persistCreate(normalizeRecord({
-              ...data,
-              bookingDate,
-              bookingTime,
-              bookingType,
-              isPurchased: isPurchased,
-              isSold: false,
-              state: "N",
-              createdAt: new Date().toISOString()
-            })));
-          }
-
-          if (data.bookingDate) {
-            selectedCalendarDateISO = data.bookingDate;
-            const parts = data.bookingDate.split("-").map(Number);
-            if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-              calendarCurrentDate = new Date(parts[0], parts[1] - 1, 1);
-            }
-          }
-
-          saveLocalRecords();
-          resetForm();
-          render();
-          if (calendarViewDialog.open) renderCalendarView();
-          valuationDialog.close();
-        } catch (err) {
-          console.error("Form submit error:", err);
-        } finally {
-          submitValuationBtn.disabled = false;
-          submitPurchasedBtn.disabled = false;
-        }
-      });
-
-      function updateSellBonusUI() {
-        if (sellBonusYBtn) sellBonusYBtn.classList.toggle("is-active", sellBonusValue === "Y");
-        if (sellBonusNBtn) sellBonusNBtn.classList.toggle("is-active", sellBonusValue === "N");
+      if (openReportModalBtn) {
+        openReportModalBtn.addEventListener("click", () => {
+          initReportModalControls();
+          renderReportModalData();
+          reportDialog.showModal();
+        });
       }
 
-      sellBonusYBtn?.addEventListener("click", () => {
-        sellBonusValue = sellBonusValue === "Y" ? "" : "Y";
-        updateSellBonusUI();
-      });
+      if (closeReportDialogBtn) closeReportDialogBtn.addEventListener("click", () => reportDialog.close());
 
-      sellBonusNBtn?.addEventListener("click", () => {
-        sellBonusValue = sellBonusValue === "N" ? "" : "N";
-        updateSellBonusUI();
-      });
+      function initReportModalControls() {
+        if (!reportYearSelect) return;
+        reportYearSelect.innerHTML = "";
 
-      buyForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const index = records.findIndex((i) => i.id === buyRecordId.value);
-        if (index >= 0) {
-          records[index] = await persistUpdate(normalizeRecord({
-            ...records[index],
-            boughtDate: buyDate.value.trim(),
-            actualDealPrice: buyActualDealPrice.value.trim(),
-            isPurchased: true,
-            updatedAt: new Date().toISOString()
-          }));
-          saveLocalRecords(); render();
-        }
-        buyDialog.close(); buyForm.reset();
-      });
-
-      sellForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const index = records.findIndex((i) => i.id === sellRecordId.value);
-        if (index >= 0) {
-          records[index] = await persistUpdate(normalizeRecord({
-            ...records[index],
-            salePrice: sellPriceInput.value.trim(),
-            bonus: sellBonusValue,
-            isSold: true,
-            state: "Y",
-            updatedAt: new Date().toISOString()
-          }));
-          saveLocalRecords(); render();
-        }
-        sellDialog.close(); sellForm.reset();
-      });
-
-      function renderQueryBonusList() {
-        selectedBonusDates = {};
-        const bonusNRecords = records.filter((r) => r.isSold && String(r.bonus).trim().toUpperCase() === "N");
-        
-        bonusNRecords.sort((a, b) => {
-          const dateA = dateValueToNumber(a.boughtDate || a.receivedDate) || 0;
-          const dateB = dateValueToNumber(b.boughtDate || b.receivedDate) || 0;
-          return dateA - dateB;
+        const yearsSet = new Set(["2026", "2025"]);
+        records.forEach(r => {
+          if (r.boughtDate) {
+            const y = r.boughtDate.slice(0, 4);
+            if (y && y.length === 4) yearsSet.add(y);
+          }
         });
 
-        if (queryBonusTitle) {
-          queryBonusTitle.textContent = `獎金 N 車輛清單 (${bonusNRecords.length} 筆)`;
-        }
-        if (!queryBonusBody) return;
-        queryBonusBody.innerHTML = "";
+        const sortedYears = Array.from(yearsSet).sort((a, b) => Number(b) - Number(a));
+        sortedYears.forEach(y => {
+          const opt = document.createElement("option");
+          opt.value = y;
+          opt.textContent = `${y} 年`;
+          reportYearSelect.appendChild(opt);
+        });
 
-        if (bonusNRecords.length === 0) {
-          if (queryBonusEmpty) queryBonusEmpty.classList.add("is-visible");
-        } else {
-          if (queryBonusEmpty) queryBonusEmpty.classList.remove("is-visible");
-          bonusNRecords.forEach((r) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${getSourceLabel(r) || "-"}</td>
-              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${formatMMDD(r.boughtDate) || "-"}</td>
-              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.year || "-"}</td>
-              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 700; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.model || ''}">${r.model || "-"}</td>
-              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.actualDealPrice || "-"}</td>
-              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #0f172a; text-align: center !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.salePrice || "-"}</td>
-              <td style="padding: 8px 2px; border-bottom: 1px solid #e2e8f0; font-size: 13px; text-align: center !important; white-space: nowrap;">
-                <label style="display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; user-select: none; width: 100%;">
-                  <div style="display: inline-flex; align-items: center; gap: 4px;">
-                    <input type="checkbox" class="bonus-y-check" data-id="${r.id}" style="width: 18px; height: 18px; cursor: pointer; accent-color: #d97706;" />
-                    <span style="font-weight: 800; color: #d97706;">Y</span>
-                  </div>
-                  <span class="bonus-date-display" id="bonusDateDisp_${r.id}" style="font-size: 11px; font-weight: 700; color: #d97706;"></span>
-                </label>
-              </td>
+        reportYearSelect.value = "2026";
+        reportMonthSelect.value = "all";
+      }
+
+      if (reportYearSelect) reportYearSelect.addEventListener("change", renderReportModalData);
+      if (reportMonthSelect) reportMonthSelect.addEventListener("change", renderReportModalData);
+
+      function renderReportModalData() {
+        const selYear = reportYearSelect.value;
+        const selMonth = reportMonthSelect.value;
+
+        const isMonthAll = (selMonth === "all");
+        if (annualTotalLabel) {
+          annualTotalLabel.textContent = isMonthAll ? `${selYear} 年度總買進台數` : `${parseInt(selMonth, 10)} 月份買進台數`;
+        }
+
+        if (openReportVehicleListBtn) {
+          openReportVehicleListBtn.style.display = (selYear === "2025" && isMonthAll) ? "none" : "inline-flex";
+        }
+
+        if (selYear === "2025" && isMonthAll) {
+          if (annualTotalPurchased) annualTotalPurchased.textContent = "42";
+          if (annualPurchasedCount) annualPurchasedCount.textContent = "0";
+          if (annualSoldCount) annualSoldCount.textContent = "0";
+          if (yearBreakdownList) yearBreakdownList.innerHTML = "";
+          if (channelGridList) channelGridList.innerHTML = "";
+          if (channelBreakdownWrap) channelBreakdownWrap.style.display = "none";
+          return;
+        }
+
+        if (channelBreakdownWrap) channelBreakdownWrap.style.display = "flex";
+
+        const purchasedAndSold = records.filter(r => {
+          if (!r.isPurchased && !r.isSold) return false;
+          if (!r.boughtDate) return false;
+          const y = r.boughtDate.slice(0, 4);
+          if (y !== selYear) return false;
+          if (!isMonthAll) {
+            const m = getRecordMonth(r.boughtDate);
+            if (m !== selMonth) return false;
+          }
+          return true;
+        });
+
+        const inStockCount = purchasedAndSold.filter(r => r.isPurchased && !r.isSold).length;
+        const soldCountVal = purchasedAndSold.filter(r => r.isSold).length;
+        const totalPurchasedVal = purchasedAndSold.length;
+
+        if (annualTotalPurchased) annualTotalPurchased.textContent = String(totalPurchasedVal);
+        if (annualPurchasedCount) annualPurchasedCount.textContent = String(inStockCount);
+        if (annualSoldCount) annualSoldCount.textContent = String(soldCountVal);
+
+        const channelCounts = {};
+        purchasedAndSold.forEach(r => {
+          const src = getSourceLabel(r) || "未分類";
+          channelCounts[src] = (channelCounts[src] || 0) + 1;
+        });
+
+        if (channelGridList) {
+          channelGridList.innerHTML = "";
+          Object.entries(channelCounts).forEach(([channel, count]) => {
+            const pct = totalPurchasedVal > 0 ? Math.round((count / totalPurchasedVal) * 100) : 0;
+            const card = document.createElement("div");
+            card.className = "channel-card";
+            card.innerHTML = `
+              <div class="channel-card-header">
+                <span>${channel}</span>
+                <span>${count} 台</span>
+              </div>
+              <div class="channel-card-val">${pct}%</div>
+              <div class="channel-progress-bg">
+                <div class="channel-progress-fill" style="width: ${pct}%;"></div>
+              </div>
             `;
-            queryBonusBody.appendChild(tr);
+            channelGridList.appendChild(card);
           });
         }
       }
 
-      queryBonusBody?.addEventListener("click", (e) => {
-        const checkbox = e.target.closest(".bonus-y-check");
-        if (!checkbox) return;
-
-        const recId = checkbox.dataset.id;
-        if (checkbox.checked) {
-          checkbox.checked = false;
-          bonusDateTargetId.value = recId;
-          bonusDateInput.value = new Date().toISOString().split("T")[0];
-          bonusDateDialog.showModal();
-        } else {
-          delete selectedBonusDates[recId];
-          const disp = document.getElementById(`bonusDateDisp_${recId}`);
-          if (disp) disp.textContent = "";
-        }
-      });
-
-      bonusDateForm?.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const targetId = bonusDateTargetId.value;
-        const chosenDate = bonusDateInput.value;
-        if (targetId && chosenDate) {
-          selectedBonusDates[targetId] = chosenDate;
-          const checkbox = document.querySelector(`.bonus-y-check[data-id="${targetId}"]`);
-          if (checkbox) checkbox.checked = true;
-          const disp = document.getElementById(`bonusDateDisp_${targetId}`);
-          if (disp) disp.textContent = formatMMDD(chosenDate);
-        }
-        bonusDateDialog.close();
-      });
-
-      closeBonusDateDialogBtn?.addEventListener("click", () => bonusDateDialog.close());
-      cancelBonusDateBtn?.addEventListener("click", () => bonusDateDialog.close());
-
-      saveQueryBonusBtn?.addEventListener("click", async () => {
-        const checkedBoxes = document.querySelectorAll(".bonus-y-check:checked");
-        if (checkedBoxes.length === 0) {
-          queryBonusDialog.close();
-          return;
-        }
-
-        saveQueryBonusBtn.disabled = true;
-        saveQueryBonusBtn.textContent = "儲存中...";
-
-        try {
-          for (const cb of checkedBoxes) {
-            const id = cb.dataset.id;
-            const chosenDate = selectedBonusDates[id] || new Date().toISOString().split("T")[0];
-            const bonusStr = `Y ${formatMMDD(chosenDate)}`;
-
-            const index = records.findIndex((r) => r.id === id);
-            if (index >= 0) {
-              records[index] = await persistUpdate(normalizeRecord({
-                ...records[index],
-                bonus: bonusStr,
-                updatedAt: new Date().toISOString()
-              }));
-            }
-          }
-          saveLocalRecords();
-          render();
-          queryBonusDialog.close();
-        } catch (err) {
-          console.error("Save bonus error:", err);
-        } finally {
-          saveQueryBonusBtn.disabled = false;
-          saveQueryBonusBtn.textContent = "儲存";
-        }
-      });
-
-      queryBonusBtn?.addEventListener("click", () => {
-        renderQueryBonusList();
-        queryBonusDialog.showModal();
-        if (document.activeElement) {
-          document.activeElement.blur();
-        }
-      });
-
-      closeQueryBonusDialogBtn?.addEventListener("click", () => {
-        queryBonusDialog.close();
-      });
-
-      openReportModalBtn?.addEventListener("click", () => {
-        updateReportSection();
-        reportDialog.showModal();
-        if (document.activeElement) {
-          document.activeElement.blur();
-        }
-      });
-
-      closeReportDialogBtn?.addEventListener("click", () => {
-        reportDialog.close();
-      });
-
-      reportYearSelect?.addEventListener("change", updateReportSection);
-      reportMonthSelect?.addEventListener("change", updateReportSection);
-
-      document.querySelectorAll(".switch-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          currentStatusFilter = btn.dataset.status;
-          render();
+      if (openReportVehicleListBtn) {
+        openReportVehicleListBtn.addEventListener("click", () => {
+          renderReportVehicleList();
+          reportVehicleDialog.showModal();
         });
-      });
-
-      function updateSoldHeadersUI() {
-        if (soldDateSortHeader) {
-          soldDateSortHeader.textContent = `進件日 ${soldSortField === "receivedDate" ? (soldSortDesc ? "▼" : "▲") : "▼"}`;
-        }
-        if (soldBonusSortHeader) {
-          soldBonusSortHeader.textContent = `獎金 ${soldSortField === "bonus" ? (soldSortDesc ? "▼" : "▲") : "▼"}`;
-        }
       }
 
-      soldDateSortHeader?.addEventListener("click", () => {
-        if (soldSortField === "receivedDate") {
-          soldSortDesc = !soldSortDesc;
-        } else {
-          soldSortField = "receivedDate";
-          soldSortDesc = true;
+      if (closeReportVehicleDialogBtn) closeReportVehicleDialogBtn.addEventListener("click", () => reportVehicleDialog.close());
+
+      function renderReportVehicleList() {
+        if (!reportVehicleBody) return;
+        reportVehicleBody.innerHTML = "";
+
+        const selYear = reportYearSelect.value;
+        const selMonth = reportMonthSelect.value;
+        const isMonthAll = (selMonth === "all");
+
+        if (reportVehicleDialogTitle) {
+          const mText = isMonthAll ? "全年" : `${parseInt(selMonth, 10)}月`;
+          reportVehicleDialogTitle.textContent = `${selYear}年 ${mText} 車輛清單`;
         }
-        updateSoldHeadersUI();
-        render();
-      });
 
-      soldBonusSortHeader?.addEventListener("click", () => {
-        if (soldSortField === "bonus") {
-          soldSortDesc = !soldSortDesc;
-        } else {
-          soldSortField = "bonus";
-          soldSortDesc = true;
-        }
-        updateSoldHeadersUI();
-        render();
-      });
-
-      cancelBuyButton?.addEventListener("click", () => buyDialog.close());
-      cancelSellButton?.addEventListener("click", () => sellDialog.close());
-      cancelDeleteButton?.addEventListener("click", () => deleteConfirmDialog.close());
-
-      deleteConfirmForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const id = deleteTargetId.value;
-        if (id) {
-          records = records.filter((r) => r.id !== id);
-          saveLocalRecords();
-          render();
-          if (calendarViewDialog && calendarViewDialog.open) renderCalendarView();
-          await persistDelete(id);
-        }
-        deleteConfirmDialog.close();
-      });
-
-      document.addEventListener("click", async (event) => {
-        const button = event.target.closest("button[data-action]");
-        if (!button) return;
-        const index = records.findIndex((item) => item.id === button.dataset.id);
-        const record = records[index];
-        if (!record) return;
-
-        if (button.dataset.action === "edit") {
-          setFormData(record);
-        } else if (button.dataset.action === "book") {
-          openBookingModalForRecord(record.id);
-        } else if (button.dataset.action === "toggle-purchased") {
-          if (record.isPurchased) {
-            records[index] = await persistUpdate(normalizeRecord({ ...record, isPurchased: false, updatedAt: new Date().toISOString() }));
-            saveLocalRecords(); render();
-          } else {
-            buyRecordId.value = record.id; buyDate.value = record.boughtDate || ""; buyActualDealPrice.value = record.actualDealPrice || "";
-            buyDialog.showModal(); buyDate.focus();
+        const matchedVehicles = records.filter(r => {
+          if (!r.isPurchased && !r.isSold) return false;
+          if (!r.boughtDate) return false;
+          const y = r.boughtDate.slice(0, 4);
+          if (y !== selYear) return false;
+          if (!isMonthAll) {
+            const m = getRecordMonth(r.boughtDate);
+            if (m !== selMonth) return false;
           }
-        } else if (button.dataset.action === "sell") {
-          sellRecordId.value = record.id;
-          sellBuyPriceDisplay.value = record.actualDealPrice || "未填寫";
-          sellPriceInput.value = record.salePrice || "";
-          sellBonusValue = record.bonus === "Y" ? "Y" : (record.bonus === "N" ? "N" : "");
-          updateSellBonusUI();
-          sellDialog.showModal(); sellPriceInput.focus();
-        } else if (button.dataset.action === "toggle-sold") {
-          records[index] = await persistUpdate(normalizeRecord({ ...record, isSold: false, state: "N", updatedAt: new Date().toISOString() }));
-          saveLocalRecords(); render();
-        } else if (button.dataset.action === "delete") {
-          deleteTargetId.value = record.id;
-          deleteConfirmText.textContent = `您確定要刪除「${record.model || '未命名車輛'}」的估價資料嗎？此操作無法復原。`;
-          deleteConfirmDialog.showModal();
-        }
-      });
+          return true;
+        });
+
+        matchedVehicles.sort((a, b) => {
+          const dateA = dateValueToNumber(a.boughtDate) || 0;
+          const dateB = dateValueToNumber(b.boughtDate) || 0;
+          return dateA - dateB;
+        });
+
+        if (reportVehicleEmpty) reportVehicleEmpty.classList.toggle("is-visible", matchedVehicles.length === 0);
+
+        matchedVehicles.forEach(item => {
+          const tr = document.createElement("tr");
+          const statusText = item.isSold ? "已售出" : "已買入";
+          const statusColor = item.isSold ? "#d97706" : "#16a34a";
+
+          tr.innerHTML = `
+            <td style="padding: 8px 4px; text-align: center !important; font-size: 13px;">${formatMMDD(item.boughtDate)}</td>
+            <td style="padding: 8px 4px; text-align: center !important; font-size: 13px;">${item.year}</td>
+            <td style="padding: 8px 4px; text-align: center !important; font-weight: 700; font-size: 13px;">${item.model}</td>
+            <td style="padding: 8px 4px; text-align: center !important; font-size: 13px; font-weight: 800; color: ${statusColor};">${statusText}</td>
+          `;
+
+          reportVehicleBody.appendChild(tr);
+        });
+      }
 
       initTimeSelects();
       initReportMonthSelect();
