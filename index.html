@@ -2989,6 +2989,14 @@
         const purchased = filtered.filter(r => r.isPurchased && !r.isSold);
         const sold = filtered.filter(r => r.isSold);
 
+        // 日期近到遠排序（日期新的在前面）
+        ongoing.sort((a, b) => (dateValueToNumber(b.receivedDate) || 0) - (dateValueToNumber(a.receivedDate) || 0));
+        purchased.sort((a, b) => {
+          const dB = dateValueToNumber(b.boughtDate) || dateValueToNumber(b.receivedDate) || 0;
+          const dA = dateValueToNumber(a.boughtDate) || dateValueToNumber(a.receivedDate) || 0;
+          return dB - dA;
+        });
+
         if (document.getElementById("switchCountAll")) document.getElementById("switchCountAll").textContent = filtered.length;
         if (document.getElementById("switchCountOngoing")) document.getElementById("switchCountOngoing").textContent = ongoing.length;
         if (document.getElementById("switchCountPurchased")) document.getElementById("switchCountPurchased").textContent = purchased.length;
@@ -3345,6 +3353,10 @@
         
         const soldNList = records.filter(r => r.isSold && (r.bonus === "N" || !r.bonus));
         
+        if (queryBonusTitle) {
+          queryBonusTitle.textContent = `獎金 N 車輛清單 (${soldNList.length} 台)`;
+        }
+        
         if (queryBonusEmpty) queryBonusEmpty.classList.toggle("is-visible", soldNList.length === 0);
 
         soldNList.forEach(item => {
@@ -3465,17 +3477,17 @@
 
         calendarGrid.innerHTML = "";
 
-        const daysOfWeek = ["日", "一", "二", "三", "四", "五", "六"];
+        const daysOfWeek = ["一", "二", "三", "四", "五", "六", "日"];
         daysOfWeek.forEach((d, idx) => {
           const h = document.createElement("div");
-          h.className = "calendar-day-header" + (idx === 0 || idx === 6 ? " is-weekend" : "");
+          h.className = "calendar-day-header" + (idx >= 5 ? " is-weekend" : "");
           h.textContent = d;
           calendarGrid.appendChild(h);
         });
 
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
-        const startingDay = firstDay.getDay();
+        const startingDay = (firstDay.getDay() + 6) % 7;
         const totalDays = lastDay.getDate();
 
         const todayISO = new Date().toISOString().slice(0, 10);
@@ -3488,46 +3500,51 @@
           const cell = document.createElement("div");
           cell.className = "calendar-cell other-month";
           cell.innerHTML = `<div class="cell-date-row"><span class="cell-date-num">${dayNum}</span></div>`;
-          workdayCalendarGrid.appendChild(cell);
+          calendarGrid.appendChild(cell);
         }
-
-        let standardWorkdays = 0;
-        let userWorkedDays = 0;
 
         for (let day = 1; day <= totalDays; day++) {
           const mStr = String(month + 1).padStart(2, "0");
           const dStr = String(day).padStart(2, "0");
           const dateISO = `${year}-${mStr}-${dStr}`;
           const curDate = new Date(year, month, day);
-          const dayOfWeek = curDate.getDay();
 
-          const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
           const holidayName = TAIWAN_HOLIDAYS[dateISO];
-          const isOffDay = isWeekend || Boolean(holidayName);
-
-          if (!isOffDay) {
-            standardWorkdays++;
-          }
-
-          const isWorked = Boolean(workdayRecords[dateISO]);
-          if (isWorked) {
-            userWorkedDays++;
-          }
+          const isToday = (dateISO === todayISO);
+          const isSelected = (dateISO === selectedCalendarDateISO);
 
           const cell = document.createElement("div");
-          cell.className = "calendar-cell";
-          if (isWorked) cell.style.backgroundColor = "#dbeafe";
+          cell.className = `calendar-cell${isToday ? " is-today" : ""}${isSelected ? " is-selected" : ""}`;
 
-          const holidayShort = holidayName ? holidayName.slice(0, 2) : "";
-          let holidayHtml = holidayShort ? `<span class="cell-holiday" style="font-size:11px; margin-left:2px;">${holidayShort}</span>` : "";
-          let workedBadge = isWorked ? `<div style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:#2563eb; color:#ffffff; font-size:12px; font-weight:800; margin-top:2px; align-self:center;">✓</div>` : "";
+          let holidayHtml = holidayName ? `<span class="cell-holiday">${holidayName}</span>` : "";
+
+          let dayEvents = records.filter(r => r.bookingDate === dateISO);
+          if (calendarFilterType === "valuation") {
+            dayEvents = dayEvents.filter(r => !r.isPurchased);
+          } else if (calendarFilterType === "delivery") {
+            dayEvents = dayEvents.filter(r => r.isPurchased);
+          }
+
+          dayEvents.sort((a, b) => timeToMinutes(a.bookingTime) - timeToMinutes(b.bookingTime));
+
+          let badgesHtml = "";
+          const displayCount = Math.min(dayEvents.length, 2);
+          for (let k = 0; k < displayCount; k++) {
+            const ev = dayEvents[k];
+            const badgeClass = ev.isPurchased ? "calendar-badge is-purchased" : "calendar-badge";
+            const timeText = ev.bookingTime || "未定";
+            badgesHtml += `<div class="${badgeClass}">${timeText}</div>`;
+          }
+          if (dayEvents.length > 2) {
+            badgesHtml += `<div class="calendar-more-badge">+${dayEvents.length - 2}</div>`;
+          }
 
           cell.innerHTML = `
             <div class="cell-date-row">
-              <span class="cell-date-num" style="${isWeekend ? "color:#ef4444;" : ""}">${day}</span>
+              <span class="cell-date-num">${day}</span>
               ${holidayHtml}
             </div>
-            ${workedBadge}
+            ${badgesHtml}
           `;
 
           cell.addEventListener("click", () => {
@@ -3535,6 +3552,15 @@
             renderCalendarView();
           });
 
+          calendarGrid.appendChild(cell);
+        }
+
+        const totalRendered = startingDay + totalDays;
+        const remaining = (7 - (totalRendered % 7)) % 7;
+        for (let day = 1; day <= remaining; day++) {
+          const cell = document.createElement("div");
+          cell.className = "calendar-cell other-month";
+          cell.innerHTML = `<div class="cell-date-row"><span class="cell-date-num">${day}</span></div>`;
           calendarGrid.appendChild(cell);
         }
 
