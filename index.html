@@ -2167,7 +2167,10 @@
       <div class="modal-content-wrap">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 4px;">
           <h2 style="margin:0; font-size:18px; font-weight:800; color:var(--text-main);">工作天數</h2>
-          <button class="secondary" type="button" id="closeWorkdayDialogBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="secondary" type="button" id="clearWorkdayBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px; font-size:14px; font-weight:700;">清除</button>
+            <button class="secondary" type="button" id="closeWorkdayDialogBtn" style="min-height:36px; padding:0 12px; border-radius:8px;">✕</button>
+          </div>
         </div>
         
         <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px;">
@@ -2324,6 +2327,7 @@
       const openWorkdayBtn = document.getElementById("openWorkdayBtn");
       const workdayDialog = document.getElementById("workdayDialog");
       const closeWorkdayDialogBtn = document.getElementById("closeWorkdayDialogBtn");
+      const clearWorkdayBtn = document.getElementById("clearWorkdayBtn");
       const workdayYearSelect = document.getElementById("workdayYearSelect");
       const workdayMonthSelect = document.getElementById("workdayMonthSelect");
       const targetWorkdaysCount = document.getElementById("targetWorkdaysCount");
@@ -2867,8 +2871,19 @@
           workdayYearSelect.appendChild(opt);
         });
 
+        workdayYearSelect.value = "2026";
+        updateWorkdayMonthOptions();
+      }
+
+      function updateWorkdayMonthOptions() {
+        if (!workdayMonthSelect) return;
+        const selectedYear = workdayYearSelect ? workdayYearSelect.value : "2026";
+        const previousMonth = workdayMonthSelect.value;
         workdayMonthSelect.innerHTML = "";
-        for (let m = 1; m <= 12; m++) {
+
+        // 2026 年刪除 01-07 月，從 08 月開始；其餘年份包含 01-12 月
+        const startMonth = (selectedYear === "2026") ? 8 : 1;
+        for (let m = startMonth; m <= 12; m++) {
           const opt = document.createElement("option");
           const mStr = String(m).padStart(2, "0");
           opt.value = mStr;
@@ -2876,9 +2891,49 @@
           workdayMonthSelect.appendChild(opt);
         }
 
-        workdayYearSelect.value = "2026";
-        workdayMonthSelect.value = "09";
+        if (Array.from(workdayMonthSelect.options).some(o => o.value === previousMonth)) {
+          workdayMonthSelect.value = previousMonth;
+        } else {
+          workdayMonthSelect.value = (selectedYear === "2026") ? "09" : "01";
+        }
       }
+
+      if (openWorkdayBtn) {
+        openWorkdayBtn.addEventListener("click", () => {
+          initWorkdayControls();
+          renderWorkdayCalendar();
+          workdayDialog.showModal();
+        });
+      }
+
+      if (closeWorkdayDialogBtn) {
+        closeWorkdayDialogBtn.addEventListener("click", () => workdayDialog.close());
+      }
+
+      if (clearWorkdayBtn) {
+        clearWorkdayBtn.addEventListener("click", () => {
+          const year = workdayYearSelect.value;
+          const month = workdayMonthSelect.value;
+          const prefix = `${year}-${month}-`;
+          
+          Object.keys(workdayRecords).forEach(key => {
+            if (key.startsWith(prefix)) {
+              delete workdayRecords[key];
+            }
+          });
+          
+          saveWorkdayRecords();
+          renderWorkdayCalendar();
+        });
+      }
+
+      if (workdayYearSelect) {
+        workdayYearSelect.addEventListener("change", () => {
+          updateWorkdayMonthOptions();
+          renderWorkdayCalendar();
+        });
+      }
+      if (workdayMonthSelect) workdayMonthSelect.addEventListener("change", renderWorkdayCalendar);
 
       function renderWorkdayCalendar() {
         if (!workdayCalendarGrid) return;
@@ -2977,6 +3032,23 @@
 
       if (closeWorkdayDialogBtn) {
         closeWorkdayDialogBtn.addEventListener("click", () => workdayDialog.close());
+      }
+
+      if (clearWorkdayBtn) {
+        clearWorkdayBtn.addEventListener("click", () => {
+          const year = workdayYearSelect.value;
+          const month = workdayMonthSelect.value;
+          const prefix = `${year}-${month}-`;
+          
+          Object.keys(workdayRecords).forEach(key => {
+            if (key.startsWith(prefix)) {
+              delete workdayRecords[key];
+            }
+          });
+          
+          saveWorkdayRecords();
+          renderWorkdayCalendar();
+        });
       }
 
       if (workdayYearSelect) workdayYearSelect.addEventListener("change", renderWorkdayCalendar);
