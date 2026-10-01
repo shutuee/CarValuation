@@ -817,6 +817,7 @@
       
       .col-actions   { width: 230px; min-width: 230px; }
       .ongoing-section .col-actions { width: 230px; min-width: 230px; }
+      .sold-section .col-actions { width: 260px; min-width: 260px; }
 
       th, td {
         border: none;
@@ -3189,6 +3190,7 @@
               <td class="col-actions">
                 <div class="row-actions">
                   <button type="button" class="secondary btn-edit" data-id="${item.id}">編輯</button>
+                  <button type="button" class="btn-cancel-sell" data-id="${item.id}" style="border-color:#d97706; background:#f59e0b; color:#ffffff;">取消售出</button>
                   <button type="button" class="danger btn-delete btn-icon" data-id="${item.id}">✕</button>
                 </div>
               </td>
@@ -3303,6 +3305,22 @@
       });
 
       document.addEventListener("click", async (e) => {
+        const cancelSellBtn = e.target.closest(".btn-cancel-sell");
+        if (cancelSellBtn) {
+          const id = cancelSellBtn.dataset.id;
+          const idx = records.findIndex(r => r.id === id);
+          if (idx >= 0) {
+            records[idx].isSold = false;
+            records[idx].state = "N";
+            records[idx].salePrice = "";
+            records[idx].bonus = "N";
+            await persistUpdate(records[idx]);
+            saveLocalRecords();
+            render();
+          }
+          return;
+        }
+
         const buyBtn = e.target.closest(".btn-buy");
         if (buyBtn) {
           const id = buyBtn.dataset.id;
