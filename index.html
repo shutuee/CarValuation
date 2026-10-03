@@ -3825,15 +3825,16 @@
 
         const isMonthAll = (selMonth === "all");
         if (annualTotalLabel) {
-          annualTotalLabel.textContent = isMonthAll ? `${selYear} 年度總買進台數` : `${parseInt(selMonth, 10)} 月份買進台數`;
+          annualTotalLabel.textContent = (isMonthAll || selYear === "2025") ? `${selYear} 年度總買進台數` : `${parseInt(selMonth, 10)} 月份買進台數`;
         }
 
-        if (openReportVehicleListBtn) {
-          openReportVehicleListBtn.style.display = (selYear === "2025" && isMonthAll) ? "none" : "inline-flex";
-        }
+        const subStatsRow = document.querySelector(".sub-stats-row");
 
-        if (selYear === "2025" && isMonthAll) {
-          if (annualTotalPurchased) annualTotalPurchased.textContent = "42";
+        if (selYear === "2025") {
+          if (reportMonthSelect) reportMonthSelect.style.display = "none";
+          if (subStatsRow) subStatsRow.style.display = "none";
+          if (openReportVehicleListBtn) openReportVehicleListBtn.style.display = "none";
+          if (annualTotalPurchased) annualTotalPurchased.textContent = "30";
           if (annualPurchasedCount) annualPurchasedCount.textContent = "0";
           if (annualSoldCount) annualSoldCount.textContent = "0";
           if (channelGridList) channelGridList.innerHTML = "";
@@ -3841,6 +3842,9 @@
           return;
         }
 
+        if (reportMonthSelect) reportMonthSelect.style.display = "";
+        if (subStatsRow) subStatsRow.style.display = "";
+        if (openReportVehicleListBtn) openReportVehicleListBtn.style.display = "inline-flex";
         if (channelBreakdownWrap) channelBreakdownWrap.style.display = "flex";
 
         // 統一嚴格根據車輛的「買進日 (boughtDate)」歸類數據報告
