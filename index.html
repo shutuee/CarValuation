@@ -2864,6 +2864,11 @@
 
       function initWorkdayControls() {
         if (!workdayYearSelect || !workdayMonthSelect) return;
+
+        const now = new Date();
+        const curYearStr = String(now.getFullYear());
+        const curMonthStr = String(now.getMonth() + 1).padStart(2, "0");
+
         workdayYearSelect.innerHTML = "";
         ["2026", "2027", "2028", "2029", "2030"].forEach(y => {
           const opt = document.createElement("option");
@@ -2872,14 +2877,19 @@
           workdayYearSelect.appendChild(opt);
         });
 
-        workdayYearSelect.value = "2026";
-        updateWorkdayMonthOptions();
+        if (Array.from(workdayYearSelect.options).some(o => o.value === curYearStr)) {
+          workdayYearSelect.value = curYearStr;
+        } else {
+          workdayYearSelect.value = "2026";
+        }
+
+        updateWorkdayMonthOptions(curMonthStr);
       }
 
-      function updateWorkdayMonthOptions() {
+      function updateWorkdayMonthOptions(preferredMonth) {
         if (!workdayMonthSelect) return;
         const selectedYear = workdayYearSelect ? workdayYearSelect.value : "2026";
-        const previousMonth = workdayMonthSelect.value;
+        const targetMonth = preferredMonth || workdayMonthSelect.value;
         workdayMonthSelect.innerHTML = "";
 
         // 2026 年刪除 01-08 月，從 09 月開始；其餘年份包含 01-12 月
@@ -2892,10 +2902,11 @@
           workdayMonthSelect.appendChild(opt);
         }
 
-        if (Array.from(workdayMonthSelect.options).some(o => o.value === previousMonth)) {
-          workdayMonthSelect.value = previousMonth;
+        if (Array.from(workdayMonthSelect.options).some(o => o.value === targetMonth)) {
+          workdayMonthSelect.value = targetMonth;
         } else {
-          workdayMonthSelect.value = (selectedYear === "2026") ? "09" : "01";
+          const firstAvailableOpt = workdayMonthSelect.options[0]?.value || "09";
+          workdayMonthSelect.value = firstAvailableOpt;
         }
       }
 
@@ -3821,11 +3832,48 @@
 
         if (channelBreakdownWrap) channelBreakdownWrap.style.display = "flex";
 
-        const purchasedAndSold = records.filter(r => {
+        // 依據「買進日 (boughtDate)」歸類統計，非「進件日 (receivedDate)」
+        const yearVehicles = records.filter(r => {
           if (!r.isPurchased && !r.isSold) return false;
           if (!r.boughtDate) return false;
-          const y = r.boughtDate.slice(0, 4);
-          if (y !== selYear) return false;
+          return r.boughtDate.slice(0, 4) === selYear;
+        });
+
+        // 依據「買進日」生成各月份買進台數統計標籤
+        if (yearBreakdownList) {
+          yearBreakdownList.innerHTML = "";
+          if (isMonthAll) {
+            const monthlyCounts = {};
+            for (let m = 1; m <= 12; m++) {
+              const mKey = String(m).padStart(2, "0");
+              monthlyCounts[mKey] = 0;
+            }
+
+            yearVehicles.forEach(r => {
+              const m = getRecordMonth(r.boughtDate);
+              if (monthlyCounts[m] !== undefined) {
+                monthlyCounts[m]++;
+              }
+            });
+
+            for (let m = 1; m <= 12; m++) {
+              const mKey = String(m).padStart(2, "0");
+              const cnt = monthlyCounts[mKey];
+              if (cnt > 0) {
+                const tag = document.createElement("div");
+                tag.className = `year-stat-tag${selMonth === mKey ? " is-active" : ""}`;
+                tag.innerHTML = `<span>${m}月</span><span class="yr-num">${cnt}台</span>`;
+                tag.addEventListener("click", () => {
+                  reportMonthSelect.value = mKey;
+                  renderReportModalData();
+                });
+                yearBreakdownList.appendChild(tag);
+              }
+            }
+          }
+        }
+
+        const purchasedAndSold = yearVehicles.filter(r => {
           if (!isMonthAll) {
             const m = getRecordMonth(r.boughtDate);
             if (m !== selMonth) return false;
