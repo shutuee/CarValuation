@@ -2567,6 +2567,17 @@
         const text = String(value).trim();
         if (!text) return "";
         
+        // 優先解析帶有時區的 ISO 字串（如 2026-09-30T16:00:00.000Z），依本地時區還原正確日期
+        if (text.includes("T") || text.includes("Z")) {
+          const d = new Date(text);
+          if (!isNaN(d.getTime())) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, "0");
+            const day = String(d.getDate()).padStart(2, "0");
+            return `${y}-${m}-${day}`;
+          }
+        }
+
         const isoMatch = text.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
         if (isoMatch) {
           const y = isoMatch[1];
