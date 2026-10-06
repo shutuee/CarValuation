@@ -2487,6 +2487,18 @@
         return String(value).trim();
       }
 
+      function cleanNonDateField(val) {
+        if (val === null || val === undefined) return "";
+        const str = String(val).trim();
+        if (!str) return "";
+        
+        // 遇到 ISO 時間字串 (如 2026-04-04T16:00:00.000Z) 時絕不轉成日期格式，亦不顯示 ISO 亂碼
+        if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(str)) {
+          return "";
+        }
+        return str;
+      }
+
       function normalizeBoolean(val) {
         if (typeof val === "boolean") return val;
         if (typeof val === "string") {
@@ -2824,7 +2836,18 @@
       async function syncFromCloud() {
         try {
           const cloudRecords = await apiGetRecords();
-          records = cloudRecords;
+          // 若雲端的非日期欄位因試算表誤判而變成 ISO 時間格式經過濾為空，但本地保有乾淨數值時，優先保留本地數值
+          const mergedRecords = cloudRecords.map(cRec => {
+            const localRec = records.find(r => r.id === cRec.id);
+            if (localRec) {
+              if (!cRec.purchasePrice && localRec.purchasePrice) cRec.purchasePrice = localRec.purchasePrice;
+              if (!cRec.actualDealPrice && localRec.actualDealPrice) cRec.actualDealPrice = localRec.actualDealPrice;
+              if (!cRec.salePrice && localRec.salePrice) cRec.salePrice = localRec.salePrice;
+              if (!cRec.model && localRec.model) cRec.model = localRec.model;
+            }
+            return cRec;
+          });
+          records = mergedRecords;
           saveLocalRecords();
           render();
           if (calendarViewDialog && calendarViewDialog.open) {
