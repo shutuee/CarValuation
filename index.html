@@ -605,6 +605,48 @@
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
       }
 
+      .report-all-btn {
+        min-height: 40px;
+        height: 40px;
+        padding: 0 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #64748b;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .report-all-btn:hover {
+        border-color: #2563eb;
+        color: #0f172a;
+        background-color: #f1f5f9;
+      }
+
+      .report-all-btn:active {
+        transform: scale(0.96);
+      }
+
+      .report-all-btn.is-active {
+        background: #eff6ff;
+        border-color: #2563eb;
+        color: #2563eb;
+        font-weight: 800;
+        box-shadow: inset 0 2px 5px rgba(37, 99, 235, 0.2);
+        transform: translateY(1px);
+      }
+
+      .report-all-btn.is-active:hover {
+        color: #1d4ed8;
+        background: #dbeafe;
+      }
+
       .report-stats-grid {
         display: flex;
         flex-direction: column;
@@ -1975,6 +2017,7 @@
             <div class="report-controls">
               <select id="reportYearSelect" class="report-select" title="選擇統計年份"></select>
               <select id="reportMonthSelect" class="report-select" title="選擇統計月份"></select>
+              <button type="button" id="reportAllMonthsBtn" class="report-all-btn">全月</button>
             </div>
           </div>
 
@@ -2269,6 +2312,7 @@
       const closeReportDialogBtn = document.getElementById("closeReportDialogBtn");
       const reportYearSelect = document.getElementById("reportYearSelect");
       const reportMonthSelect = document.getElementById("reportMonthSelect");
+      const reportAllMonthsBtn = document.getElementById("reportAllMonthsBtn");
       const annualTotalLabel = document.getElementById("annualTotalLabel");
       const annualTotalPurchased = document.getElementById("annualTotalPurchased");
       const annualPurchasedCount = document.getElementById("annualPurchasedCount");
@@ -2544,7 +2588,7 @@
 
       function initReportMonthSelect() {
         if (!reportMonthSelect) return;
-        reportMonthSelect.innerHTML = '<option value="all">全部月份</option>';
+        reportMonthSelect.innerHTML = "";
         for (let m = 1; m <= 12; m++) {
           const opt = document.createElement("option");
           const mStr = String(m).padStart(2, "0");
@@ -3851,11 +3895,67 @@
       }
 
       if (reportYearSelect) reportYearSelect.addEventListener("change", renderReportModalData);
-      if (reportMonthSelect) reportMonthSelect.addEventListener("change", renderReportModalData);
+      if (reportMonthSelect) {
+        reportMonthSelect.addEventListener("change", () => {
+          if (reportAllMonthsBtn) reportAllMonthsBtn.classList.remove("is-active");
+          renderReportModalData();
+        });
+      }
+      if (reportAllMonthsBtn) {
+        reportAllMonthsBtn.addEventListener("click", () => {
+          if (reportAllMonthsBtn.classList.contains("is-active")) {
+            reportAllMonthsBtn.classList.remove("is-active");
+          } else {
+            reportAllMonthsBtn.classList.add("is-active");
+          }
+          renderReportModalData();
+        });
+      }
+
+      function initReportModalControls() {
+        if (!reportYearSelect) return;
+        reportYearSelect.innerHTML = "";
+
+        const yearsSet = new Set(["2026", "2025"]);
+        records.forEach(r => {
+          if (r.boughtDate) {
+            const y = r.boughtDate.slice(0, 4);
+            if (y && y.length === 4) yearsSet.add(y);
+          }
+        });
+
+        const sortedYears = Array.from(yearsSet).sort((a, b) => Number(b) - Number(a));
+        sortedYears.forEach(y => {
+          const opt = document.createElement("option");
+          opt.value = y;
+          opt.textContent = `${y} 年`;
+          reportYearSelect.appendChild(opt);
+        });
+
+        const now = new Date();
+        const curYearStr = String(now.getFullYear());
+        const curMonthStr = String(now.getMonth() + 1).padStart(2, "0");
+
+        if (Array.from(reportYearSelect.options).some(o => o.value === curYearStr)) {
+          reportYearSelect.value = curYearStr;
+        } else {
+          reportYearSelect.value = reportYearSelect.options[0]?.value || "2026";
+        }
+
+        if (reportMonthSelect) {
+          if (Array.from(reportMonthSelect.options).some(o => o.value === curMonthStr)) {
+            reportMonthSelect.value = curMonthStr;
+          } else {
+            reportMonthSelect.value = reportMonthSelect.options[0]?.value || "01";
+          }
+        }
+        if (reportAllMonthsBtn) reportAllMonthsBtn.classList.remove("is-active");
+      }
 
       function renderReportModalData() {
         const selYear = reportYearSelect.value;
-        const selMonth = reportMonthSelect.value;
+        const isAllMonthsActive = reportAllMonthsBtn && reportAllMonthsBtn.classList.contains("is-active");
+        const selMonth = isAllMonthsActive ? "all" : reportMonthSelect.value;
 
         const isMonthAll = (selMonth === "all");
         if (annualTotalLabel) {
@@ -3866,6 +3966,7 @@
 
         if (selYear === "2025") {
           if (reportMonthSelect) reportMonthSelect.style.display = "none";
+          if (reportAllMonthsBtn) reportAllMonthsBtn.style.display = "none";
           if (subStatsRow) subStatsRow.style.display = "none";
           if (openReportVehicleListBtn) openReportVehicleListBtn.style.display = "none";
           if (annualTotalPurchased) annualTotalPurchased.textContent = "30";
@@ -3877,6 +3978,7 @@
         }
 
         if (reportMonthSelect) reportMonthSelect.style.display = "";
+        if (reportAllMonthsBtn) reportAllMonthsBtn.style.display = "inline-flex";
         if (subStatsRow) subStatsRow.style.display = "";
         if (openReportVehicleListBtn) openReportVehicleListBtn.style.display = "inline-flex";
         if (channelBreakdownWrap) channelBreakdownWrap.style.display = "flex";
@@ -3929,21 +4031,13 @@
         }
       }
 
-      if (openReportVehicleListBtn) {
-        openReportVehicleListBtn.addEventListener("click", () => {
-          renderReportVehicleList();
-          reportVehicleDialog.showModal();
-        });
-      }
-
-      if (closeReportVehicleDialogBtn) closeReportVehicleDialogBtn.addEventListener("click", () => reportVehicleDialog.close());
-
       function renderReportVehicleList() {
         if (!reportVehicleBody) return;
         reportVehicleBody.innerHTML = "";
 
         const selYear = reportYearSelect.value;
-        const selMonth = reportMonthSelect.value;
+        const isAllMonthsActive = reportAllMonthsBtn && reportAllMonthsBtn.classList.contains("is-active");
+        const selMonth = isAllMonthsActive ? "all" : reportMonthSelect.value;
         const isMonthAll = (selMonth === "all");
 
         if (reportVehicleDialogTitle) {
