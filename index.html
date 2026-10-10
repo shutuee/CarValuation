@@ -3871,64 +3871,7 @@
         sortedYears.forEach(y => {
           const opt = document.createElement("option");
           opt.value = y;
-          opt.textContent = `${y} 年`;
-          reportYearSelect.appendChild(opt);
-        });
-
-        const now = new Date();
-        const curYearStr = String(now.getFullYear());
-        const curMonthStr = String(now.getMonth() + 1).padStart(2, "0");
-
-        if (Array.from(reportYearSelect.options).some(o => o.value === curYearStr)) {
-          reportYearSelect.value = curYearStr;
-        } else {
-          reportYearSelect.value = reportYearSelect.options[0]?.value || "2026";
-        }
-
-        if (reportMonthSelect) {
-          if (Array.from(reportMonthSelect.options).some(o => o.value === curMonthStr)) {
-            reportMonthSelect.value = curMonthStr;
-          } else {
-            reportMonthSelect.value = "all";
-          }
-        }
-      }
-
-      if (reportYearSelect) reportYearSelect.addEventListener("change", renderReportModalData);
-      if (reportMonthSelect) {
-        reportMonthSelect.addEventListener("change", () => {
-          if (reportAllMonthsBtn) reportAllMonthsBtn.classList.remove("is-active");
-          renderReportModalData();
-        });
-      }
-      if (reportAllMonthsBtn) {
-        reportAllMonthsBtn.addEventListener("click", () => {
-          if (reportAllMonthsBtn.classList.contains("is-active")) {
-            reportAllMonthsBtn.classList.remove("is-active");
-          } else {
-            reportAllMonthsBtn.classList.add("is-active");
-          }
-          renderReportModalData();
-        });
-      }
-
-      function initReportModalControls() {
-        if (!reportYearSelect) return;
-        reportYearSelect.innerHTML = "";
-
-        const yearsSet = new Set(["2026", "2025"]);
-        records.forEach(r => {
-          if (r.boughtDate) {
-            const y = r.boughtDate.slice(0, 4);
-            if (y && y.length === 4) yearsSet.add(y);
-          }
-        });
-
-        const sortedYears = Array.from(yearsSet).sort((a, b) => Number(b) - Number(a));
-        sortedYears.forEach(y => {
-          const opt = document.createElement("option");
-          opt.value = y;
-          opt.textContent = `${y} 年`;
+          opt.textContent = y;
           reportYearSelect.appendChild(opt);
         });
 
@@ -3950,6 +3893,24 @@
           }
         }
         if (reportAllMonthsBtn) reportAllMonthsBtn.classList.remove("is-active");
+      }
+
+      if (reportYearSelect) reportYearSelect.addEventListener("change", renderReportModalData);
+      if (reportMonthSelect) {
+        reportMonthSelect.addEventListener("change", () => {
+          if (reportAllMonthsBtn) reportAllMonthsBtn.classList.remove("is-active");
+          renderReportModalData();
+        });
+      }
+      if (reportAllMonthsBtn) {
+        reportAllMonthsBtn.addEventListener("click", () => {
+          if (reportAllMonthsBtn.classList.contains("is-active")) {
+            reportAllMonthsBtn.classList.remove("is-active");
+          } else {
+            reportAllMonthsBtn.classList.add("is-active");
+          }
+          renderReportModalData();
+        });
       }
 
       function renderReportModalData() {
