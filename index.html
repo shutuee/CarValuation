@@ -3855,6 +3855,19 @@
 
       if (closeReportDialogBtn) closeReportDialogBtn.addEventListener("click", () => reportDialog.close());
 
+      if (openReportVehicleListBtn) {
+        openReportVehicleListBtn.addEventListener("click", () => {
+          renderReportVehicleList();
+          reportVehicleDialog.showModal();
+        });
+      }
+
+      if (closeReportVehicleDialogBtn) {
+        closeReportVehicleDialogBtn.addEventListener("click", () => {
+          reportVehicleDialog.close();
+        });
+      }
+
       function initReportModalControls() {
         if (!reportYearSelect) return;
         reportYearSelect.innerHTML = "";
