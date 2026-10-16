@@ -1052,6 +1052,103 @@
         overflow: hidden;
       }
 
+      dialog#vehicleDetailDialog {
+        width: min(440px, calc(100vw - 20px));
+        max-width: calc(100vw - 20px) !important;
+        max-height: 88vh;
+        border-radius: 20px;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+      }
+
+      .detail-hero-card {
+        padding: 16px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-left: 6px solid #2563eb;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .detail-hero-card.type-ongoing { border-left-color: #2563eb; background: #eff6ff; }
+      .detail-hero-card.type-purchased { border-left-color: #16a34a; background: #f0fdf4; }
+      .detail-hero-card.type-sold { border-left-color: #f59e0b; background: #fffbeb; }
+
+      .detail-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 800;
+        color: #ffffff;
+        width: fit-content;
+      }
+
+      .detail-badge.type-ongoing { background: #2563eb; }
+      .detail-badge.type-purchased { background: #16a34a; }
+      .detail-badge.type-sold { background: #f59e0b; }
+
+      .detail-card-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        width: 100%;
+      }
+
+      .detail-info-item {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+      }
+
+      .detail-info-item.full-width {
+        grid-column: 1 / -1;
+      }
+
+      .detail-info-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #64748b;
+      }
+
+      .detail-info-val {
+        font-size: 15px;
+        font-weight: 800;
+        color: #0f172a;
+        word-break: break-word;
+      }
+
+      .clickable-model {
+        color: #2563eb;
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .clickable-model:hover {
+        opacity: 0.8;
+      }
+
+      .clickable-model.type-ongoing {
+        color: #2563eb;
+      }
+
+      .clickable-model.type-purchased {
+        color: #16a34a;
+      }
+
+      .clickable-model.type-sold {
+        color: #d97706;
+      }
+
       /* Mandatory centering rule for Query Bonus Table across desktop and mobile devices */
       #queryBonusTable th,
       #queryBonusTable td {
@@ -2083,6 +2180,30 @@
       </div>
     </dialog>
 
+    <dialog id="vehicleDetailDialog">
+      <div class="modal-content-wrap" style="max-height: 88vh; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; flex-shrink: 0;">
+          <h2 style="margin:0; font-size:18px; font-weight:800; color:var(--text-main);" id="detailDialogTitle">車輛資料</h2>
+          <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+            <button class="btn-slate" type="button" id="editVehicleDetailBtn" style="min-height:36px; height:36px; padding:0 14px; border-radius:8px; font-size:14px;">編輯</button>
+            <button class="secondary" type="button" id="closeVehicleDetailDialogBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px;">✕</button>
+          </div>
+        </div>
+
+        <div id="detailHeroCard" class="detail-hero-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span id="detailStatusBadge" class="detail-badge type-ongoing">進行中</span>
+            <span id="detailSource" style="font-size:13px; font-weight:800; color:#475569;">網站</span>
+          </div>
+          <div id="detailModelTitle" style="font-size:20px; font-weight:900; color:#0f172a; margin-top:4px;">YARIS</div>
+        </div>
+
+        <div class="detail-card-grid" id="detailGridContent">
+          <!-- JS 動態生成詳細內容卡片 -->
+        </div>
+      </div>
+    </dialog>
+
     <dialog id="buyDialog">
       <form id="buyForm" method="dialog">
         <h2>已買入資料</h2>
@@ -2375,6 +2496,87 @@
       const targetWorkdaysCount = document.getElementById("targetWorkdaysCount");
       const actualWorkedCount = document.getElementById("actualWorkedCount");
       const workdayCalendarGrid = document.getElementById("workdayCalendarGrid");
+
+      const vehicleDetailDialog = document.getElementById("vehicleDetailDialog");
+      const closeVehicleDetailDialogBtn = document.getElementById("closeVehicleDetailDialogBtn");
+      const editVehicleDetailBtn = document.getElementById("editVehicleDetailBtn");
+      const detailHeroCard = document.getElementById("detailHeroCard");
+      const detailStatusBadge = document.getElementById("detailStatusBadge");
+      const detailSource = document.getElementById("detailSource");
+      const detailModelTitle = document.getElementById("detailModelTitle");
+      const detailGridContent = document.getElementById("detailGridContent");
+
+      let currentDetailRecordId = null;
+
+      if (closeVehicleDetailDialogBtn) {
+        closeVehicleDetailDialogBtn.addEventListener("click", () => vehicleDetailDialog.close());
+      }
+
+      if (editVehicleDetailBtn) {
+        editVehicleDetailBtn.addEventListener("click", () => {
+          if (!currentDetailRecordId) return;
+          const rec = records.find(r => r.id === currentDetailRecordId);
+          vehicleDetailDialog.close();
+          if (rec) setFormData(rec);
+        });
+      }
+
+      function openVehicleDetailModal(recordId) {
+        const item = records.find(r => r.id === recordId);
+        if (!item || !vehicleDetailDialog) return;
+
+        currentDetailRecordId = recordId;
+
+        let categoryType = "ongoing";
+        let statusText = "進行中";
+        if (item.isSold) {
+          categoryType = "sold";
+          statusText = "已售出";
+        } else if (item.isPurchased) {
+          categoryType = "purchased";
+          statusText = "已買入";
+        }
+
+        detailHeroCard.className = `detail-hero-card type-${categoryType}`;
+        detailStatusBadge.className = `detail-badge type-${categoryType}`;
+        detailStatusBadge.textContent = statusText;
+        detailSource.textContent = getSourceLabel(item) || "未填寫";
+        detailModelTitle.textContent = `${item.year || ""} ${item.model || "車輛詳細"}`;
+
+        // 年份與車型已在上方英雄卡片顯示，故下方欄位刪除年份與車型
+        const cardFields = [
+          { label: "進件日", val: formatMMDD(item.receivedDate) || "未填寫" },
+          { label: "買進日", val: formatMMDD(item.boughtDate) || "未買進" },
+          { label: "報價(金額)", val: item.purchasePrice || "-" },
+          { label: "買進價", val: item.actualDealPrice || "-" },
+          { label: "賣出價", val: item.salePrice || "-" },
+          { label: "里程", val: item.km ? `${item.km} 萬km` : "未填寫" },
+          { label: "顏色", val: item.color || "未填寫" },
+          { label: "車況", val: item.condition || "-" },
+          { label: "版本", val: item.version || "未填寫" },
+          { label: "權威", val: item.authority || "-" },
+          { label: "報價", val: item.quote || "-" },
+          { label: "獎金", val: item.bonus || "N" },
+          { label: "賣家", val: item.seller || "未填寫", full: true },
+          { label: "預約日期", val: item.bookingDate || "無" },
+          { label: "預約時間", val: item.bookingTime || "無" },
+          { label: "備註", val: item.remarks || "無", full: true },
+          { label: "整理項目", val: item.repairItems || "無", full: true }
+        ];
+
+        detailGridContent.innerHTML = "";
+        cardFields.forEach(f => {
+          const div = document.createElement("div");
+          div.className = `detail-info-item${f.full ? " full-width" : ""}`;
+          div.innerHTML = `
+            <span class="detail-info-label">${f.label}</span>
+            <span class="detail-info-val">${f.val}</span>
+          `;
+          detailGridContent.appendChild(div);
+        });
+
+        vehicleDetailDialog.showModal();
+      }
 
       const allDialogs = document.querySelectorAll("dialog");
       
@@ -3207,7 +3409,7 @@
               <td class="col-src">${getSourceLabel(item)}</td>
               <td class="col-date">${formatMMDD(item.receivedDate)}</td>
               <td class="col-year">${item.year}</td>
-              <td class="col-model model-cell">${item.model}</td>
+              <td class="col-model model-cell"><span class="clickable-model type-ongoing" data-detail-id="${item.id}">${item.model}</span></td>
               <td class="col-price">${item.purchasePrice}</td>
               <td class="col-km">${item.km}</td>
               <td class="col-color">${item.color}</td>
@@ -3232,7 +3434,7 @@
               <td class="col-date">${formatMMDD(item.boughtDate)}</td>
               <td class="col-date col-purchased-detail">${formatMMDD(item.receivedDate)}</td>
               <td class="col-year">${item.year}</td>
-              <td class="col-model model-cell">${item.model}</td>
+              <td class="col-model model-cell"><span class="clickable-model type-purchased" data-detail-id="${item.id}">${item.model}</span></td>
               <td class="col-buy-price">${item.actualDealPrice}</td>
               <td class="col-price">${item.purchasePrice}</td>
               <td class="col-km">${item.km}</td>
@@ -3259,7 +3461,7 @@
               <td class="col-date">${formatMMDD(item.receivedDate)}</td>
               <td class="col-date">${formatMMDD(item.boughtDate)}</td>
               <td class="col-year">${item.year}</td>
-              <td class="col-model model-cell">${item.model}</td>
+              <td class="col-model model-cell"><span class="clickable-model type-sold" data-detail-id="${item.id}">${item.model}</span></td>
               <td class="col-buy-price">${item.actualDealPrice}</td>
               <td class="col-sell-price">${item.salePrice}</td>
               <td class="col-km">${item.km}</td>
@@ -3391,6 +3593,13 @@
       });
 
       document.addEventListener("click", async (e) => {
+        const modelBtn = e.target.closest(".clickable-model");
+        if (modelBtn) {
+          const id = modelBtn.dataset.detailId;
+          if (id) openVehicleDetailModal(id);
+          return;
+        }
+
         const cancelSellBtn = e.target.closest(".btn-cancel-sell");
         if (cancelSellBtn) {
           const id = cancelSellBtn.dataset.id;
@@ -3544,7 +3753,7 @@
             <td style="padding:8px 2px; text-align:center !important;">${getSourceLabel(item)}</td>
             <td style="padding:8px 2px; text-align:center !important;">${formatMMDD(item.boughtDate)}</td>
             <td style="padding:8px 2px; text-align:center !important;">${item.year}</td>
-            <td style="padding:8px 2px; text-align:center !important; font-weight:700;">${item.model}</td>
+            <td style="padding:8px 2px; text-align:center !important; font-weight:700;"><span class="clickable-model type-sold" data-detail-id="${item.id}">${item.model}</span></td>
             <td style="padding:8px 2px; text-align:center !important;">${item.actualDealPrice}</td>
             <td style="padding:8px 2px; text-align:center !important;">${item.salePrice}</td>
             <td style="padding:8px 2px; text-align:center !important;">
@@ -4043,11 +4252,12 @@
           const tr = document.createElement("tr");
           const statusText = item.isSold ? "已售出" : "已買入";
           const statusColor = item.isSold ? "#d97706" : "#16a34a";
+          const typeClass = item.isSold ? "type-sold" : "type-purchased";
 
           tr.innerHTML = `
             <td style="padding: 8px 4px; text-align: center !important; font-size: 13px;">${formatMMDD(item.boughtDate)}</td>
             <td style="padding: 8px 4px; text-align: center !important; font-size: 13px;">${item.year}</td>
-            <td style="padding: 8px 4px; text-align: center !important; font-weight: 700; font-size: 13px;">${item.model}</td>
+            <td style="padding: 8px 4px; text-align: center !important; font-size: 13px;"><span class="clickable-model ${typeClass}" data-detail-id="${item.id}">${item.model}</span></td>
             <td style="padding: 8px 4px; text-align: center !important; font-size: 13px; font-weight: 800; color: ${statusColor};">${statusText}</td>
           `;
 
