@@ -2185,7 +2185,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; flex-shrink: 0;">
           <h2 style="margin:0; font-size:18px; font-weight:800; color:var(--text-main);" id="detailDialogTitle">車輛資料</h2>
           <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-            <button class="btn-slate" type="button" id="editVehicleDetailBtn" style="min-height:36px; height:36px; padding:0 14px; border-radius:8px; font-size:14px;">編輯</button>
+            <button class="secondary" type="button" id="editVehicleDetailBtn" style="min-height:36px; height:36px; padding:0 14px; border-radius:8px; font-size:14px; font-weight:700;">編輯</button>
             <button class="secondary" type="button" id="closeVehicleDetailDialogBtn" style="min-height:36px; height:36px; padding:0 12px; border-radius:8px;">✕</button>
           </div>
         </div>
@@ -2540,28 +2540,28 @@
         detailHeroCard.className = `detail-hero-card type-${categoryType}`;
         detailStatusBadge.className = `detail-badge type-${categoryType}`;
         detailStatusBadge.textContent = statusText;
-        detailSource.textContent = getSourceLabel(item) || "未填寫";
-        detailModelTitle.textContent = `${item.year || ""} ${item.model || "車輛詳細"}`;
+        detailSource.textContent = getSourceLabel(item) || "-";
+        detailModelTitle.textContent = `${item.year || ""} ${item.model || "-"}`;
 
-        // 年份與車型已在上方英雄卡片顯示，故下方欄位刪除年份與車型
+        // 整理所有欄位，預設未填寫者統一用 "-" 呈現
         const cardFields = [
-          { label: "進件日", val: formatMMDD(item.receivedDate) || "未填寫" },
-          { label: "買進日", val: formatMMDD(item.boughtDate) || "未買進" },
+          { label: "進件日", val: formatMMDD(item.receivedDate) || "-" },
+          { label: "買進日", val: formatMMDD(item.boughtDate) || "-" },
           { label: "報價(金額)", val: item.purchasePrice || "-" },
           { label: "買進價", val: item.actualDealPrice || "-" },
           { label: "賣出價", val: item.salePrice || "-" },
-          { label: "里程", val: item.km ? `${item.km} 萬km` : "未填寫" },
-          { label: "顏色", val: item.color || "未填寫" },
+          { label: "里程", val: item.km ? `${item.km} 萬km` : "-" },
+          { label: "顏色", val: item.color || "-" },
           { label: "車況", val: item.condition || "-" },
-          { label: "版本", val: item.version || "未填寫" },
+          { label: "版本", val: item.version || "-" },
           { label: "權威", val: item.authority || "-" },
           { label: "報價", val: item.quote || "-" },
-          { label: "獎金", val: item.bonus || "N" },
-          { label: "賣家", val: item.seller || "未填寫", full: true },
-          { label: "預約日期", val: item.bookingDate || "無" },
-          { label: "預約時間", val: item.bookingTime || "無" },
-          { label: "備註", val: item.remarks || "無", full: true },
-          { label: "整理項目", val: item.repairItems || "無", full: true }
+          { label: "獎金", val: item.bonus || "-" },
+          { label: "賣家", val: item.seller || "-", full: true },
+          { label: "預約日期", val: item.bookingDate || "-" },
+          { label: "預約時間", val: item.bookingTime || "-" },
+          { label: "備註", val: item.remarks || "-", full: true },
+          { label: "整理項目", val: item.repairItems || "-", full: true }
         ];
 
         detailGridContent.innerHTML = "";
