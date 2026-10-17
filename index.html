@@ -1114,39 +1114,58 @@
         grid-column: 1 / -1;
       }
 
+      /* 僅針對已買入車輛的買進價卡片加上淺綠底色 */
+      .detail-info-item.purchased-deal-price {
+        background-color: #f0fdf4 !important;
+        border-color: #86efac !important;
+      }
+
       .detail-info-label {
-        font-size: 12px;
-        font-weight: 700;
+        font-size: 13px;
+        font-weight: 600;
         color: #64748b;
       }
 
       .detail-info-val {
-        font-size: 15px;
+        font-size: 20px;
         font-weight: 800;
         color: #0f172a;
         word-break: break-word;
+        line-height: 1.35;
+      }
+
+      .detail-info-input {
+        font-size: 18px;
+        font-weight: 800;
+        color: #0f172a;
+        width: 100%;
+        border: 2px solid #2563eb;
+        border-radius: 8px;
+        padding: 4px 8px;
+        background: #ffffff !important;
+        outline: none;
+        box-sizing: border-box;
       }
 
       .clickable-model {
-        color: #2563eb;
         text-decoration: underline;
         cursor: pointer;
-        font-weight: 700;
+        font-weight: 800;
       }
       .clickable-model:hover {
         opacity: 0.8;
       }
 
       .clickable-model.type-ongoing {
-        color: #2563eb;
+        color: #1d4ed8;
       }
 
       .clickable-model.type-purchased {
-        color: #16a34a;
+        color: #15803d;
       }
 
       .clickable-model.type-sold {
-        color: #d97706;
+        color: #b45309;
       }
 
       /* Mandatory centering rule for Query Bonus Table across desktop and mobile devices */
@@ -2548,7 +2567,7 @@
           { label: "進件日", val: formatMMDD(item.receivedDate) || "-" },
           { label: "買進日", val: formatMMDD(item.boughtDate) || "-" },
           { label: "報價(金額)", val: item.purchasePrice || "-" },
-          { label: "買進價", val: item.actualDealPrice || "-" },
+          { label: "買進價", val: item.actualDealPrice || "-", key: "actualDealPrice" },
           { label: "賣出價", val: item.salePrice || "-" },
           { label: "里程", val: item.km ? `${item.km} 萬km` : "-" },
           { label: "顏色", val: item.color || "-" },
@@ -2567,7 +2586,8 @@
         detailGridContent.innerHTML = "";
         cardFields.forEach(f => {
           const div = document.createElement("div");
-          div.className = `detail-info-item${f.full ? " full-width" : ""}`;
+          const isPurchasedDealPrice = item.isPurchased && !item.isSold && f.key === "actualDealPrice";
+          div.className = `detail-info-item${f.full ? " full-width" : ""}${isPurchasedDealPrice ? " purchased-deal-price" : ""}`;
           div.innerHTML = `
             <span class="detail-info-label">${f.label}</span>
             <span class="detail-info-val">${f.val}</span>
