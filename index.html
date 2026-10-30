@@ -3085,6 +3085,13 @@
         const response = await fetch(API_URL, { method: "GET" });
         const data = await response.json();
         if (!data.ok) throw new Error(data.error || "讀取 Google Sheet 失敗");
+        
+        // 若雲端有返回工作天數資料，同步更新本地
+        if (data.workdayRecords && typeof data.workdayRecords === "object") {
+          workdayRecords = data.workdayRecords;
+          saveWorkdayRecords();
+        }
+
         return (data.records || []).map(normalizeRecord);
       }
 
@@ -3097,6 +3104,15 @@
         const data = await response.json();
         if (!data.ok) throw new Error(data.error || "寫入 Google Sheet 失敗");
         return data;
+      }
+
+      // 新增雲端同步工作天數函數
+      async function persistWorkdays() {
+        try {
+          await apiPost("updateWorkdays", { workdayRecords });
+        } catch (error) {
+          console.warn("工作天數雲端同步失敗", error);
+        }
       }
 
       async function syncFromCloud() {
@@ -3116,6 +3132,11 @@
           records = mergedRecords;
           saveLocalRecords();
           render();
+          
+          if (workdayDialog && workdayDialog.open) {
+            renderWorkdayCalendar();
+          }
+
           if (calendarViewDialog && calendarViewDialog.open) {
             renderCalendarView();
           }
@@ -3233,6 +3254,7 @@
           
           saveWorkdayRecords();
           renderWorkdayCalendar();
+          persistWorkdays(); // 同步清除至雲端
         });
       }
 
@@ -3322,6 +3344,7 @@
             if (!workdayRecords[dateISO]) delete workdayRecords[dateISO];
             saveWorkdayRecords();
             renderWorkdayCalendar();
+            persistWorkdays(); // 即時上傳雲端
           });
 
           workdayCalendarGrid.appendChild(cell);
