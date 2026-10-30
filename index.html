@@ -3145,6 +3145,17 @@
         }
       }
 
+      // 頁面切換或獲得焦點時自動重新自雲端同步，確保手機與電腦隨時一致
+      window.addEventListener("focus", () => {
+        syncFromCloud();
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) {
+          syncFromCloud();
+        }
+      });
+
       async function persistCreate(record) {
         try {
           const result = await apiPost("create", { record: toSheetRecord(record) });
@@ -3229,10 +3240,12 @@
       }
 
       if (openWorkdayBtn) {
-        openWorkdayBtn.addEventListener("click", () => {
+        openWorkdayBtn.addEventListener("click", async () => {
           initWorkdayControls();
           renderWorkdayCalendar();
           workdayDialog.showModal();
+          // 開啟視窗時即時由雲端重新載入最新打卡紀錄
+          await syncFromCloud();
         });
       }
 
@@ -3241,7 +3254,7 @@
       }
 
       if (clearWorkdayBtn) {
-        clearWorkdayBtn.addEventListener("click", () => {
+        clearWorkdayBtn.addEventListener("click", async () => {
           const year = workdayYearSelect.value;
           const month = workdayMonthSelect.value;
           const prefix = `${year}-${month}-`;
@@ -3254,7 +3267,7 @@
           
           saveWorkdayRecords();
           renderWorkdayCalendar();
-          persistWorkdays(); // 同步清除至雲端
+          await persistWorkdays(); // 同步清除至雲端
         });
       }
 
@@ -3339,12 +3352,12 @@
             ${workedBadge}
           `;
 
-          cell.addEventListener("click", () => {
+          cell.addEventListener("click", async () => {
             workdayRecords[dateISO] = !workdayRecords[dateISO];
             if (!workdayRecords[dateISO]) delete workdayRecords[dateISO];
             saveWorkdayRecords();
             renderWorkdayCalendar();
-            persistWorkdays(); // 即時上傳雲端
+            await persistWorkdays(); // 點擊即時同步雲端
           });
 
           workdayCalendarGrid.appendChild(cell);
