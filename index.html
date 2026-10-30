@@ -2510,6 +2510,7 @@
       const workdayDialog = document.getElementById("workdayDialog");
       const closeWorkdayDialogBtn = document.getElementById("closeWorkdayDialogBtn");
       const clearWorkdayBtn = document.getElementById("clearWorkdayBtn");
+      const syncWorkdayBtn = document.getElementById("syncWorkdayBtn");
       const workdayYearSelect = document.getElementById("workdayYearSelect");
       const workdayMonthSelect = document.getElementById("workdayMonthSelect");
       const targetWorkdaysCount = document.getElementById("targetWorkdaysCount");
@@ -3086,9 +3087,13 @@
         const data = await response.json();
         if (!data.ok) throw new Error(data.error || "讀取 Google Sheet 失敗");
         
-        // 若雲端有返回工作天數資料，同步更新本地
+        // 雲端與本地打卡紀錄進行雙向智能「聯集」合併，絕不遺漏任何裝置點擊的日期
         if (data.workdayRecords && typeof data.workdayRecords === "object") {
-          workdayRecords = data.workdayRecords;
+          const mergedWorkdays = { ...workdayRecords };
+          for (const [dateKey, val] of Object.entries(data.workdayRecords)) {
+            if (val) mergedWorkdays[dateKey] = true;
+          }
+          workdayRecords = mergedWorkdays;
           saveWorkdayRecords();
         }
 
@@ -3244,8 +3249,20 @@
           initWorkdayControls();
           renderWorkdayCalendar();
           workdayDialog.showModal();
-          // 開啟視窗時即時由雲端重新載入最新打卡紀錄
+          
+          // 開啟視窗時強制執行雲端拉取與同步
+          if (syncWorkdayBtn) syncWorkdayBtn.textContent = "同步中...";
           await syncFromCloud();
+          if (syncWorkdayBtn) syncWorkdayBtn.textContent = "↻ 同步";
+        });
+      }
+
+      if (syncWorkdayBtn) {
+        syncWorkdayBtn.addEventListener("click", async () => {
+          syncWorkdayBtn.textContent = "同步中...";
+          await persistWorkdays();
+          await syncFromCloud();
+          syncWorkdayBtn.textContent = "↻ 同步";
         });
       }
 
