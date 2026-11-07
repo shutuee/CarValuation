@@ -2026,16 +2026,16 @@
             </select>
           </label>
           <label>
+            <span>賣家</span>
+            <input id="seller" type="text" />
+          </label>
+          <label>
             <span>備註</span>
             <input id="remarks" type="text" />
           </label>
           <label class="wide">
             <span>整理項目</span>
             <textarea id="repairItems" rows="3"></textarea>
-          </label>
-          <label>
-            <span>賣家</span>
-            <input id="seller" type="text" />
           </label>
           <label>
             <span>獎金</span>
@@ -2588,12 +2588,12 @@
           { label: "版本", val: item.version || "-" },
           { label: "權威", val: item.authority || "-" },
           { label: "報價", val: item.quote || "-" },
-          { label: "獎金", val: item.bonus || "-" },
-          { label: "賣家", val: item.seller || "-", full: true },
-          { label: "預約日期", val: item.bookingDate || "-" },
-          { label: "預約時間", val: item.bookingTime || "-" },
+          { label: "賣家", val: item.seller || "-" },
           { label: "備註", val: item.remarks || "-", full: true },
-          { label: "整理項目", val: item.repairItems || "-", full: true }
+          { label: "整理項目", val: item.repairItems || "-", full: true },
+          { label: "獎金", val: item.bonus || "-" },
+          { label: "預約日期", val: item.bookingDate || "-" },
+          { label: "預約時間", val: item.bookingTime || "-" }
         ];
 
         detailGridContent.innerHTML = "";
