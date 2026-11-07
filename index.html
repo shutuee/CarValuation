@@ -1564,9 +1564,9 @@
         height: 38px;
         padding: 0 18px;
         border-radius: 8px;
-        border: 1px solid #cbd5e1;
+        border: 1px solid #2563eb;
         background-color: #ffffff;
-        color: #64748b;
+        color: #2563eb;
         font-weight: 700;
         font-size: 15px;
         cursor: pointer;
@@ -1574,13 +1574,38 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
+        transition: all 0.2s ease;
+      }
+
+      .bonus-opt-btn:hover {
+        background-color: #eff6ff;
       }
 
       .bonus-opt-btn.is-active {
-        background-color: #e2e8f0 !important;
-        border-color: #475569 !important;
-        color: #0f172a !important;
+        background-color: #2563eb !important;
+        border-color: #2563eb !important;
+        color: #ffffff !important;
         font-weight: 800;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      }
+
+      /* 售出對話框中的獎金按鈕樣式：未選取時綠框白底綠字，選取後綠底白字 */
+      .bonus-green-btn {
+        border-color: #16a34a !important;
+        color: #16a34a !important;
+        background-color: #ffffff !important;
+      }
+
+      .bonus-green-btn:hover {
+        background-color: #f0fdf4 !important;
+      }
+
+      .bonus-green-btn.is-active {
+        background-color: #16a34a !important;
+        border-color: #16a34a !important;
+        color: #ffffff !important;
+        font-weight: 800;
+        box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
       }
 
       @media (max-width: 768px) {
@@ -2247,6 +2272,17 @@
           <span>買進價</span>
           <input id="buyActualDealPrice" type="text" />
         </label>
+        <label>
+          <span>稅費</span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button type="button" class="bonus-opt-btn" id="buyNoteEachBtn">
+              <span>各自</span>
+            </button>
+            <button type="button" class="bonus-opt-btn" id="buyNoteTaxBtn">
+              <span>含稅</span>
+            </button>
+          </div>
+        </label>
         <div class="dialog-actions">
           <button class="secondary" type="button" id="cancelBuyButton">取消</button>
           <button type="submit" class="action-blue">確認買入</button>
@@ -2264,13 +2300,13 @@
         </label>
 
         <label>
-          <span>獎金標註</span>
+          <span>獎金</span>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <button type="button" class="bonus-opt-btn" id="sellBonusYBtn">
-              <span>獎金 Y</span>
+            <button type="button" class="bonus-opt-btn bonus-green-btn" id="sellBonusYBtn">
+              <span>Y</span>
             </button>
-            <button type="button" class="bonus-opt-btn" id="sellBonusNBtn">
-              <span>獎金 N</span>
+            <button type="button" class="bonus-opt-btn bonus-green-btn" id="sellBonusNBtn">
+              <span>N</span>
             </button>
           </div>
         </label>
@@ -2484,7 +2520,28 @@
       const buyRecordId = document.getElementById("buyRecordId");
       const buyDate = document.getElementById("buyDate");
       const buyActualDealPrice = document.getElementById("buyActualDealPrice");
+      const buyNoteEachBtn = document.getElementById("buyNoteEachBtn");
+      const buyNoteTaxBtn = document.getElementById("buyNoteTaxBtn");
       const cancelBuyButton = document.getElementById("cancelBuyButton");
+
+      let buyNoteEachSelected = false;
+      let buyNoteTaxSelected = false;
+
+      if (buyNoteEachBtn && buyNoteTaxBtn) {
+        buyNoteEachBtn.addEventListener("click", () => {
+          buyNoteEachSelected = !buyNoteEachSelected;
+          if (buyNoteEachSelected) buyNoteTaxSelected = false;
+          buyNoteEachBtn.classList.toggle("is-active", buyNoteEachSelected);
+          buyNoteTaxBtn.classList.toggle("is-active", buyNoteTaxSelected);
+        });
+
+        buyNoteTaxBtn.addEventListener("click", () => {
+          buyNoteTaxSelected = !buyNoteTaxSelected;
+          if (buyNoteTaxSelected) buyNoteEachSelected = false;
+          buyNoteTaxBtn.classList.toggle("is-active", buyNoteTaxSelected);
+          buyNoteEachBtn.classList.toggle("is-active", buyNoteEachSelected);
+        });
+      }
 
       const sellDialog = document.getElementById("sellDialog");
       const sellForm = document.getElementById("sellForm");
@@ -2615,6 +2672,65 @@
           `;
           detailGridContent.appendChild(div);
         });
+
+        // 依據狀態在「預約時間」右側新增動態操作按鈕（藍底白字「已買入」/ 綠底白字「已售出」）
+        if (!item.isSold) {
+          const actionDiv = document.createElement("div");
+          actionDiv.className = "detail-info-item";
+          actionDiv.style.display = "flex";
+          actionDiv.style.flexDirection = "column";
+          actionDiv.style.justifyContent = "center";
+          actionDiv.style.alignItems = "stretch";
+          actionDiv.style.padding = "4px";
+
+          if (!item.isPurchased) {
+            actionDiv.innerHTML = `
+              <button type="button" class="action-blue" id="detailBuyBtn" data-id="${item.id}" style="width:100%; height:100%; min-height:44px; font-size:16px; font-weight:800; border-radius:8px; display:flex; align-items:center; justify-content:center;">已買入</button>
+            `;
+          } else {
+            actionDiv.innerHTML = `
+              <button type="button" class="action-green" id="detailSellBtn" data-id="${item.id}" style="width:100%; height:100%; min-height:44px; font-size:16px; font-weight:800; border-radius:8px; display:flex; align-items:center; justify-content:center;">已售出</button>
+            `;
+          }
+          detailGridContent.appendChild(actionDiv);
+
+          const detailBuyBtn = actionDiv.querySelector("#detailBuyBtn");
+          if (detailBuyBtn) {
+            detailBuyBtn.addEventListener("click", () => {
+              vehicleDetailDialog.close();
+              const rec = records.find(r => r.id === item.id);
+              if (rec) {
+                buyRecordId.value = rec.id;
+                buyDate.value = rec.boughtDate ? toDateInputValue(rec.boughtDate) : "";
+                buyActualDealPrice.value = rec.actualDealPrice || rec.purchasePrice || "";
+                buyNoteEachSelected = false;
+                buyNoteTaxSelected = false;
+                if (buyNoteEachBtn) buyNoteEachBtn.classList.remove("is-active");
+                if (buyNoteTaxBtn) buyNoteTaxBtn.classList.remove("is-active");
+                buyDialog.showModal();
+              }
+            });
+          }
+
+          const detailSellBtn = actionDiv.querySelector("#detailSellBtn");
+          if (detailSellBtn) {
+            detailSellBtn.addEventListener("click", () => {
+              vehicleDetailDialog.close();
+              const rec = records.find(r => r.id === item.id);
+              if (rec) {
+                sellRecordId.value = rec.id;
+                sellBuyPriceDisplay.value = rec.actualDealPrice || "";
+                sellPriceInput.value = rec.salePrice || "";
+                sellBonusValue = rec.bonus || "N";
+                if (sellBonusYBtn && sellBonusNBtn) {
+                  sellBonusYBtn.classList.toggle("is-active", sellBonusValue === "Y");
+                  sellBonusNBtn.classList.toggle("is-active", sellBonusValue === "N");
+                }
+                sellDialog.showModal();
+              }
+            });
+          }
+        }
 
         vehicleDetailDialog.showModal();
       }
@@ -3712,8 +3828,12 @@
           const rec = records.find(r => r.id === id);
           if (rec) {
             buyRecordId.value = id;
-            buyDate.value = toDateInputValue(rec.boughtDate || new Date().toISOString().slice(0,10));
+            buyDate.value = rec.boughtDate ? toDateInputValue(rec.boughtDate) : "";
             buyActualDealPrice.value = rec.actualDealPrice || rec.purchasePrice || "";
+            buyNoteEachSelected = false;
+            buyNoteTaxSelected = false;
+            if (buyNoteEachBtn) buyNoteEachBtn.classList.remove("is-active");
+            if (buyNoteTaxBtn) buyNoteTaxBtn.classList.remove("is-active");
             buyDialog.showModal();
           }
           return;
@@ -3762,6 +3882,15 @@
           records[idx].isPurchased = true;
           records[idx].boughtDate = buyDate.value;
           records[idx].actualDealPrice = buyActualDealPrice.value;
+
+          const addedNotes = [];
+          if (buyNoteEachSelected) addedNotes.push("各自");
+          if (buyNoteTaxSelected) addedNotes.push("含稅");
+          if (addedNotes.length > 0) {
+            const currentRemark = records[idx].remarks || "";
+            records[idx].remarks = currentRemark ? `${currentRemark} ${addedNotes.join(" ")}` : addedNotes.join(" ");
+          }
+
           await persistUpdate(records[idx]);
           saveLocalRecords();
           render();
@@ -3982,7 +4111,6 @@
           const mStr = String(month + 1).padStart(2, "0");
           const dStr = String(day).padStart(2, "0");
           const dateISO = `${year}-${mStr}-${dStr}`;
-          const curDate = new Date(year, month, day);
 
           const holidayName = TAIWAN_HOLIDAYS[dateISO];
           const isToday = (dateISO === todayISO);
@@ -4256,7 +4384,6 @@
         if (openReportVehicleListBtn) openReportVehicleListBtn.style.display = "inline-flex";
         if (channelBreakdownWrap) channelBreakdownWrap.style.display = "flex";
 
-        // 統一嚴格根據車輛的「買進日 (boughtDate)」歸類數據報告
         const purchasedAndSold = records.filter(r => {
           if (!r.isPurchased && !r.isSold) return false;
           if (!r.boughtDate) return false;
