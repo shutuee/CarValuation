@@ -1120,6 +1120,18 @@
         border-color: #86efac !important;
       }
 
+      /* 已售出車輛：買進價卡片（柔和黃底） */
+      .detail-info-item.sold-buy-price {
+        background-color: #fffbeb !important;
+        border-color: #fde68a !important;
+      }
+
+      /* 已售出車輛：賣出價卡片（深一階質感暖黃底與黃橘邊框） */
+      .detail-info-item.sold-sale-price {
+        background-color: #fef3c7 !important;
+        border-color: #fcd34d !important;
+      }
+
       .detail-info-label {
         font-size: 13px;
         font-weight: 600;
@@ -2569,7 +2581,7 @@
           { label: "買進日", val: formatMMDD(item.boughtDate) || "-" },
           { label: "報價(金額)", val: item.purchasePrice || "-" },
           { label: "買進價", val: item.actualDealPrice || "-", key: "actualDealPrice" },
-          { label: "賣出價", val: item.salePrice || "-" },
+          { label: "賣出價", val: item.salePrice || "-", key: "salePrice" },
           { label: "里程", val: item.km ? `${item.km} 萬km` : "-" },
           { label: "顏色", val: item.color || "-" },
           { label: "車況", val: item.condition || "-" },
@@ -2588,7 +2600,15 @@
         cardFields.forEach(f => {
           const div = document.createElement("div");
           const isPurchasedDealPrice = item.isPurchased && !item.isSold && f.key === "actualDealPrice";
-          div.className = `detail-info-item${f.full ? " full-width" : ""}${isPurchasedDealPrice ? " purchased-deal-price" : ""}`;
+          const isSoldBuyPrice = item.isSold && f.key === "actualDealPrice";
+          const isSoldSalePrice = item.isSold && f.key === "salePrice";
+
+          let customClass = "";
+          if (isPurchasedDealPrice) customClass = " purchased-deal-price";
+          else if (isSoldBuyPrice) customClass = " sold-buy-price";
+          else if (isSoldSalePrice) customClass = " sold-sale-price";
+
+          div.className = `detail-info-item${f.full ? " full-width" : ""}${customClass}`;
           div.innerHTML = `
             <span class="detail-info-label">${f.label}</span>
             <span class="detail-info-val">${f.val}</span>
@@ -3089,10 +3109,7 @@
         
         // 雲端與本地打卡紀錄進行雙向智能「聯集」合併，絕不遺漏任何裝置點擊的日期
         if (data.workdayRecords && typeof data.workdayRecords === "object") {
-          const mergedWorkdays = { ...workdayRecords };
-          for (const [dateKey, val] of Object.entries(data.workdayRecords)) {
-            if (val) mergedWorkdays[dateKey] = true;
-          }
+          const mergedWorkdays = { ...workdayRecords, ...data.workdayRecords };
           workdayRecords = mergedWorkdays;
           saveWorkdayRecords();
         }
@@ -3111,7 +3128,7 @@
         return data;
       }
 
-      // 新增雲端同步工作天數函數
+      // 雲端同步工作天數函數
       async function persistWorkdays() {
         try {
           await apiPost("updateWorkdays", { workdayRecords });
@@ -3374,7 +3391,7 @@
             if (!workdayRecords[dateISO]) delete workdayRecords[dateISO];
             saveWorkdayRecords();
             renderWorkdayCalendar();
-            await persistWorkdays(); // 點擊即時同步雲端
+            await persistWorkdays(); // 點擊日期即時傳送 action: "updateWorkdays" 儲存至雲端
           });
 
           workdayCalendarGrid.appendChild(cell);
